@@ -35,6 +35,17 @@ export default function TeamDetailPage() {
   const [draft, setDraft] = useState<Partial<Task>>({});
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
+  // ── ALL hooks must be called unconditionally before any early returns ──
+  const allTasks = getTeamTasks(params.id ?? "");
+  const filteredTasks = useMemo(() => {
+    return allTasks.filter((t) => {
+      const matchFilter = filter === "All" || t.status === filter;
+      const matchSearch =
+        search === "" || t.title.toLowerCase().includes(search.toLowerCase());
+      return matchFilter && matchSearch;
+    });
+  }, [allTasks, filter, search]);
+
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="flex flex-col items-center gap-3 text-slate-400">
@@ -55,23 +66,12 @@ export default function TeamDetailPage() {
   }
   function cancelEdit() { setEditingId(null); }
 
-  // Must call hooks unconditionally before any early returns
-  const allTasks = getTeamTasks(params.id ?? "");
   const progress = getTeamProgress(params.id ?? "");
   const activity = getTeamActivity(params.id ?? "");
   const today = new Date().toISOString().split("T")[0];
 
   const totalWeight = allTasks.reduce((s, t) => s + t.weight, 0);
   const weightWarning = totalWeight !== 100;
-
-  const filteredTasks = useMemo(() => {
-    return allTasks.filter((t) => {
-      const matchFilter = filter === "All" || t.status === filter;
-      const matchSearch =
-        search === "" || t.title.toLowerCase().includes(search.toLowerCase());
-      return matchFilter && matchSearch;
-    });
-  }, [allTasks, filter, search]);
 
   if (!team) {
     return (
