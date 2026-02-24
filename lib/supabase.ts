@@ -26,6 +26,9 @@ export function getSupabase(): SupabaseClient {
 /** Convenience re-export — use only in client components / server actions */
 export const supabase = new Proxy({} as SupabaseClient, {
   get(_t, prop) {
-    return (getSupabase() as unknown as Record<string | symbol, unknown>)[prop];
+    const client = getSupabase();
+    const val = (client as unknown as Record<string | symbol, unknown>)[prop];
+    // Bind functions to their client so `this` is correct inside Supabase internals
+    return typeof val === "function" ? (val as Function).bind(client) : val;
   },
 });
