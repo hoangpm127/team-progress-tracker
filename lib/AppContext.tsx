@@ -8,6 +8,12 @@ import React, {
 } from "react";
 import { Team, Task, ActivityEntry, TaskStatus, Objective, KeyResult } from "./types";
 import { TEAMS, SEED_TASKS, SEED_OBJECTIVES } from "./seedData";
+import {
+  fetchTeams, fetchTasks, fetchObjectives, fetchActivity,
+  dbAddTask, dbUpdateTask, dbDeleteTask, dbAddActivity,
+  dbAddObjective, dbUpdateObjective, dbDeleteObjective,
+  dbAddKeyResult, dbUpdateKeyResult, dbDeleteKeyResult,
+} from "./db";
 
 interface AppState {
   teams: Team[];
@@ -18,7 +24,8 @@ interface AppState {
 }
 
 interface AppContextValue extends AppState {
-  toggleTask: (taskId: string, owner: string) => void;
+  loading:           boolean;
+  toggleTask:        (taskId: string, owner: string) => void;
   addTask: (task: Omit<Task, "id">) => void;
   editTask: (taskId: string, updates: Partial<Omit<Task, "id" | "teamId">>) => void;
   deleteTask: (taskId: string) => void;
@@ -39,71 +46,58 @@ interface AppContextValue extends AppState {
 
 const AppContext = createContext<AppContextValue | null>(null);
 
-const STORAGE_KEY = "team-progress-tracker-v1";
-
 const INITIAL_STATE: AppState = {
-  teams: TEAMS,
-  tasks: SEED_TASKS,
-  objectives: SEED_OBJECTIVES,
-  activity: [],
+  teams:       TEAMS,
+  tasks:       SEED_TASKS,
+  objectives:  SEED_OBJECTIVES,
+  activity:    [],
   lastUpdated: null,
 };
 
-function loadFromStorage(): AppState {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as AppState;
-      if (!parsed.objectives || parsed.objectives.length === 0) {
-        parsed.objectives = SEED_OBJECTIVES;
-      }
-      return parsed;
-    }
-  } catch {
-    // ignore
-  }
-  return INITIAL_STATE;
-}
-
-function saveState(state: AppState) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // ignore
-  }
-}
-
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  // Always start with seed data so server & client initial render match (no hydration mismatch)
-  const [state, setState] = useState<AppState>(INITIAL_STATE);
-  const [hydrated, setHydrated] = useState(false);
+  const [state,   setState]   = useState<AppState>(INITIAL_STATE);
+  const [loading, setLoading] = useState(true);
 
-  // After mount: load from localStorage, then run auto-transitions
+  // ── Bootstrap: fetch all data from Supabase ───────────────
   useEffect(() => {
-    setState(loadFromStorage());
-    setHydrated(true);
+    let cancelled = false;
+    (async () => {
+      try {
+        const [teams, tasks, objectives, activity] = await Promise.all([
+          fetchTeams(),
+          fetchTasks(),
+          fetchObjectives(),
+          fetchActivity(),
+        ]);
+        if (cancelled) return;
+        setState({
+          teams:       teams.length      ? teams      : TEAMS,
+          tasks:       tasks.length      ? tasks      : SEED_TASKS,
+          objectives:  objectives.length ? objectives : SEED_OBJECTIVES,
+          activity,
+          lastUpdated: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.error("[AppContext] Supabase fetch failed, using seed data:", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
-  // Persist on every change (only after hydration to avoid overwriting with seed data)
+  // ── Auto-transition: Todo → Doing when startDate passed ───
   useEffect(() => {
-    if (hydrated) saveState(state);
-  }, [state, hydrated]);
-
-  // Auto-transition: Todo → Doing when startDate has passed (runs after localStorage is loaded)
-  useEffect(() => {
-    if (!hydrated) return;
+    if (loading) return;
     const today = new Date().toISOString().split("T")[0];
     setState((prev) => {
       const toTransition = prev.tasks.filter(
         (t) => t.status === "Todo" && t.startDate && t.startDate <= today
       );
       if (toTransition.length === 0) return prev;
-
       const now = new Date().toISOString();
       const updatedTasks = prev.tasks.map((t) =>
-        toTransition.find((x) => x.id === t.id)
-          ? { ...t, status: "Doing" as TaskStatus }
-          : t
+        toTransition.find((x) => x.id === t.id) ? { ...t, status: "Doing" as TaskStatus } : t
       );
       const newEntries: ActivityEntry[] = toTransition.map((t, i) => ({
         id: `act-auto-${Date.now()}-${i}`,
@@ -111,6 +105,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         message: `🤖 Tự động chuyển "${t.title}" sang Đang làm (đã đến ngày bắt đầu)`,
         timestamp: now,
       }));
+      toTransition.forEach((t) => dbUpdateTask(t.id, { status: "Doing" }));
+      newEntries.forEach((e) => dbAddActivity(e));
       return {
         ...prev,
         tasks: updatedTasks,
@@ -118,26 +114,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         lastUpdated: now,
       };
     });
-  }, [hydrated]);
+  }, [loading]);
 
   const toggleTask = useCallback((taskId: string, owner: string) => {
     setState((prev) => {
       const tasks = prev.tasks.map((t) => {
         if (t.id !== taskId) return t;
-        const newDone = !t.done;
+        const newDone   = !t.done;
         const newStatus: TaskStatus = newDone ? "Done" : t.status === "Done" ? "Doing" : t.status;
         return { ...t, done: newDone, status: newStatus };
       });
-
       const task = tasks.find((t) => t.id === taskId)!;
-      const now = new Date().toISOString();
+      const now  = new Date().toISOString();
       const entry: ActivityEntry = {
-        id: `act-${Date.now()}`,
-        teamId: task.teamId,
-        message: `${owner} đã đánh dấu "${task.title}" là ${task.done ? "Hoàn thành" : "Đang làm"}`,
+        id:        `act-${Date.now()}`,
+        teamId:    task.teamId,
+        message:   `${owner} đã đánh dấu "${task.title}" là ${task.done ? "Hoàn thành" : "Đang làm"}`,
         timestamp: now,
       };
-
+      dbUpdateTask(taskId, { done: task.done, status: task.status });
+      dbAddActivity(entry);
       return {
         ...prev,
         tasks,
@@ -149,17 +145,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const addTask = useCallback((taskData: Omit<Task, "id">) => {
     setState((prev) => {
-      const id = `custom-${Date.now()}`;
-      const now = new Date().toISOString();
+      const id      = `custom-${Date.now()}`;
+      const now     = new Date().toISOString();
+      const newTask: Task = { ...taskData, id };
       const entry: ActivityEntry = {
-        id: `act-${Date.now()}`,
-        teamId: taskData.teamId,
-        message: `${taskData.owner} đã thêm công việc "${taskData.title}"`,
+        id:        `act-${Date.now()}`,
+        teamId:    taskData.teamId,
+        message:   `${taskData.owner} đã thêm công việc "${taskData.title}"`,
         timestamp: now,
       };
+      dbAddTask(newTask);
+      dbAddActivity(entry);
       return {
         ...prev,
-        tasks: [...prev.tasks, { ...taskData, id }],
+        tasks:    [...prev.tasks, newTask],
         activity: [entry, ...prev.activity].slice(0, 200),
         lastUpdated: now,
       };
@@ -202,92 +201,107 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const updateTaskStatus = useCallback((taskId: string, status: TaskStatus, owner: string) => {
     setState((prev) => {
-      const tasks = prev.tasks.map((t) => {
-        if (t.id !== taskId) return t;
-        const done = status === "Done";
-        return { ...t, status, done };
-      });
+      const tasks = prev.tasks.map((t) =>
+        t.id !== taskId ? t : { ...t, status, done: status === "Done" }
+      );
       const task = tasks.find((t) => t.id === taskId)!;
-      const now = new Date().toISOString();
-      const statusLabel: Record<TaskStatus, string> = { Todo: "Chờ làm", Doing: "Đang làm", Done: "Hoàn thành" };
+      const now  = new Date().toISOString();
+      const labels: Record<TaskStatus, string> = { Todo:"Chờ làm", Doing:"Đang làm", Done:"Hoàn thành" };
       const entry: ActivityEntry = {
-        id: `act-${Date.now()}`,
-        teamId: task.teamId,
-        message: `${owner} chuyển "${task.title}" sang ${statusLabel[status]}`,
+        id:        `act-${Date.now()}`,
+        teamId:    task.teamId,
+        message:   `${owner} chuyển "${task.title}" sang ${labels[status]}`,
         timestamp: now,
       };
+      dbUpdateTask(taskId, { status, done: status === "Done" });
+      dbAddActivity(entry);
       return { ...prev, tasks, activity: [entry, ...prev.activity].slice(0, 200), lastUpdated: now };
     });
   }, []);
 
   const editTask = useCallback((taskId: string, updates: Partial<Omit<Task, "id" | "teamId">>) => {
-    setState((prev) => ({
-      ...prev,
-      tasks: prev.tasks.map((t) =>
-        t.id !== taskId ? t : { ...t, ...updates, done: (updates.status ?? t.status) === "Done" }
-      ),
-      lastUpdated: new Date().toISOString(),
-    }));
+    setState((prev) => {
+      dbUpdateTask(taskId, updates);
+      return {
+        ...prev,
+        tasks: prev.tasks.map((t) =>
+          t.id !== taskId ? t : { ...t, ...updates, done: (updates.status ?? t.status) === "Done" }
+        ),
+        lastUpdated: new Date().toISOString(),
+      };
+    });
   }, []);
 
   const deleteTask = useCallback((taskId: string) => {
-    setState((prev) => ({
-      ...prev,
-      tasks: prev.tasks.filter((t) => t.id !== taskId),
-      lastUpdated: new Date().toISOString(),
-    }));
+    setState((prev) => {
+      dbDeleteTask(taskId);
+      return {
+        ...prev,
+        tasks: prev.tasks.filter((t) => t.id !== taskId),
+        lastUpdated: new Date().toISOString(),
+      };
+    });
   }, []);
 
   const addObjective = useCallback((obj: Omit<Objective, "id">) => {
-    setState((prev) => ({
-      ...prev,
-      objectives: [...prev.objectives, { ...obj, id: `obj-custom-${Date.now()}` }],
-    }));
+    setState((prev) => {
+      const newObj: Objective = { ...obj, id: `obj-custom-${Date.now()}` };
+      dbAddObjective(newObj);
+      return { ...prev, objectives: [...prev.objectives, newObj] };
+    });
   }, []);
 
   const updateObjective = useCallback((objId: string, updates: Partial<Omit<Objective, "id">>) => {
-    setState((prev) => ({
-      ...prev,
-      objectives: prev.objectives.map((o) => (o.id !== objId ? o : { ...o, ...updates })),
-    }));
+    setState((prev) => {
+      dbUpdateObjective(objId, updates);
+      return { ...prev, objectives: prev.objectives.map((o) => (o.id !== objId ? o : { ...o, ...updates })) };
+    });
   }, []);
 
   const deleteObjective = useCallback((objId: string) => {
-    setState((prev) => ({
-      ...prev,
-      objectives: prev.objectives.filter((o) => o.id !== objId),
-    }));
+    setState((prev) => {
+      dbDeleteObjective(objId);
+      return { ...prev, objectives: prev.objectives.filter((o) => o.id !== objId) };
+    });
   }, []);
 
-  const addKeyResult = useCallback((objId: string, kr: Omit<KeyResult, "id">) => {
-    setState((prev) => ({
-      ...prev,
-      objectives: prev.objectives.map((o) =>
-        o.id !== objId
-          ? o
-          : { ...o, keyResults: [...o.keyResults, { ...kr, id: `kr-custom-${Date.now()}` }] }
-      ),
-    }));
+  const addKeyResult = useCallback((objId: string, krData: Omit<KeyResult, "id">) => {
+    setState((prev) => {
+      const kr: KeyResult = { ...krData, id: `kr-custom-${Date.now()}` };
+      dbAddKeyResult(objId, kr);
+      return {
+        ...prev,
+        objectives: prev.objectives.map((o) =>
+          o.id !== objId ? o : { ...o, keyResults: [...o.keyResults, kr] }
+        ),
+      };
+    });
   }, []);
 
   const deleteKeyResult = useCallback((objId: string, krId: string) => {
-    setState((prev) => ({
-      ...prev,
-      objectives: prev.objectives.map((o) =>
-        o.id !== objId ? o : { ...o, keyResults: o.keyResults.filter((kr) => kr.id !== krId) }
-      ),
-    }));
+    setState((prev) => {
+      dbDeleteKeyResult(krId);
+      return {
+        ...prev,
+        objectives: prev.objectives.map((o) =>
+          o.id !== objId ? o : { ...o, keyResults: o.keyResults.filter((kr) => kr.id !== krId) }
+        ),
+      };
+    });
   }, []);
 
   const updateKeyResult = useCallback((objId: string, krId: string, current: number) => {
-    setState((prev) => ({
-      ...prev,
-      objectives: prev.objectives.map((o) =>
-        o.id !== objId
-          ? o
-          : { ...o, keyResults: o.keyResults.map((kr) => (kr.id !== krId ? kr : { ...kr, current })) }
-      ),
-    }));
+    setState((prev) => {
+      dbUpdateKeyResult(krId, current);
+      return {
+        ...prev,
+        objectives: prev.objectives.map((o) =>
+          o.id !== objId
+            ? o
+            : { ...o, keyResults: o.keyResults.map((kr) => (kr.id !== krId ? kr : { ...kr, current })) }
+        ),
+      };
+    });
   }, []);
 
   const getTeamObjectives = useCallback(
@@ -304,23 +318,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     <AppContext.Provider
       value={{
         ...state,
-        toggleTask,
-        addTask,
-        editTask,
-        deleteTask,
-        updateTaskStatus,
-        updateKeyResult,
-        addObjective,
-        updateObjective,
-        deleteObjective,
-        addKeyResult,
-        deleteKeyResult,
-        getTeamTasks,
-        getTeamProgress,
-        getTeamStats,
-        getTeamActivity,
-        getTeamObjectives,
-        getCompanyObjectives,
+        loading,
+        toggleTask, addTask, editTask, deleteTask, updateTaskStatus,
+        updateKeyResult, addObjective, updateObjective, deleteObjective,
+        addKeyResult, deleteKeyResult,
+        getTeamTasks, getTeamProgress, getTeamStats,
+        getTeamActivity, getTeamObjectives, getCompanyObjectives,
       }}
     >
       {children}
