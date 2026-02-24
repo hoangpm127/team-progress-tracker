@@ -5,12 +5,13 @@ import { useApp } from "@/lib/AppContext";
 // ─── Q1 2026 time reference ────────────────────────────────────────────────
 const Q1_START = new Date("2026-01-01");
 const Q1_END   = new Date("2026-03-31");
-const TODAY    = new Date("2026-02-24");
-const Q1_TOTAL = Math.round((Q1_END.getTime()   - Q1_START.getTime()) / 86400000); // 89
-const Q1_ELAPSED = Math.round((TODAY.getTime()  - Q1_START.getTime()) / 86400000); // 54
+const TODAY    = new Date(); // dynamic — always current date
+const Q1_TOTAL    = Math.round((Q1_END.getTime()   - Q1_START.getTime()) / 86400000);
+const Q1_ELAPSED  = Math.max(0, Math.min(Q1_TOTAL, Math.round((TODAY.getTime() - Q1_START.getTime()) / 86400000)));
 const Q1_REMAINING = Q1_TOTAL - Q1_ELAPSED;
-const YEAR_TOTAL   = 365;
-const YEAR_ELAPSED = Math.round((TODAY.getTime() - new Date("2026-01-01").getTime()) / 86400000);
+const YEAR_START  = new Date(TODAY.getFullYear(), 0, 1);
+const YEAR_TOTAL  = ((TODAY.getFullYear() % 4 === 0) ? 366 : 365);
+const YEAR_ELAPSED = Math.round((TODAY.getTime() - YEAR_START.getTime()) / 86400000);
 
 // ─── Annual company KPIs ───────────────────────────────────────────────────
 const ANNUAL_KPIS = [
@@ -44,7 +45,16 @@ function avgOKR(krs: { current: number; target: number }[]) {
 }
 
 export default function DashboardPage() {
-  const { teams, tasks, lastUpdated, getTeamProgress, getTeamStats, getTeamObjectives, getCompanyObjectives } = useApp();
+  const { teams, tasks, lastUpdated, loading, getTeamProgress, getTeamStats, getTeamObjectives, getCompanyObjectives } = useApp();
+
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center gap-3 text-slate-400">
+        <div className="w-8 h-8 border-2 border-slate-200 border-t-indigo-500 rounded-full animate-spin"/>
+        <span className="text-sm">Đang tải dữ liệu...</span>
+      </div>
+    </div>
+  );
 
   const allWeight   = tasks.reduce((s, t) => s + t.weight, 0);
   const doneWeight  = tasks.filter((t) => t.done).reduce((s, t) => s + t.weight, 0);

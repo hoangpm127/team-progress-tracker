@@ -318,8 +318,17 @@ function AddObjModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function OKRPage() {
-  const { objectives, getTeamObjectives, getCompanyObjectives } = useApp();
+  const { objectives, loading, getTeamObjectives, getCompanyObjectives } = useApp();
   const [showAddObj, setShowAddObj] = useState(false);
+
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center gap-3 text-slate-400">
+        <div className="w-8 h-8 border-2 border-slate-200 border-t-indigo-500 rounded-full animate-spin"/>
+        <span className="text-sm">Đang tải dữ liệu...</span>
+      </div>
+    </div>
+  );
 
   const grouped: Record<string, Objective[]> = {};
   for (const teamId of GROUP_ORDER) {

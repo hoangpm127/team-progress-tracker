@@ -5,8 +5,17 @@ import TeamCard from "@/components/TeamCard";
 import EcosystemTree from "@/components/EcosystemTree";
 
 export default function TeamsPage() {
-  const { teams } = useApp();
+  const { teams, loading } = useApp();
   const [view, setView] = useState<"tree" | "cards">("tree");
+
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center gap-3 text-slate-400">
+        <div className="w-8 h-8 border-2 border-slate-200 border-t-indigo-500 rounded-full animate-spin"/>
+        <span className="text-sm">Đang tải dữ liệu...</span>
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto">

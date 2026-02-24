@@ -22,7 +22,7 @@ const FILTER_LABELS: Record<Filter, string> = {
 export default function TeamDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const { teams, getTeamTasks, getTeamProgress, getTeamActivity, toggleTask, editTask, deleteTask, lastUpdated } =
+  const { teams, loading, getTeamTasks, getTeamProgress, getTeamActivity, toggleTask, editTask, deleteTask, lastUpdated } =
     useApp();
 
   const team = teams.find((t) => t.id === params.id);
@@ -34,6 +34,15 @@ export default function TeamDetailPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Partial<Task>>({});
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center gap-3 text-slate-400">
+        <div className="w-8 h-8 border-2 border-slate-200 border-t-indigo-500 rounded-full animate-spin"/>
+        <span className="text-sm">Đang tải dữ liệu...</span>
+      </div>
+    </div>
+  );
 
   function startEdit(task: Task) {
     setEditingId(task.id);
