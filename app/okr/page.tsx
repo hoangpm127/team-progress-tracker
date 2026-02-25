@@ -1,274 +1,31 @@
 ﻿"use client";
 
 import { useApp } from "@/lib/AppContext";
-import { Objective, KeyResult } from "@/lib/types";
-import { useState } from "react";
+import { Objective } from "@/lib/types";
+import { useState, useRef, useEffect, useCallback } from "react";
+import Goal, { objProgress } from "@/components/Goal";
 
-const TEAM_META: Record<string, { name: string; color: string }> = {
-  company:      { name: "Toàn công ty", color: "#64748b" },
-  tech:         { name: "Công nghệ",    color: "#6366f1" },
-  marketing:    { name: "Marketing",    color: "#ec4899" },
-  hr:           { name: "Nhân sự",      color: "#f59e0b" },
-  partnerships: { name: "Hợp tác",      color: "#10b981" },
-  assistant:    { name: "Hành chính",   color: "#3b82f6" },
+/* ── Department metadata ─────────────────────────────────── */
+
+const TEAM_META: Record<string, { name: string; color: string; icon: string }> = {
+  company:      { name: "Toàn công ty", color: "#64748b", icon: "🏢" },
+  marketing:    { name: "Marketing",    color: "#ec4899", icon: "📢" },
+  partnerships: { name: "Hợp tác",      color: "#10b981", icon: "🤝" },
+  tech:         { name: "Công nghệ",    color: "#6366f1", icon: "💻" },
+  hr:           { name: "Nhân sự",      color: "#f59e0b", icon: "👥" },
+  assistant:    { name: "Hành chính",   color: "#3b82f6", icon: "📋" },
 };
-const GROUP_ORDER = ["company", "tech", "marketing", "hr", "partnerships", "assistant"];
 
-function krProgress(kr: KeyResult): number {
-  if (kr.target === 0) return 100;
-  if ((kr.unit === "ms" || kr.unit === "%") && kr.current > kr.target) {
-    return Math.max(0, Math.min(100, Math.round((1 - (kr.current - kr.target) / kr.target) * 100)));
-  }
-  return Math.max(0, Math.min(100, Math.round((kr.current / kr.target) * 100)));
-}
+/* Clockwise: Toàn công ty → Marketing → Hợp tác → Công nghệ → Nhân sự → Hành chính */
+const SEGMENT_ORDER = ["company", "marketing", "partnerships", "tech", "hr", "assistant"];
 
-function objProgress(obj: Objective): number {
-  if (obj.keyResults.length === 0) return 0;
-  return Math.round(obj.keyResults.reduce((s, kr) => s + krProgress(kr), 0) / obj.keyResults.length);
-}
+/* ── Add Objective Modal ─────────────────────────────────── */
 
-function ProgressRing({ pct, color, size = 56 }: { pct: number; color: string; size?: number }) {
-  const r = (size - 8) / 2;
-  const circ = 2 * Math.PI * r;
-  const dash = (pct / 100) * circ;
-  return (
-    <svg width={size} height={size} className="shrink-0">
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#e2e8f0" strokeWidth={6} />
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={6}
-        strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
-        transform={`rotate(-90 ${size / 2} ${size / 2})`} />
-      <text x={size / 2} y={size / 2 + 5} textAnchor="middle" fontSize={12} fontWeight={700} fill="#1e293b">
-        {pct}%
-      </text>
-    </svg>
-  );
-}
-
-function KrRow({ kr, onUpdateCurrent, onUpdateKr, onDelete }: {
-  kr: KeyResult;
-  onUpdateCurrent: (krId: string, val: number) => void;
-  onUpdateKr: (krId: string, updates: Partial<Omit<KeyResult, "id">>) => void;
-  onDelete: (krId: string) => void;
-}) {
-  const pct = krProgress(kr);
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState({ title: kr.title, current: String(kr.current), target: String(kr.target), unit: kr.unit });
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [editCurrent, setEditCurrent] = useState(false);
-  const [currentVal, setCurrentVal] = useState(String(kr.current));
-
-  let barColor = "#6366f1";
-  if (pct >= 100) barColor = "#10b981";
-  else if (pct < 40) barColor = "#ef4444";
-  else if (pct < 70) barColor = "#f59e0b";
-
-  function save() {
-    onUpdateKr(kr.id, {
-      title: draft.title,
-      current: parseFloat(draft.current) || 0,
-      target: parseFloat(draft.target) || 1,
-      unit: draft.unit,
-    });
-    setEditing(false);
-  }
-
-  return (
-    <div className={`py-3 border-b border-slate-100 last:border-0 ${editing ? "bg-slate-50 -mx-4 px-4 rounded-lg" : ""}`}>
-      {editing ? (
-        <div className="flex flex-col gap-2">
-          <input value={draft.title} onChange={e => setDraft(d => ({...d, title: e.target.value}))}
-            className="w-full text-sm border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-          <div className="flex gap-2 flex-wrap items-center">
-            <label className="text-xs text-slate-500">Hiện tại
-              <input type="number" value={draft.current} onChange={e => setDraft(d => ({...d, current: e.target.value}))}
-                className="ml-1 w-20 text-sm border border-slate-200 rounded px-2 py-1 focus:outline-none" />
-            </label>
-            <label className="text-xs text-slate-500">Mục tiêu
-              <input type="number" value={draft.target} onChange={e => setDraft(d => ({...d, target: e.target.value}))}
-                className="ml-1 w-20 text-sm border border-slate-200 rounded px-2 py-1 focus:outline-none" />
-            </label>
-            <label className="text-xs text-slate-500">Đơn vị
-              <input value={draft.unit} onChange={e => setDraft(d => ({...d, unit: e.target.value}))}
-                className="ml-1 w-20 text-sm border border-slate-200 rounded px-2 py-1 focus:outline-none" />
-            </label>
-            <button onClick={save} className="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700 font-semibold">Lưu</button>
-            <button onClick={() => setEditing(false)} className="text-xs bg-slate-200 text-slate-600 px-3 py-1.5 rounded hover:bg-slate-300">Hủy</button>
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-center gap-4">
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-700 truncate">{kr.title}</p>
-            <div className="mt-1.5 flex items-center gap-2">
-              <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: barColor }} />
-              </div>
-              <span className="text-xs text-slate-500 w-8 text-right">{pct}%</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            {editCurrent ? (
-              <>
-                <input type="number" value={currentVal} onChange={e => setCurrentVal(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") { const n = parseFloat(currentVal); if (!isNaN(n)) onUpdateCurrent(kr.id, n); setEditCurrent(false); } if (e.key === "Escape") setEditCurrent(false); }}
-                  className="w-20 text-sm border border-indigo-300 rounded px-2 py-0.5 text-right focus:outline-none focus:ring-2 focus:ring-indigo-400" autoFocus />
-                <button onClick={() => { const n = parseFloat(currentVal); if (!isNaN(n)) onUpdateCurrent(kr.id, n); setEditCurrent(false); }}
-                  className="text-xs bg-indigo-500 text-white px-2 py-1 rounded hover:bg-indigo-600">Lưu</button>
-                <button onClick={() => setEditCurrent(false)} className="text-xs text-slate-500 hover:text-slate-700">Hủy</button>
-              </>
-            ) : (
-              <button onClick={() => { setCurrentVal(String(kr.current)); setEditCurrent(true); }}
-                className="text-xs font-mono bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded transition">
-                {kr.current} / {kr.target} {kr.unit}
-              </button>
-            )}
-            <button onClick={() => { setDraft({ title: kr.title, current: String(kr.current), target: String(kr.target), unit: kr.unit }); setEditing(true); }}
-              className="p-1 rounded hover:bg-indigo-100 text-slate-400 hover:text-indigo-600 transition" title="Sửa KR">
-              <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
-            </button>
-            {confirmDelete ? (
-              <>
-                <button onClick={() => onDelete(kr.id)} className="text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded hover:bg-red-600 font-semibold">Xóa</button>
-                <button onClick={() => setConfirmDelete(false)} className="text-[10px] text-slate-400 hover:text-slate-600">✕</button>
-              </>
-            ) : (
-              <button onClick={() => setConfirmDelete(true)} className="p-1 rounded hover:bg-red-100 text-slate-400 hover:text-red-500 transition" title="Xóa KR">
-                <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function AddKrForm({ onAdd, onCancel }: { onAdd: (kr: Omit<KeyResult, "id">) => void; onCancel: () => void }) {
-  const [title, setTitle] = useState("");
-  const [target, setTarget] = useState("100");
-  const [unit, setUnit] = useState("%");
-  return (
-    <div className="flex flex-col gap-2 py-3 border-t border-indigo-100 bg-indigo-50 -mx-4 px-4 rounded-b-xl">
-      <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Tiêu đề kết quả then chốt"
-        className="w-full text-sm border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-      <div className="flex gap-2 flex-wrap items-center">
-        <label className="text-xs text-slate-500">Mục tiêu
-          <input type="number" value={target} onChange={e => setTarget(e.target.value)}
-            className="ml-1 w-20 text-sm border border-slate-200 rounded px-2 py-1 focus:outline-none" />
-        </label>
-        <label className="text-xs text-slate-500">Đơn vị
-          <input value={unit} onChange={e => setUnit(e.target.value)}
-            className="ml-1 w-20 text-sm border border-slate-200 rounded px-2 py-1 focus:outline-none" />
-        </label>
-        <button onClick={() => { if (title.trim()) onAdd({ title: title.trim(), current: 0, target: parseFloat(target) || 100, unit }); }}
-          disabled={!title.trim()}
-          className="text-xs bg-indigo-600 disabled:opacity-40 text-white px-3 py-1.5 rounded hover:bg-indigo-700 font-semibold">Thêm KR</button>
-        <button onClick={onCancel} className="text-xs text-slate-500 hover:text-slate-700">Hủy</button>
-      </div>
-    </div>
-  );
-}
-
-function ObjCard({ obj }: { obj: Objective }) {
-  const { updateKeyResult, addKeyResult, deleteKeyResult, updateObjective, deleteObjective } = useApp();
-  const meta = TEAM_META[obj.teamId] ?? { name: obj.teamId, color: "#64748b" };
-  const pct = objProgress(obj);
-  const [open, setOpen] = useState(true);
-  const [editingHeader, setEditingHeader] = useState(false);
-  const [headerDraft, setHeaderDraft] = useState({ title: obj.title, quarter: obj.quarter });
-  const [addingKr, setAddingKr] = useState(false);
-  const [confirmDeleteObj, setConfirmDeleteObj] = useState(false);
-
-  function saveHeader() {
-    updateObjective(obj.id, { title: headerDraft.title, quarter: headerDraft.quarter });
-    setEditingHeader(false);
-  }
-
-  function handleUpdateKr(krId: string, updates: Partial<Omit<KeyResult, "id">>) {
-    updateObjective(obj.id, {
-      keyResults: obj.keyResults.map(k => k.id === krId ? { ...k, ...updates } : k),
-    } as never);
-  }
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      {editingHeader ? (
-        <div className="p-4 bg-slate-50 flex flex-col gap-2">
-          <input value={headerDraft.title} onChange={e => setHeaderDraft(d => ({...d, title: e.target.value}))}
-            className="w-full text-sm font-semibold border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-          <div className="flex gap-2 items-center">
-            <input value={headerDraft.quarter} onChange={e => setHeaderDraft(d => ({...d, quarter: e.target.value}))}
-              placeholder="Q1 2026" className="w-24 text-sm border border-slate-200 rounded px-2 py-1.5 focus:outline-none" />
-            <button onClick={saveHeader} className="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700 font-semibold">Lưu</button>
-            <button onClick={() => setEditingHeader(false)} className="text-xs bg-slate-200 text-slate-600 px-3 py-1.5 rounded hover:bg-slate-300">Hủy</button>
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-center gap-4 p-4 cursor-pointer hover:bg-slate-50 transition group" onClick={() => setOpen(o => !o)}>
-          <ProgressRing pct={pct} color={meta.color} />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ background: meta.color }}>
-                {obj.quarter}
-              </span>
-            </div>
-            <p className="font-semibold text-slate-800 leading-snug">{obj.title}</p>
-            <p className="text-xs text-slate-500 mt-0.5">{obj.keyResults.length} kết quả then chốt</p>
-          </div>
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition" onClick={e => e.stopPropagation()}>
-            <button onClick={() => { setHeaderDraft({ title: obj.title, quarter: obj.quarter }); setEditingHeader(true); }}
-              className="p-1.5 rounded hover:bg-indigo-100 text-slate-400 hover:text-indigo-600 transition" title="Sửa mục tiêu">
-              <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
-            </button>
-            {confirmDeleteObj ? (
-              <>
-                <button onClick={() => deleteObjective(obj.id)} className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded hover:bg-red-600 font-semibold">Xóa</button>
-                <button onClick={() => setConfirmDeleteObj(false)} className="text-[10px] text-slate-400 px-1">✕</button>
-              </>
-            ) : (
-              <button onClick={() => setConfirmDeleteObj(true)} className="p-1.5 rounded hover:bg-red-100 text-slate-400 hover:text-red-500 transition" title="Xóa mục tiêu">
-                <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
-              </button>
-            )}
-          </div>
-          <svg className="w-5 h-5 text-slate-400 transition-transform shrink-0" style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
-            viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-          </svg>
-        </div>
-      )}
-      {open && (
-        <div className="px-4 pb-2 border-t border-slate-100">
-          {obj.keyResults.map(kr => (
-            <KrRow key={kr.id} kr={kr}
-              onUpdateCurrent={(krId, val) => updateKeyResult(obj.id, krId, val)}
-              onUpdateKr={(krId, updates) => handleUpdateKr(krId, updates)}
-              onDelete={krId => deleteKeyResult(obj.id, krId)}
-            />
-          ))}
-          {addingKr ? (
-            <AddKrForm
-              onAdd={kr => { addKeyResult(obj.id, kr); setAddingKr(false); }}
-              onCancel={() => setAddingKr(false)}
-            />
-          ) : (
-            <button onClick={() => setAddingKr(true)}
-              className="mt-2 mb-1 w-full text-xs text-indigo-500 hover:text-indigo-700 border border-dashed border-indigo-200 hover:border-indigo-400 rounded-lg py-1.5 transition flex items-center justify-center gap-1">
-              <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
-              Thêm kết quả then chốt
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function AddObjModal({ onClose }: { onClose: () => void }) {
+function AddObjModal({ onClose, defaultTeam }: { onClose: () => void; defaultTeam?: string }) {
   const { addObjective } = useApp();
   const [title, setTitle] = useState("");
   const [quarter, setQuarter] = useState("Q2 2026");
-  const [teamId, setTeamId] = useState("company");
+  const [teamId, setTeamId] = useState(defaultTeam ?? "company");
 
   function submit() {
     if (!title.trim()) return;
@@ -291,7 +48,7 @@ function AddObjModal({ onClose }: { onClose: () => void }) {
               <label className="text-xs font-semibold text-slate-500 mb-1 block">Phòng ban</label>
               <select value={teamId} onChange={e => setTeamId(e.target.value)}
                 className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                {GROUP_ORDER.map(id => (
+                {SEGMENT_ORDER.map(id => (
                   <option key={id} value={id}>{TEAM_META[id]?.name ?? id}</option>
                 ))}
               </select>
@@ -317,51 +74,323 @@ function AddObjModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+/* ── Horizontal scrollable goal strip ────────────────────── */
+
+function GoalStrip({ objectives, color }: { objectives: Objective[]; color: string }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 2);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    const el = scrollRef.current;
+    if (el) el.addEventListener("scroll", checkScroll, { passive: true });
+    window.addEventListener("resize", checkScroll);
+    return () => {
+      if (el) el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, [checkScroll, objectives.length]);
+
+  const scroll = (dir: number) => {
+    scrollRef.current?.scrollBy({ left: dir * 390, behavior: "smooth" });
+  };
+
+  if (objectives.length === 0) {
+    return (
+      <div className="flex items-center justify-center py-8 text-sm text-slate-400 italic">
+        Chưa có mục tiêu nào
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative">
+      {canScrollLeft && (
+        <button onClick={() => scroll(-1)}
+          className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/95 shadow-lg border border-slate-200 flex items-center justify-center hover:bg-white hover:shadow-xl transition">
+          <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-slate-600"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+        </button>
+      )}
+      {canScrollRight && (
+        <button onClick={() => scroll(1)}
+          className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/95 shadow-lg border border-slate-200 flex items-center justify-center hover:bg-white hover:shadow-xl transition">
+          <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-slate-600"><path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg>
+        </button>
+      )}
+      <div ref={scrollRef}
+        className="flex gap-4 overflow-x-auto pb-2 px-1 snap-x"
+        style={{ scrollbarWidth: "thin", scrollbarColor: "#cbd5e1 transparent" }}>
+        {objectives.map(obj => (
+          <div key={obj.id} className="snap-start">
+            <Goal obj={obj} color={color} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Expandable Department Panel ─────────────────────────── */
+
+function DeptPanel({ teamId, objectives, color, name, isOpen, onToggle, onAddObj }: {
+  teamId: string;
+  objectives: Objective[];
+  color: string;
+  name: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  onAddObj: () => void;
+}) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const teamAvg = objectives.length > 0
+    ? Math.round(objectives.reduce((s, o) => s + objProgress(o), 0) / objectives.length)
+    : 0;
+
+  useEffect(() => {
+    if (isOpen && panelRef.current) {
+      panelRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div ref={panelRef}
+      className="rounded-2xl border-2 overflow-hidden animate-in slide-in-from-top-2 duration-300"
+      style={{ borderColor: color + "50", background: `linear-gradient(135deg, ${color}08, ${color}04)` }}>
+      <div className="flex items-center gap-3 px-5 py-3" style={{ borderBottom: `1px solid ${color}20` }}>
+        <div className="w-1.5 h-6 rounded-full" style={{ background: color }} />
+        <span className="text-sm font-bold text-slate-700">{name}</span>
+        <span className="text-xs text-slate-400">
+          {objectives.length} mục tiêu · TB: <strong style={{ color }}>{teamAvg}%</strong>
+        </span>
+        <div className="ml-auto flex items-center gap-2">
+          <button onClick={onAddObj}
+            className="text-xs flex items-center gap-1 px-3 py-1.5 rounded-lg border border-dashed hover:bg-white/60 transition font-medium"
+            style={{ borderColor: color + "60", color }}>
+            <svg viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
+            Thêm mục tiêu
+          </button>
+          <button onClick={onToggle}
+            className="p-1.5 rounded-lg hover:bg-white/60 text-slate-400 hover:text-slate-600 transition" title="Đóng">
+            <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+          </button>
+        </div>
+      </div>
+      <div className="p-4">
+        <GoalStrip objectives={objectives} color={color} />
+      </div>
+    </div>
+  );
+}
+
+/* ── SVG Donut Wheel ─────────────────────────────────────── */
+
+function DeptWheel({
+  teamStats,
+  openSet,
+  onToggle,
+}: {
+  teamStats: Record<string, { count: number; avg: number }>;
+  openSet: Set<string>;
+  onToggle: (id: string) => void;
+}) {
+  const size = 420;
+  const cx = size / 2;
+  const cy = size / 2;
+  const outerR = 195;
+  const innerR = 80;
+  const segCount = SEGMENT_ORDER.length;
+  const gapDeg = 2;
+
+  const [hovered, setHovered] = useState<string | null>(null);
+
+  const segments = SEGMENT_ORDER.map((id, i) => {
+    const meta = TEAM_META[id];
+    const startDeg = (i * 360) / segCount - 90 + gapDeg / 2;
+    const endDeg = ((i + 1) * 360) / segCount - 90 - gapDeg / 2;
+    const startRad = (startDeg * Math.PI) / 180;
+    const endRad = (endDeg * Math.PI) / 180;
+
+    const x1 = cx + outerR * Math.cos(startRad);
+    const y1 = cy + outerR * Math.sin(startRad);
+    const x2 = cx + outerR * Math.cos(endRad);
+    const y2 = cy + outerR * Math.sin(endRad);
+    const x3 = cx + innerR * Math.cos(endRad);
+    const y3 = cy + innerR * Math.sin(endRad);
+    const x4 = cx + innerR * Math.cos(startRad);
+    const y4 = cy + innerR * Math.sin(startRad);
+
+    const largeArc = endDeg - startDeg > 180 ? 1 : 0;
+    const path = [
+      `M ${x1} ${y1}`,
+      `A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2} ${y2}`,
+      `L ${x3} ${y3}`,
+      `A ${innerR} ${innerR} 0 ${largeArc} 0 ${x4} ${y4}`,
+      `Z`,
+    ].join(" ");
+
+    const midDeg = (startDeg + endDeg) / 2;
+    const midRad = (midDeg * Math.PI) / 180;
+    const labelR = (outerR + innerR) / 2;
+    const lx = cx + labelR * Math.cos(midRad);
+    const ly = cy + labelR * Math.sin(midRad);
+
+    const stats = teamStats[id] ?? { count: 0, avg: 0 };
+    const isOpen = openSet.has(id);
+
+    return { id, meta, path, lx, ly, stats, isOpen };
+  });
+
+  const allCounts = Object.values(teamStats);
+  const totalObjs = allCounts.reduce((s, t) => s + t.count, 0);
+  const overallAvg = totalObjs > 0
+    ? Math.round(Object.values(teamStats).reduce((s, t) => s + t.avg * t.count, 0) / totalObjs)
+    : 0;
+
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full max-w-[420px] max-h-[420px] select-none">
+      <defs>
+        {segments.map(seg => (
+          <filter key={`shadow-${seg.id}`} id={`shadow-${seg.id}`}>
+            <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor={seg.meta.color} floodOpacity="0.3" />
+          </filter>
+        ))}
+      </defs>
+
+      {segments.map(seg => {
+        const isHover = hovered === seg.id;
+        const isActive = seg.isOpen;
+        return (
+          <g key={seg.id} className="cursor-pointer"
+            onClick={() => onToggle(seg.id)}
+            onMouseEnter={() => setHovered(seg.id)}
+            onMouseLeave={() => setHovered(null)}>
+            <path d={seg.path}
+              fill={isActive ? seg.meta.color : isHover ? seg.meta.color + "18" : "#f8fafc"}
+              stroke={seg.meta.color}
+              strokeWidth={isActive ? 2.5 : isHover ? 2 : 1}
+              filter={isActive || isHover ? `url(#shadow-${seg.id})` : undefined}
+              className="transition-all duration-200"
+            />
+            <text x={seg.lx} y={seg.ly - 18} textAnchor="middle" fontSize={18} className="pointer-events-none">
+              {seg.meta.icon}
+            </text>
+            <text x={seg.lx} y={seg.ly + 2} textAnchor="middle" fontSize={11} fontWeight={700}
+              fill={isActive ? "#fff" : "#334155"} className="pointer-events-none">
+              {seg.meta.name}
+            </text>
+            <text x={seg.lx} y={seg.ly + 16} textAnchor="middle" fontSize={9.5}
+              fill={isActive ? "#ffffffcc" : "#64748b"} className="pointer-events-none">
+              {seg.stats.count} mục tiêu
+            </text>
+            <text x={seg.lx} y={seg.ly + 29} textAnchor="middle" fontSize={12} fontWeight={800}
+              fill={isActive ? "#fff" : seg.meta.color} className="pointer-events-none">
+              {seg.stats.avg}%
+            </text>
+          </g>
+        );
+      })}
+
+      {/* Center */}
+      <circle cx={cx} cy={cy} r={innerR - 3} fill="white" stroke="#e2e8f0" strokeWidth={1.5} />
+      <text x={cx} y={cy - 16} textAnchor="middle" fontSize={10} fill="#94a3b8" fontWeight={600} letterSpacing="0.05em">TỔNG QUAN</text>
+      <text x={cx} y={cy + 10} textAnchor="middle" fontSize={28} fontWeight={800} fill="#1e293b">{overallAvg}%</text>
+      <text x={cx} y={cy + 28} textAnchor="middle" fontSize={10} fill="#94a3b8">{totalObjs} mục tiêu</text>
+    </svg>
+  );
+}
+
+/* ── Main OKR Page ───────────────────────────────────────── */
+
 export default function OKRPage() {
   const { objectives, loading, getTeamObjectives, getCompanyObjectives } = useApp();
+  const [openDepts, setOpenDepts] = useState<Set<string>>(new Set());
   const [showAddObj, setShowAddObj] = useState(false);
+  const [addObjTeam, setAddObjTeam] = useState<string | undefined>();
+
+  const toggleDept = useCallback((id: string) => {
+    setOpenDepts(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="flex flex-col items-center gap-3 text-slate-400">
-        <div className="w-8 h-8 border-2 border-slate-200 border-t-indigo-500 rounded-full animate-spin"/>
+        <div className="w-8 h-8 border-2 border-slate-200 border-t-indigo-500 rounded-full animate-spin" />
         <span className="text-sm">Đang tải dữ liệu...</span>
       </div>
     </div>
   );
 
-  const grouped: Record<string, Objective[]> = {};
-  for (const teamId of GROUP_ORDER) {
+  // Per-team data
+  const teamObjs: Record<string, Objective[]> = {};
+  const teamStats: Record<string, { count: number; avg: number }> = {};
+  for (const teamId of SEGMENT_ORDER) {
     const objs = teamId === "company" ? getCompanyObjectives() : getTeamObjectives(teamId);
-    if (objs.length > 0) grouped[teamId] = objs;
+    teamObjs[teamId] = objs;
+    const avg = objs.length > 0 ? Math.round(objs.reduce((s, o) => s + objProgress(o), 0) / objs.length) : 0;
+    teamStats[teamId] = { count: objs.length, avg };
   }
 
   const totalObjs = objectives.length;
   const completedObjs = objectives.filter(o => objProgress(o) >= 100).length;
-  const avgOverall = objectives.length > 0
-    ? Math.round(objectives.reduce((s, o) => s + objProgress(o), 0) / objectives.length) : 0;
+  const avgOverall = totalObjs > 0
+    ? Math.round(objectives.reduce((s, o) => s + objProgress(o), 0) / totalObjs)
+    : 0;
   const totalKRs = objectives.reduce((s, o) => s + o.keyResults.length, 0);
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 uppercase tracking-tight text-center" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", letterSpacing: "0.12em" }}>Mục tiêu &amp; Kết quả then chốt (OKR)</h1>
-          <p className="text-slate-500 mt-1 text-sm">Theo dõi và chỉnh sửa OKR theo phòng ban</p>
+          <h1 className="text-2xl font-bold text-slate-800 uppercase tracking-tight"
+            style={{ fontFamily: "'Georgia', 'Times New Roman', serif", letterSpacing: "0.12em" }}>
+            Mục tiêu &amp; Kết quả then chốt (OKR)
+          </h1>
+          <p className="text-slate-500 mt-1 text-sm">Ấn vào phòng ban trên biểu đồ để xem chi tiết mục tiêu</p>
         </div>
-        <button onClick={() => setShowAddObj(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition shadow-sm shrink-0">
-          <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
-          Thêm mục tiêu
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          {openDepts.size < 6 && (
+            <button onClick={() => setOpenDepts(new Set(SEGMENT_ORDER))}
+              className="text-xs px-3 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition font-medium">
+              Mở tất cả
+            </button>
+          )}
+          {openDepts.size > 0 && (
+            <button onClick={() => setOpenDepts(new Set())}
+              className="text-xs px-3 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition font-medium">
+              Đóng tất cả
+            </button>
+          )}
+          <button onClick={() => { setAddObjTeam(undefined); setShowAddObj(true); }}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition shadow-sm">
+            <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
+            Thêm mục tiêu
+          </button>
+        </div>
       </div>
 
+      {/* Summary stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Tổng mục tiêu",      value: totalObjs,        color: "#6366f1" },
-          { label: "Hoàn thành",         value: completedObjs,    color: "#10b981" },
-          { label: "Kết quả then chốt",  value: totalKRs,         color: "#f59e0b" },
-          { label: "Tiến độ TB",         value: `${avgOverall}%`, color: "#3b82f6" },
+          { label: "Tổng mục tiêu", value: totalObjs, color: "#6366f1" },
+          { label: "Hoàn thành", value: completedObjs, color: "#10b981" },
+          { label: "Kết quả then chốt", value: totalKRs, color: "#f59e0b" },
+          { label: "Tiến độ TB", value: `${avgOverall}%`, color: "#3b82f6" },
         ].map(s => (
           <div key={s.label} className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col gap-1">
             <span className="text-xs text-slate-500 font-medium">{s.label}</span>
@@ -370,28 +399,34 @@ export default function OKRPage() {
         ))}
       </div>
 
-      {GROUP_ORDER.map(teamId => {
-        const objs = grouped[teamId];
-        if (!objs || objs.length === 0) return null;
-        const meta = TEAM_META[teamId] ?? { name: teamId, color: "#64748b" };
-        const teamAvg = Math.round(objs.reduce((s, o) => s + objProgress(o), 0) / objs.length);
-        return (
-          <div key={teamId} className="mb-8">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-1 h-7 rounded-full" style={{ background: meta.color }} />
-              <h2 className="text-base font-bold text-slate-700 text-center">{meta.name}</h2>
-              <span className="text-sm text-slate-400 ml-auto">
-                Tiến độ TB: <strong style={{ color: meta.color }}>{teamAvg}%</strong>
-              </span>
-            </div>
-            <div className="grid md:grid-cols-2 gap-4">
-              {objs.map(obj => <ObjCard key={obj.id} obj={obj} />)}
-            </div>
-          </div>
-        );
-      })}
+      {/* Wheel */}
+      <div className="flex justify-center mb-6">
+        <div className="w-[300px] h-[300px] sm:w-[360px] sm:h-[360px] md:w-[420px] md:h-[420px]">
+          <DeptWheel teamStats={teamStats} openSet={openDepts} onToggle={toggleDept} />
+        </div>
+      </div>
 
-      {showAddObj && <AddObjModal onClose={() => setShowAddObj(false)} />}
+      {/* Expanded panels */}
+      <div className="flex flex-col gap-4">
+        {SEGMENT_ORDER.map(teamId => {
+          const meta = TEAM_META[teamId];
+          const objs = teamObjs[teamId] ?? [];
+          return (
+            <DeptPanel
+              key={teamId}
+              teamId={teamId}
+              objectives={objs}
+              color={meta.color}
+              name={meta.name}
+              isOpen={openDepts.has(teamId)}
+              onToggle={() => toggleDept(teamId)}
+              onAddObj={() => { setAddObjTeam(teamId); setShowAddObj(true); }}
+            />
+          );
+        })}
+      </div>
+
+      {showAddObj && <AddObjModal onClose={() => setShowAddObj(false)} defaultTeam={addObjTeam} />}
     </div>
   );
 }
