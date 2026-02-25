@@ -62,19 +62,20 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-slate-200 flex items-center px-4 h-14 shadow-sm">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-30 border-b border-slate-200/60 flex items-center px-4 h-14"
+        style={{ background: "rgba(245,247,255,0.92)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
         <button
           onClick={() => setMobileOpen((v) => !v)}
-          className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+          className="p-2 rounded-xl hover:bg-slate-100 transition-colors"
           aria-label="Toggle menu"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6 text-slate-600">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-slate-600">
             <line x1="3" y1="6" x2="21" y2="6" />
             <line x1="3" y1="12" x2="21" y2="12" />
             <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
         </button>
-        <span className="ml-3 font-bold text-slate-800 text-lg tracking-tight">Xgroup</span>
+        <span className="ml-3 font-extrabold text-slate-800 tracking-tight">Xgroup</span>
       </div>
 
       {/* Mobile overlay */}
@@ -89,22 +90,24 @@ export default function Sidebar() {
       <aside
         className={`
           fixed md:sticky top-0 left-0 z-20 h-screen w-60
-          bg-white border-r border-slate-200 flex flex-col
+          border-r border-slate-200/60 flex flex-col
           transform transition-transform duration-300
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0
         `}
+        style={{ background: "linear-gradient(180deg, #fafbff 0%, #f5f7ff 100%)", boxShadow: "1px 0 0 rgba(148,163,184,0.1), 4px 0 24px -4px rgba(15,23,42,0.04)" }}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-            <svg viewBox="0 0 24 24" fill="white" className="w-4 h-4">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2" fill="none" />
+        <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100/80">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm"
+            style={{ background: "linear-gradient(135deg, #6366f1 0%, #7c3aed 100%)", boxShadow: "0 4px 12px -2px rgba(99,102,241,0.4)" }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="w-4 h-4">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
           </div>
           <div>
-          <div className="font-bold text-slate-800 text-sm leading-tight">Xgroup</div>
-          <div className="text-xs text-slate-400">Dashboard</div>
+            <div className="font-extrabold text-slate-800 text-sm leading-tight tracking-tight">Xgroup</div>
+            <div className="text-[11px] text-slate-400 font-medium">Operations Hub</div>
           </div>
         </div>
 
@@ -120,13 +123,17 @@ export default function Sidebar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   active
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+                    ? "text-white"
+                    : "text-slate-500 hover:bg-white/70 hover:text-slate-800 hover:shadow-sm"
                 }`}
+                style={active ? {
+                  background: "linear-gradient(135deg, #6366f1 0%, #7c3aed 100%)",
+                  boxShadow: "0 4px 12px -2px rgba(99,102,241,0.35)"
+                } : {}}
               >
-                <span className={active ? "text-indigo-600" : "text-slate-400"}>
+                <span className={active ? "text-white" : "text-slate-400"}>
                   {item.icon}
                 </span>
                 {item.label}

@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import { AppProvider } from "@/lib/AppContext";
 
-const inter = Inter({ subsets: ["latin"] });
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-jakarta",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Tiến Độ Nhóm",
@@ -13,8 +18,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} bg-slate-50 text-slate-900 antialiased`}>
+    <html lang="en" className={jakarta.variable}>
+      <body className={`${jakarta.className} bg-[--color-background] text-[--color-foreground] antialiased`}>
         <AppProvider>
           <div className="flex min-h-screen">
             <Sidebar />

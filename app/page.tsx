@@ -217,13 +217,20 @@ export default function DashboardPage() {
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
 
       {/* ── Page header ───────────────────────────────────────────────────── */}
-      <div className="mb-8 text-center">
-        <p className="text-xs text-slate-400 mb-1">Q1 2026 · Ngày {Q1_ELAPSED}/{Q1_TOTAL} của quý</p>
-        <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.10em" }}>TỔNG QUAN ĐIỀU HÀNH</h1>
-        <p className="text-slate-500 text-sm mt-1">Bám sát chiến lược từ GSX · Mọi mục tiêu, tiến độ & rủi ro đều hiện diện tại đây</p>
+      <div className="mb-10 text-center">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-100/80 mb-5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-xs font-semibold text-indigo-600 tracking-wide">Q1 2026 · Ngày {Q1_ELAPSED}/{Q1_TOTAL} của quý</span>
+        </div>
+        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-3 leading-tight"
+          style={{ background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 40%, #6d28d9 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+          Tổng Quan Điều Hành
+        </h1>
+        <p className="text-slate-500 text-sm max-w-lg mx-auto leading-relaxed">Bám sát chiến lược từ GSX · Mọi mục tiêu, tiến độ &amp; rủi ro đều hiện diện tại đây</p>
         {lastUpdated && (
-          <p className="text-xs text-slate-400 mt-1">
-            Cập nhật lúc {new Date(lastUpdated).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}
+          <p className="text-xs text-slate-400 mt-3 flex items-center justify-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+            Live · Cập nhật lúc {new Date(lastUpdated).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}
           </p>
         )}
       </div>
@@ -231,26 +238,28 @@ export default function DashboardPage() {
       {/* ── Row 1: Summary stat cards ──────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         {[
-          { label: "Xgroup",          value: `${overallPct}%`,              sub: "theo trọng số",            color: "text-indigo-600",  bg: "bg-indigo-50",  border: "border-indigo-200"  },
-          { label: "Công việc xong",  value: `${totalDone}/${tasks.length}`, sub: "weighted progress",        color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200" },
-          { label: "OKR trung bình",  value: `${avgOKRPct}%`,               sub: "kết quả then chốt",        color: "text-violet-600",  bg: "bg-violet-50",  border: "border-violet-200"  },
-          { label: "Team nguy hiểm",  value: `${atRiskCount}`,              sub: `${onTrackCount} đúng hạn`, color: atRiskCount > 0 ? "text-red-600" : "text-emerald-600", bg: atRiskCount > 0 ? "bg-red-50" : "bg-emerald-50", border: atRiskCount > 0 ? "border-red-200" : "border-emerald-200" },
-          { label: "Quá hạn",         value: `${totalOverdue}`,             sub: "cần xử lý ngay",           color: totalOverdue > 0 ? "text-red-500" : "text-slate-400", bg: totalOverdue > 0 ? "bg-red-50" : "bg-slate-50", border: totalOverdue > 0 ? "border-red-200" : "border-slate-200" },
-          { label: "Thời gian Q1",    value: `${timeElapsedPct}%`,          sub: `${Q1_REMAINING} ngày còn lại`, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-200" },
+          { label: "Xgroup",         value: `${overallPct}%`,              sub: "theo trọng số",             accent: "#6366f1" },
+          { label: "CV hoàn thành",  value: `${totalDone}/${tasks.length}`, sub: "weighted progress",         accent: "#10b981" },
+          { label: "OKR trung bình", value: `${avgOKRPct}%`,               sub: "kết quả then chốt",         accent: "#8b5cf6" },
+          { label: "Team nguy hiểm", value: `${atRiskCount}`,              sub: `${onTrackCount} đúng hạn`,  accent: atRiskCount > 0 ? "#ef4444" : "#10b981" },
+          { label: "Quá hạn",        value: `${totalOverdue}`,             sub: "cần xử lý ngay",            accent: totalOverdue > 0 ? "#f97316" : "#94a3b8" },
+          { label: "Thời gian Q1",   value: `${timeElapsedPct}%`,          sub: `${Q1_REMAINING} ngày còn`, accent: "#f59e0b" },
         ].map((s) => (
-          <div key={s.label} className={`${s.bg} border-2 ${s.border} rounded-2xl px-4 py-4 text-center`}>
-            <p className="text-[11px] font-medium text-slate-400 mb-1 leading-tight">{s.label}</p>
-            <p className={`text-2xl font-extrabold leading-none mb-1 ${s.color}`}>{s.value}</p>
+          <div key={s.label} className="stat-card bg-white rounded-2xl px-4 py-4 text-center relative overflow-hidden border border-slate-100/60"
+            style={{ boxShadow: `0 2px 16px -4px ${s.accent}26, 0 1px 3px rgba(0,0,0,0.04)` }}>
+            <div className="absolute top-0 inset-x-0 h-[3px] rounded-t-2xl" style={{ background: `linear-gradient(90deg, transparent, ${s.accent}cc, transparent)` }} />
+            <p className="text-[10px] font-bold text-slate-400 mb-1.5 leading-tight uppercase tracking-wider">{s.label}</p>
+            <p className="text-[1.6rem] font-black leading-none mb-1 tabular-nums" style={{ color: s.accent }}>{s.value}</p>
             <p className="text-[10px] text-slate-400 leading-tight">{s.sub}</p>
           </div>
         ))}
       </div>
 
       {/* ── Row 2: Annual KPI targets ──────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-5 mb-6">
-        <div className="text-center mb-4">
-          <h2 className="font-bold text-slate-800 text-sm" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.08em" }}>🎯 KPI CHIẾN LƯỢC NĂM 2026</h2>
-          <p className="text-xs text-slate-400 mt-0.5" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.07em" }}>MỤC TIÊU CẤP HỆ SINH THÁI · NĂM ĐÃ QUA {Math.round(YEAR_ELAPSED / YEAR_TOTAL * 100)}%</p>
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/70 px-6 py-5 mb-6" style={{ boxShadow: "0 4px 24px -4px rgba(15,23,42,0.08), 0 1px 3px rgba(0,0,0,0.04)" }}>
+        <div className="text-center mb-5">
+          <h2 className="font-bold text-slate-800 text-base tracking-tight">🎯 KPI Chiến Lược Năm 2026</h2>
+          <p className="text-xs text-slate-400 mt-1 font-medium">Mục tiêu cấp hệ sinh thái · Năm đã qua {Math.round(YEAR_ELAPSED / YEAR_TOTAL * 100)}%</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
           {ANNUAL_KPIS.map((kpi) => {
@@ -267,9 +276,9 @@ export default function DashboardPage() {
                   <span className="text-xs font-bold" style={{ color: kpi.color }}>{pct}%</span>
                 </div>
                 <div className="relative h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                  {/* Time elapsed marker */}
-                  <div className="absolute top-0 bottom-0 w-px bg-slate-300/70 z-10" style={{ left: `${Math.round(YEAR_ELAPSED / YEAR_TOTAL * 100)}%` }} />
-                  <div className="absolute left-0 top-0 h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: kpi.color }} />
+                  <div className="absolute top-0 bottom-0 w-0.5 bg-slate-400/50 z-10" style={{ left: `${Math.round(YEAR_ELAPSED / YEAR_TOTAL * 100)}%` }} />
+                  <div className="absolute left-0 top-0 h-full rounded-full transition-all duration-700"
+                    style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${kpi.color}99, ${kpi.color})`, boxShadow: pct > 5 ? `0 0 8px -1px ${kpi.color}80` : 'none' }} />
                 </div>
                 <div className="flex items-center justify-between text-[11px] text-slate-400">
                   <span><span className="font-semibold text-slate-600">{fmtNum(kpi.current, kpi.unit)}</span> / {fmtNum(kpi.target, kpi.unit)} {kpi.unit}</span>
@@ -282,11 +291,11 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Row 3: Team progress + health + forecast ──────────────────────── */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-50">
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/70 overflow-hidden mb-6" style={{ boxShadow: "0 4px 24px -4px rgba(15,23,42,0.08), 0 1px 3px rgba(0,0,0,0.04)" }}>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100/60">
           <div>
-            <h2 className="font-bold text-slate-800 text-base" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.08em" }}>TIẾN ĐỘ CÁC PHÒNG BAN</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Tính theo trọng số · Đường dọc = mức kỳ vọng tại thời điểm hiện tại ({timeElapsedPct}%)</p>
+            <h2 className="font-bold text-slate-800 text-base tracking-tight">Tiến Độ Các Phòng Ban</h2>
+            <p className="text-xs text-slate-400 mt-0.5">Tính theo trọng số · Đường dọc = mức kỳ vọng hôm nay ({timeElapsedPct}%)</p>
           </div>
         </div>
 
@@ -326,7 +335,7 @@ export default function DashboardPage() {
                       style={{ left: `${timeElapsedPct}%` }} />
                     {/* Filled bar */}
                     <div className="absolute left-0 top-0 h-full rounded-xl transition-all duration-700 ease-out"
-                      style={{ width: `${pct}%`, backgroundColor: team.color, minWidth: pct > 0 ? "2rem" : "0", transitionDelay: animDelay }} />
+                      style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${team.color}bb, ${team.color})`, boxShadow: pct > 0 ? `0 2px 12px -2px ${team.color}66` : 'none', minWidth: pct > 0 ? "2rem" : "0", transitionDelay: animDelay }} />
                     {[25, 50, 75].map((mark) => (
                       <div key={mark} className="absolute top-0 bottom-0 w-px bg-white/60" style={{ left: `${mark}%` }} />
                     ))}
@@ -360,10 +369,14 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
 
         {/* AI Quick Analysis */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4 flex flex-col">
+        <div className="relative bg-white/85 backdrop-blur-sm rounded-2xl border border-indigo-100/60 px-5 py-4 flex flex-col overflow-hidden"
+          style={{ boxShadow: "0 4px 32px -4px rgba(99,102,241,0.18), 0 1px 4px rgba(0,0,0,0.04)" }}>
+          {/* Subtle gradient bg */}
+          <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(238,242,255,0.6) 0%, rgba(245,243,255,0.4) 100%)" }} />
+          <div className="relative z-10">
           {/* Header + timestamp */}
           <div className="mb-3 text-center">
-            <h3 className="font-bold text-slate-800 text-sm" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.08em" }}>🤖 PHâN TÍCH NHANH · AI</h3>
+            <h3 className="font-bold text-slate-800 text-sm tracking-tight">🤖 Phân Tích Nhanh · AI</h3>
             <div className="flex items-center justify-center gap-2 mt-1">
               {aiLoading
                 ? <span className="text-[10px] text-indigo-400 animate-pulse">⏳ Đang cập nhật...</span>
@@ -397,8 +410,10 @@ export default function DashboardPage() {
             {aiAnalysis.length > 0 && (
               <ul className="space-y-2">
                 {aiAnalysis.map((bullet, i) => (
-                  <li key={i} className={`flex gap-2.5 items-start bg-indigo-50 border border-indigo-100 rounded-xl px-3 py-2.5 ${aiLoading ? "opacity-50" : ""}`}>
-                    <span className="text-indigo-400 font-black text-xs mt-0.5 shrink-0 w-4">{i + 1}.</span>
+                  <li key={i} className={`flex gap-3 items-start rounded-xl px-3 py-2.5 transition-opacity ${aiLoading ? "opacity-40" : ""}`}
+                    style={{ background: "linear-gradient(135deg, rgba(238,242,255,0.8), rgba(245,243,255,0.6))", border: "1px solid rgba(165,180,252,0.3)" }}>
+                    <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white mt-0.5"
+                      style={{ background: "linear-gradient(135deg, #6366f1, #7c3aed)" }}>{i + 1}</span>
                     <p className="text-xs text-slate-700 leading-relaxed">{bullet}</p>
                   </li>
                 ))}
@@ -410,17 +425,18 @@ export default function DashboardPage() {
           <button
             onClick={() => fetchAI("POST")}
             disabled={aiLoading}
-            className="mt-4 w-full py-2 rounded-xl text-xs font-semibold transition-all border
-              disabled:opacity-50 disabled:cursor-not-allowed
-              bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700 active:scale-[0.98]"
+            className="mt-4 w-full py-2.5 rounded-xl text-xs font-bold transition-all
+              disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+            style={{ background: "linear-gradient(135deg, #6366f1, #7c3aed)", color: "white", boxShadow: "0 4px 16px -2px rgba(99,102,241,0.4)" }}
           >
             {aiLoading ? "⏳ Đang phân tích..." : "🔄 Cập nhật ngay"}
           </button>
+          </div>
         </div>
 
         {/* Strategic alerts (now second) */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
-          <h3 className="font-bold text-slate-800 text-sm mb-3 text-center" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.08em" }}>⚡ CẢNH BÁO CHIẾN LƯỢC</h3>
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/70 px-5 py-4" style={{ boxShadow: "0 4px 24px -4px rgba(15,23,42,0.08), 0 1px 3px rgba(0,0,0,0.04)" }}>
+          <h3 className="font-bold text-slate-800 text-sm mb-3 text-center tracking-tight">⚡ Cảnh Báo Chiến Lược</h3>
           <div className="space-y-2">
             {teamHealthData.filter((d) => d.health.label !== "Đúng tiến độ").length === 0 && (
               <p className="text-xs text-emerald-600 font-semibold">✅ Tất cả phòng ban đang đúng tiến độ!</p>
