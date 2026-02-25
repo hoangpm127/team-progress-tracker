@@ -1,6 +1,6 @@
 ﻿"use client";
 import Link from "next/link";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useApp } from "@/lib/AppContext";
 
 // ─── Q1 2026 time reference ────────────────────────────────────────────────
@@ -153,48 +153,23 @@ export default function DashboardPage() {
   const [aiError, setAiError]       = useState<string | null>(null);
   const [aiUpdatedAt, setAiUpdatedAt] = useState<Date | null>(null);
 
-  // ── Auto AI analysis: run on load + every 2 hours ────────────────────────
-  const runAIAnalysis = useCallback(async () => {
+  // ── AI analysis helpers ─────────────────────────────────────────────────
+  const fetchAI = async (method: "GET" | "POST") => {
     setAiLoading(true);
     setAiError(null);
     try {
-      const now = new Date();
-      const q1E = Math.max(0, Math.min(Q1_TOTAL, Math.round((now.getTime() - Q1_START.getTime()) / 86400000)));
-      const q1R = Q1_TOTAL - q1E;
-      const todayStr = now.toISOString().split("T")[0];
-      const totalOD = tasks.filter((t) => !t.done && t.deadline < todayStr).length;
-      const allObjsL = [...getCompanyObjectives(), ...teams.flatMap((t) => getTeamObjectives(t.id))];
-      const avgOKRL = avgOKR(allObjsL.flatMap((o) => o.keyResults));
-      const ownerMapL: Record<string, number> = {};
-      tasks.filter((t) => !t.done).forEach((t) => { ownerMapL[t.owner] = (ownerMapL[t.owner] ?? 0) + 1; });
-      const bneck = Object.entries(ownerMapL).sort((a, b) => b[1] - a[1])[0];
-      const fc = (pct: number) => q1E === 0 ? pct : Math.min(100, Math.round(pct + (pct / q1E) * q1R));
-      const snapshot = {
-        date: now.toLocaleDateString("vi-VN"),
-        q1ElapsedDays: q1E, q1TotalDays: Q1_TOTAL,
-        q1ElapsedPct: Math.round((q1E / Q1_TOTAL) * 100),
-        avgOKR: avgOKRL, totalOverdue: totalOD,
-        bottleneck: bneck ? bneck[0] : null,
-        kpis: ANNUAL_KPIS.map((k) => ({ label: k.label, current: k.current, target: k.target, pct: Math.min(100, Math.round((Number(k.current) / Number(k.target)) * 100)) })),
-        teams: teams.map((t) => { const pct = getTeamProgress(t.id); const stats = getTeamStats(t.id); return { id: t.id, name: t.name, progress: pct, done: stats.done, total: stats.total, overdue: stats.overdue, forecast: fc(pct), health: getHealth(pct).label }; }),
-      };
-      const res = await fetch("/api/ai-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(snapshot) });
-      const data = await res.json() as { bullets?: string[]; error?: string };
+      const res  = await fetch("/api/ai-analysis", { method });
+      const data = await res.json() as { bullets?: string[]; updatedAt?: string; error?: string };
       if (!res.ok || data.error) { setAiError(data.error ?? "Lỗi không xác định từ server"); }
-      else { setAiAnalysis(data.bullets ?? []); setAiUpdatedAt(new Date()); }
+      else { setAiAnalysis(data.bullets ?? []); setAiUpdatedAt(data.updatedAt ? new Date(data.updatedAt) : new Date()); }
     } catch { setAiError("Không thể kết nối server. Kiểm tra lại mạng hoặc API key."); }
     finally { setAiLoading(false); }
-  }, [teams, tasks, getTeamProgress, getTeamStats, getTeamObjectives, getCompanyObjectives]);
+  };
 
-  const runAIRef = useRef(runAIAnalysis);
-  useEffect(() => { runAIRef.current = runAIAnalysis; });
-
-  // Trigger on first load (after data ready) + every 2 hours
+  // Load cached analysis on mount (GET — instant if cache fresh, ~3s if stale)
   useEffect(() => {
     if (loading) return;
-    runAIRef.current();
-    const id = setInterval(() => runAIRef.current(), 2 * 60 * 60 * 1000);
-    return () => clearInterval(id);
+    fetchAI("GET");
   }, [loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) return (
@@ -433,7 +408,7 @@ export default function DashboardPage() {
 
           {/* Manual trigger button */}
           <button
-            onClick={runAIAnalysis}
+            onClick={() => fetchAI("POST")}
             disabled={aiLoading}
             className="mt-4 w-full py-2 rounded-xl text-xs font-semibold transition-all border
               disabled:opacity-50 disabled:cursor-not-allowed

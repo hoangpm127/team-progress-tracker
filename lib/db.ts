@@ -397,3 +397,30 @@ export async function dbUpdateHeavenTiming(updates: Partial<HeavenTiming>): Prom
   const { error } = await supabase.from("heaven_timing").upsert(row);
   if (error) console.error("[db] dbUpdateHeavenTiming", error);
 }
+
+// ══════════════════════════════════════════════════════════════
+//  AI Analysis Cache (singleton row, key = 'main')
+// ══════════════════════════════════════════════════════════════
+
+export async function fetchAiCache(): Promise<{ bullets: string[]; updatedAt: string } | null> {
+  const { data, error } = await supabase
+    .from("ai_cache")
+    .select("bullets, updated_at")
+    .eq("key", "main")
+    .maybeSingle();
+  if (error || !data) return null;
+  const row = data as Record<string, unknown>;
+  return {
+    bullets:   row.bullets   as string[],
+    updatedAt: row.updated_at as string,
+  };
+}
+
+export async function saveAiCache(bullets: string[]): Promise<void> {
+  const { error } = await supabase.from("ai_cache").upsert({
+    key:        "main",
+    bullets,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) console.error("[db] saveAiCache", error);
+}
