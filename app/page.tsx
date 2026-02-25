@@ -1,6 +1,6 @@
 ﻿"use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useApp } from "@/lib/AppContext";
 
 // ─── Q1 2026 time reference ────────────────────────────────────────────────
@@ -151,6 +151,51 @@ export default function DashboardPage() {
   const [aiAnalysis, setAiAnalysis] = useState<string[]>([]);
   const [aiLoading, setAiLoading]   = useState(false);
   const [aiError, setAiError]       = useState<string | null>(null);
+  const [aiUpdatedAt, setAiUpdatedAt] = useState<Date | null>(null);
+
+  // ── Auto AI analysis: run on load + every 2 hours ────────────────────────
+  const runAIAnalysis = useCallback(async () => {
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const now = new Date();
+      const q1E = Math.max(0, Math.min(Q1_TOTAL, Math.round((now.getTime() - Q1_START.getTime()) / 86400000)));
+      const q1R = Q1_TOTAL - q1E;
+      const todayStr = now.toISOString().split("T")[0];
+      const totalOD = tasks.filter((t) => !t.done && t.deadline < todayStr).length;
+      const allObjsL = [...getCompanyObjectives(), ...teams.flatMap((t) => getTeamObjectives(t.id))];
+      const avgOKRL = avgOKR(allObjsL.flatMap((o) => o.keyResults));
+      const ownerMapL: Record<string, number> = {};
+      tasks.filter((t) => !t.done).forEach((t) => { ownerMapL[t.owner] = (ownerMapL[t.owner] ?? 0) + 1; });
+      const bneck = Object.entries(ownerMapL).sort((a, b) => b[1] - a[1])[0];
+      const fc = (pct: number) => q1E === 0 ? pct : Math.min(100, Math.round(pct + (pct / q1E) * q1R));
+      const snapshot = {
+        date: now.toLocaleDateString("vi-VN"),
+        q1ElapsedDays: q1E, q1TotalDays: Q1_TOTAL,
+        q1ElapsedPct: Math.round((q1E / Q1_TOTAL) * 100),
+        avgOKR: avgOKRL, totalOverdue: totalOD,
+        bottleneck: bneck ? bneck[0] : null,
+        kpis: ANNUAL_KPIS.map((k) => ({ label: k.label, current: k.current, target: k.target, pct: Math.min(100, Math.round((Number(k.current) / Number(k.target)) * 100)) })),
+        teams: teams.map((t) => { const pct = getTeamProgress(t.id); const stats = getTeamStats(t.id); return { id: t.id, name: t.name, progress: pct, done: stats.done, total: stats.total, overdue: stats.overdue, forecast: fc(pct), health: getHealth(pct).label }; }),
+      };
+      const res = await fetch("/api/ai-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(snapshot) });
+      const data = await res.json() as { bullets?: string[]; error?: string };
+      if (!res.ok || data.error) { setAiError(data.error ?? "Lỗi không xác định từ server"); }
+      else { setAiAnalysis(data.bullets ?? []); setAiUpdatedAt(new Date()); }
+    } catch { setAiError("Không thể kết nối server. Kiểm tra lại mạng hoặc API key."); }
+    finally { setAiLoading(false); }
+  }, [teams, tasks, getTeamProgress, getTeamStats, getTeamObjectives, getCompanyObjectives]);
+
+  const runAIRef = useRef(runAIAnalysis);
+  useEffect(() => { runAIRef.current = runAIAnalysis; });
+
+  // Trigger on first load (after data ready) + every 2 hours
+  useEffect(() => {
+    if (loading) return;
+    runAIRef.current();
+    const id = setInterval(() => runAIRef.current(), 2 * 60 * 60 * 1000);
+    return () => clearInterval(id);
+  }, [loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
@@ -192,58 +237,6 @@ export default function DashboardPage() {
   }
 
   const timeElapsedPct = Math.round((Q1_ELAPSED / Q1_TOTAL) * 100);
-
-  // ── AI Quick Analysis ──────────────────────────────────────────────────
-  async function handleAIAnalysis() {
-    setAiLoading(true);
-    setAiError(null);
-    try {
-      const snapshot = {
-        date: TODAY.toLocaleDateString("vi-VN"),
-        q1ElapsedDays: Q1_ELAPSED,
-        q1TotalDays: Q1_TOTAL,
-        q1ElapsedPct: timeElapsedPct,
-        avgOKR: avgOKRPct,
-        totalOverdue,
-        bottleneck: bottleneck ? bottleneck[0] : null,
-        kpis: ANNUAL_KPIS.map((k) => ({
-          label: k.label,
-          current: k.current,
-          target: k.target,
-          pct: Math.min(100, Math.round((Number(k.current) / Number(k.target)) * 100)),
-        })),
-        teams: teams.map((t) => {
-          const pct   = getTeamProgress(t.id);
-          const stats = getTeamStats(t.id);
-          return {
-            id:       t.id,
-            name:     t.name,
-            progress: pct,
-            done:     stats.done,
-            total:    stats.total,
-            overdue:  stats.overdue,
-            forecast: q1Forecast(pct),
-            health:   getHealth(pct).label,
-          };
-        }),
-      };
-      const res  = await fetch("/api/ai-analysis", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(snapshot),
-      });
-      const data = await res.json() as { bullets?: string[]; error?: string };
-      if (!res.ok || data.error) {
-        setAiError(data.error ?? "Lỗi không xác định từ server");
-      } else {
-        setAiAnalysis(data.bullets ?? []);
-      }
-    } catch {
-      setAiError("Không thể kết nối server. Kiểm tra lại mạng hoặc API key.");
-    } finally {
-      setAiLoading(false);
-    }
-  }
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
@@ -393,13 +386,24 @@ export default function DashboardPage() {
 
         {/* AI Quick Analysis */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4 flex flex-col">
-          <h3 className="font-bold text-slate-800 text-sm mb-3 text-center" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.08em" }}>🤖 PHÂN TÍCH NHANH · AI</h3>
+          {/* Header + timestamp */}
+          <div className="mb-3 text-center">
+            <h3 className="font-bold text-slate-800 text-sm" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.08em" }}>🤖 PHâN TÍCH NHANH · AI</h3>
+            <div className="flex items-center justify-center gap-2 mt-1">
+              {aiLoading
+                ? <span className="text-[10px] text-indigo-400 animate-pulse">⏳ Đang cập nhật...</span>
+                : aiUpdatedAt
+                  ? <span className="text-[10px] text-slate-400">⏰ Cập nhật lúc {aiUpdatedAt.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} · tự động mỗi 2 giờ</span>
+                  : <span className="text-[10px] text-slate-300">Tự động cập nhật mỗi 2 giờ</span>
+              }
+            </div>
+          </div>
 
           {/* Content area */}
           <div className="flex-1 space-y-2">
 
             {/* Loading */}
-            {aiLoading && (
+            {aiLoading && aiAnalysis.length === 0 && (
               <div className="flex items-center gap-3 py-5 text-indigo-500">
                 <div className="w-4 h-4 border-2 border-indigo-200 border-t-indigo-500 rounded-full animate-spin shrink-0" />
                 <p className="text-xs leading-relaxed">AI đang đọc toàn bộ dữ liệu hệ thống và phân tích...</p>
@@ -414,22 +418,11 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Empty state */}
-            {!aiLoading && !aiError && aiAnalysis.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-6 text-slate-400 gap-2">
-                <span className="text-3xl">🧠</span>
-                <p className="text-xs text-center leading-relaxed">
-                  Bấm nút bên dưới để AI đọc toàn bộ số liệu<br />
-                  và đưa ra nhận xét chiến lược ngay lập tức
-                </p>
-              </div>
-            )}
-
             {/* AI bullets */}
-            {!aiLoading && aiAnalysis.length > 0 && (
+            {aiAnalysis.length > 0 && (
               <ul className="space-y-2">
                 {aiAnalysis.map((bullet, i) => (
-                  <li key={i} className="flex gap-2.5 items-start bg-indigo-50 border border-indigo-100 rounded-xl px-3 py-2.5">
+                  <li key={i} className={`flex gap-2.5 items-start bg-indigo-50 border border-indigo-100 rounded-xl px-3 py-2.5 ${aiLoading ? "opacity-50" : ""}`}>
                     <span className="text-indigo-400 font-black text-xs mt-0.5 shrink-0 w-4">{i + 1}.</span>
                     <p className="text-xs text-slate-700 leading-relaxed">{bullet}</p>
                   </li>
@@ -438,19 +431,15 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Trigger button */}
+          {/* Manual trigger button */}
           <button
-            onClick={handleAIAnalysis}
+            onClick={runAIAnalysis}
             disabled={aiLoading}
             className="mt-4 w-full py-2 rounded-xl text-xs font-semibold transition-all border
               disabled:opacity-50 disabled:cursor-not-allowed
               bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700 active:scale-[0.98]"
           >
-            {aiLoading
-              ? "⏳ Đang phân tích..."
-              : aiAnalysis.length > 0
-                ? "🔄 Phân tích lại"
-                : "🤖 Phân tích với AI"}
+            {aiLoading ? "⏳ Đang phân tích..." : "🔄 Cập nhật ngay"}
           </button>
         </div>
 
