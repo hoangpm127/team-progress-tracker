@@ -21,6 +21,7 @@ export default function SettingsPage() {
             key={section.label}
             className="flex items-center justify-between rounded-2xl px-6 py-5"
             style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.7)", boxShadow: "0 4px 24px -4px rgba(15,23,42,0.07), 0 1px 3px rgba(0,0,0,0.04)" }}
+          >
             <div>
               <p className="font-semibold text-slate-800">{section.label}</p>
               <p className="text-sm text-slate-400 mt-0.5">{section.desc}</p>
