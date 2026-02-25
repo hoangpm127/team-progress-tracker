@@ -92,13 +92,16 @@ Hãy phân tích và trả về JSON.`;
       generationConfig: {
         temperature: 0.4,
         maxOutputTokens: 600,
-        responseMimeType: "application/json",
       },
       systemInstruction: systemPrompt,
     });
 
     const result = await model.generateContent(userMessage);
-    const text   = result.response.text();
+    let text = result.response.text().trim();
+
+    // Strip markdown code fences if Gemini wraps response in ```json ... ```
+    text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+
     const parsed = JSON.parse(text) as { bullets?: string[] };
 
     if (!Array.isArray(parsed.bullets) || parsed.bullets.length === 0) {
