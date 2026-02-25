@@ -229,27 +229,6 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
 }
 
 // ─────────────────────────────────────────────────────────────
-//  CANOPY BLOB GENERATOR  (organic cluster, size = progress)
-// ─────────────────────────────────────────────────────────────
-interface Blob{cx:number;cy:number;r:number;layer:0|1|2}
-function genBlobs(cx:number,cy:number,prog:number,seed:number):Blob[]{
-  // base radius grows with progress: 48(0%) → 108(100%)
-  const base=Math.round(48+prog*0.60);
-  // blob count grows: 3(0%) → 10(100%)
-  const count=Math.round(3+prog/14);
-  const rng=mkRng(seed);
-  const out:Blob[]=[{cx,cy,r:base,layer:0}];
-  for(let i=0;i<count;i++){
-    const angle=rng()*Math.PI*2;
-    const dist=rng()*base*0.65;
-    const r=Math.round(base*(0.50+rng()*0.48));
-    const layer:0|1|2=i<2?0:i<5?1:2;
-    out.push({cx:Math.round(cx+Math.cos(angle)*dist),cy:Math.round(cy+Math.sin(angle)*dist),r,layer});
-  }
-  return out;
-}
-
-// ─────────────────────────────────────────────────────────────
 //  CANOPY LABEL (permanent, expands on hover)
 // ─────────────────────────────────────────────────────────────
 function CanopyLabel({cx,cy,r,icon,title,prog,color,teamId,onClick,hovered,onEnter,onLeave,done,total}:{
@@ -302,33 +281,29 @@ function branchPath(x0:number,y0:number,x1:number,y1:number,w0:number,w1:number)
 //  SVG CONSTANTS   viewBox 0 0 1000 700    GY=560
 // ─────────────────────────────────────────────────────────────
 const VW=1000, VH=700, GY=560;
-const TX=500;                    // trunk center X
-const TRUNK_TOP_Y=252;           // where trunk meets main fork Y
-const TRUNK_TW=32;               // trunk half-width at top
-const TRUNK_BW=64;               // trunk half-width at base
-// Main branch fork exits
-const LBX=TX-16, LBY=320;
-const RBX=TX+16, RBY=320;
-// Canopy centers
-const PIANO_CX=196, PIANO_CY=148;
-const ASST_CX=804,  ASST_CY=148;
-const TECH_CX=500,  TECH_CY=116;
-// Secondary horizontal branch stubs
-const ML_CX=310, ML_CY=348;     // mid-left
-const MR_CX=690, MR_CY=348;    // mid-right
-
+const TX=500;
+const TRUNK_TOP_Y=258;
+// Organic trunk: natural S-curve taper, left & right sides differ for asymmetry
 const TRUNK_PATH=`
-  M ${TX-TRUNK_TW},${TRUNK_TOP_Y}
-  C ${TX-TRUNK_TW-4},${TRUNK_TOP_Y+70} ${TX-TRUNK_BW-4},${GY-110} ${TX-TRUNK_BW},${GY}
-  L ${TX+TRUNK_BW},${GY}
-  C ${TX+TRUNK_BW+4},${GY-110} ${TX+TRUNK_TW+4},${TRUNK_TOP_Y+70} ${TX+TRUNK_TW},${TRUNK_TOP_Y}
-  Z
-`;
+  M 444,560
+  C 440,468 474,382 487,312
+  C 488,290 488,270 489,${TRUNK_TOP_Y}
+  L 513,${TRUNK_TOP_Y}
+  C 514,268 515,288 516,316
+  C 528,384 560,470 556,560
+  Z`;
 
-// Canopy colour palette (3 shading layers)
-const DEEP=["#174d20","#1b5a25","#1f642a"];
-const MID= ["#247730","#2c8838","#339942"];
-const LITE=["#39aa4e","#46bc60","#55cc6e","#68d880"];
+// Branch fork points — ASYMMETRIC (left forks a bit lower than right)
+const LBX=489, LBY=290;
+const RBX=513, RBY=278;
+// Canopy anchors — asymmetric by design: left reaches further, right sits lower
+const PIANO_CX=215, PIANO_CY=182;
+const ASST_CX=762,  ASST_CY=208;
+const TECH_CX=498,  TECH_CY=112;
+const ML_CX=308, ML_CY=338;
+const MR_CX=674, MR_CY=352;
+// Logical canopy radius from progress (used for CanopyLabel y-offset)
+const cR=(prog:number)=>Math.round(52+prog*0.54);
 
 // Pre-baked seeded values for grass & rain
 const RAIN_DROPS=Array.from({length:26},(_,i)=>{const r=mkRng(i*137);return{x:600+r()*240,y:28+r()*120,del:r()*1.6,dur:.46+r()*.44};});
@@ -339,54 +314,66 @@ function makeGrass(count:number){
   });
 }
 
-// ─────────────────────────────────────────────────────────────
-//  LEAF CLUSTER  (individual SVG leaves at canopy perimeter)
-// ─────────────────────────────────────────────────────────────
-// Bright yellow-green palette — clearly visible against dark green blobs
+// Leaf colour palettes — bright-on-dark for depth
 const LEAF_BRIGHT=["#aee84e","#bef460","#c8f472","#9ee040","#d0f47a","#8cd83a"];
 const LEAF_MID   =["#7cc82c","#88d636","#68be1e","#74ca28","#6ab820"];
-function LeafCluster({cx,cy,r,done,overdue,prog,seed}:{cx:number;cy:number;r:number;done:number;overdue:number;prog:number;seed:number}){
-  const rng=mkRng(seed*7+13);
-  // Always show leaves: minimum 10, scaling up to 44 with progress + done
-  const greenCount=Math.min(Math.max(10,Math.round(prog*0.30+done*2.2)),44);
-  const yellowCount=Math.min(overdue,10);
-  // Leaf size: large enough to see (14px min → 28px at 100%)
-  const leafSz=14+prog*0.14;
-  // arc: 115° → 425° — nearly full circle; skip small bottom wedge where branch attaches
-  const AS=115*Math.PI/180, AE=425*Math.PI/180, AT=AE-AS;
-  const out:React.ReactElement[]=[];
-  // green leaves — alternating bright / mid-tone for depth
-  for(let i=0;i<greenCount;i++){
-    const t=rng();
-    const angle=AS+t*AT;
-    // scatter from 60% radius (inner) to 110% (bursting slightly outside)
-    const dist=r*(0.60+rng()*0.52);
-    const lx=cx+Math.cos(angle)*dist;
-    const ly=cy+Math.sin(angle)*dist;
-    const rot=angle*180/Math.PI+90+(rng()-0.5)*38;
-    const sz=leafSz*(0.62+rng()*0.70);
-    const col=i%3===0?LEAF_BRIGHT[i%LEAF_BRIGHT.length]:LEAF_MID[i%LEAF_MID.length];
-    // teardrop leaf path, with thin dark outline for definition
-    out.push(<path key={`g${i}`}
-      d={`M 0,0 C ${sz*.38},${-sz*.26} ${sz*.32},${-sz*.80} 0,${-sz} C ${-sz*.32},${-sz*.80} ${-sz*.38},${-sz*.26} 0,0 Z`}
-      fill={col} stroke="rgba(0,60,0,.22)" strokeWidth="0.6" opacity={0.80+rng()*.18}
-      transform={`translate(${lx.toFixed(1)},${ly.toFixed(1)}) rotate(${rot.toFixed(1)})`}/>);
+
+// ─────────────────────────────────────────────────────────────
+//  ORGANIC CANOPY  — secondary branches + scattered leaves, no circles
+// ─────────────────────────────────────────────────────────────
+function OrganicCanopy({cx,cy,prog,color,done,overdue,seed}:{
+  cx:number;cy:number;prog:number;color:string;done:number;overdue:number;seed:number;
+}){
+  const rng=mkRng(seed*3+19);
+  const bCnt=Math.max(4,Math.round(3+prog*0.07));    // 4→~11 branches
+  const bLen=48+prog*0.64;                            // 48→112 px reach
+  const lPer=Math.max(3,Math.round(2+prog*0.07));    // 3→~9 leaves/branch
+  const els:React.ReactElement[]=[];
+  // Very subtle identity-colour ambient glow (barely visible depth hint)
+  els.push(<circle key="amb" cx={cx} cy={cy} r={bLen*1.08}
+    fill={color} opacity={0.055} filter="url(#cloudBlur)"/>);
+  const BASE_ANG=-Math.PI/2; // fan upward
+  const SPREAD=1.35+prog*0.0028;
+  for(let i=0;i<bCnt;i++){
+    const ni=bCnt>1?i/(bCnt-1):0.5;
+    const ang=BASE_ANG-SPREAD/2+ni*SPREAD+(rng()-0.5)*0.18;
+    const bL=bLen*(0.64+rng()*0.52);
+    const cAng=ang+(rng()-0.5)*0.36;
+    const mx=cx+Math.cos(cAng)*bL*0.50;
+    const my=cy+Math.sin(cAng)*bL*0.50;
+    const ex=cx+Math.cos(ang+(rng()-0.5)*0.10)*bL;
+    const ey=cy+Math.sin(ang+(rng()-0.5)*0.10)*bL;
+    const bw=Math.max(0.6,(2.0-ni*0.8)*(0.5+rng()*0.7));
+    // thin branch stroke
+    els.push(<path key={`b${i}`}
+      d={`M ${cx.toFixed(1)} ${cy.toFixed(1)} Q ${mx.toFixed(1)} ${my.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`}
+      stroke={i%2===0?"#4a2808":"#5a3210"} strokeWidth={bw.toFixed(1)}
+      fill="none" strokeLinecap="round" opacity="0.78"/>);
+    // leaves scattered along the bezier curve
+    for(let j=0;j<lPer;j++){
+      const t=0.22+rng()*0.80; const t1=1-t;
+      const lx=t1*t1*cx+2*t*t1*mx+t*t*ex+(rng()-0.5)*12;
+      const ly=t1*t1*cy+2*t*t1*my+t*t*ey+(rng()-0.5)*12;
+      const rot=ang*180/Math.PI+(rng()-0.5)*96;
+      const sz=8+rng()*14;
+      const col=rng()<0.40?LEAF_BRIGHT[Math.floor(rng()*LEAF_BRIGHT.length)]:LEAF_MID[Math.floor(rng()*LEAF_MID.length)];
+      els.push(<path key={`l${i}_${j}`}
+        d={`M 0,0 C ${(sz*.38).toFixed(1)},${(-sz*.26).toFixed(1)} ${(sz*.32).toFixed(1)},${(-sz*.80).toFixed(1)} 0,${(-sz).toFixed(1)} C ${(-sz*.32).toFixed(1)},${(-sz*.80).toFixed(1)} ${(-sz*.38).toFixed(1)},${(-sz*.26).toFixed(1)} 0,0 Z`}
+        fill={col} stroke="rgba(0,45,0,.15)" strokeWidth="0.5"
+        opacity={(0.74+rng()*.24).toFixed(2)}
+        transform={`translate(${lx.toFixed(1)},${ly.toFixed(1)}) rotate(${rot.toFixed(1)})`}/>);
+    }
+    // yellow drooping overdue leaf at branch tip
+    if(overdue>0 && i<Math.min(overdue,3)){
+      const lx=ex+(rng()-0.5)*7; const ly=ey+rng()*8;
+      const sz=8+rng()*6; const rot=ang*180/Math.PI+44+rng()*22;
+      els.push(<path key={`ov${i}`}
+        d={`M 0,0 C ${(sz*.38).toFixed(1)},${(-sz*.26).toFixed(1)} ${(sz*.32).toFixed(1)},${(-sz*.80).toFixed(1)} 0,${(-sz).toFixed(1)} C ${(-sz*.32).toFixed(1)},${(-sz*.80).toFixed(1)} ${(-sz*.38).toFixed(1)},${(-sz*.26).toFixed(1)} 0,0 Z`}
+        fill="#fcd34d" stroke="rgba(120,60,0,.20)" strokeWidth="0.5" opacity="0.86"
+        transform={`translate(${lx.toFixed(1)},${ly.toFixed(1)}) rotate(${rot.toFixed(1)})`}/>);
+    }
   }
-  // yellow/amber overdue leaves — drooping (rotation +42°)
-  for(let i=0;i<yellowCount;i++){
-    const t=rng();
-    const angle=AS+35*Math.PI/180+t*(AT-70*Math.PI/180);
-    const dist=r*(0.72+rng()*0.32);
-    const lx=cx+Math.cos(angle)*dist;
-    const ly=cy+Math.sin(angle)*dist;
-    const rot=angle*180/Math.PI+90+42+rng()*30;
-    const sz=leafSz*(0.58+rng()*0.52);
-    out.push(<path key={`y${i}`}
-      d={`M 0,0 C ${sz*.38},${-sz*.26} ${sz*.32},${-sz*.80} 0,${-sz} C ${-sz*.32},${-sz*.80} ${-sz*.38},${-sz*.26} 0,0 Z`}
-      fill={i%2===0?"#fcd34d":"#fbbf24"} stroke="rgba(120,60,0,.25)" strokeWidth="0.6" opacity="0.88"
-      transform={`translate(${lx.toFixed(1)},${ly.toFixed(1)}) rotate(${rot.toFixed(1)})`}/>);
-  }
-  return <g style={{pointerEvents:"none"}}>{out}</g>;
+  return <g style={{pointerEvents:"none"}}>{els}</g>;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -453,36 +440,14 @@ export default function TreeCanvas(){
   const asstS=gs("assistant"), pianoS=gs("piano");
   const rainOn=app.heavenTiming.rainEnabled, mkIdx=app.market.marketIndex, hvIdx=app.heavenTiming.heavenTimingIndex;
 
-  // Generate blob arrays (memo-ized by progress)
-  const pianoBlobs=useMemo(()=>genBlobs(PIANO_CX,PIANO_CY,pianoP,11),[pianoP]);
-  const asstBlobs= useMemo(()=>genBlobs(ASST_CX, ASST_CY, asstP, 22),[asstP]);
-  const techBlobs= useMemo(()=>genBlobs(TECH_CX,  TECH_CY, techP, 33),[techP]);
-  const mlBlobs=   useMemo(()=>genBlobs(ML_CX,    ML_CY,   Math.round(techP*0.65),44),[techP]);
-  const mrBlobs=   useMemo(()=>genBlobs(MR_CX,    MR_CY,   Math.round(techP*0.65),55),[techP]);
+  // Canopy radii for CanopyLabel y-offset (logical enclosing radius)
+  const pianoR=cR(pianoP), asstR=cR(asstP), techR=cR(techP);
   const blades=    useMemo(()=>makeGrass(32+Math.round(partP*.4)),[partP]);
-
-  const pianoR=pianoBlobs[0].r, asstR=asstBlobs[0].r, techR=techBlobs[0].r;
-  const mlR=mlBlobs[0].r, mrR=mrBlobs[0].r;
 
   // Trunk colour (warmer when tech is doing well)
   const sat=40+techP*.12;
   const tA=`hsl(22,${sat}%,18%)`, tB=`hsl(26,${sat+10}%,30%)`, tC=`hsl(24,${sat+5}%,24%)`;
-
-  // Helper: render a canopy cluster
-  function BlobGroup({blobs,rimColor,rimW=5,rimOp=.45}:{blobs:Blob[];rimColor?:string;rimW?:number;rimOp?:number}){
-    const base=blobs[0];
-    return(
-      <>
-        {blobs.filter(b=>b.layer===0).map((b,i)=><circle key={`d${i}`} cx={b.cx} cy={b.cy} r={b.r} fill={DEEP[i%3]}/>)}
-        {blobs.filter(b=>b.layer===1).map((b,i)=><circle key={`m${i}`} cx={b.cx} cy={b.cy} r={b.r} fill={MID[i%3]}/>)}
-        {blobs.filter(b=>b.layer===2).map((b,i)=><circle key={`l${i}`} cx={b.cx} cy={b.cy} r={b.r} fill={LITE[i%4]} opacity=".88"/>)}
-        {/* specular highlight dot */}
-        <circle cx={base.cx-base.r*0.26} cy={base.cy-base.r*0.30} r={Math.round(base.r*0.28)} fill={LITE[3]} opacity=".45"/>
-        {/* team identity rim */}
-        {rimColor&&<circle cx={base.cx} cy={base.cy} r={base.r+rimW} fill="none" stroke={rimColor} strokeWidth={rimW*1.4} opacity={rimOp}/>}
-      </>
-    );
-  }
+  void tB; // reserved
 
   return(
     <div className="relative w-full h-full" style={{background:"linear-gradient(180deg,#92c8e4 0%,#b8dff2 32%,#c2e4b8 68%,#b8dca8 100%)"}}>
@@ -551,24 +516,21 @@ export default function TreeCanvas(){
           `}</style>
         </defs>
 
-        {/* ── SKY ──────────────────────────────────────────────── */}
-        <rect x="0" y="0" width={VW} height={VH} fill="#b4d8f0"/>
+        {/* ── SKY — muted, less saturated ──────────────────── */}
         <defs>
           <linearGradient id="skyG2" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#88bede"/><stop offset="55%" stopColor="#b8dcf0"/>
-            <stop offset="78%" stopColor="#c2e4b4"/><stop offset="100%" stopColor="#baded8"/>
+            <stop offset="0%"  stopColor="#7eaec4"/>
+            <stop offset="46%" stopColor="#a6ccde"/>
+            <stop offset="74%" stopColor="#b6d4a8"/>
+            <stop offset="100%" stopColor="#a6ca98"/>
           </linearGradient>
         </defs>
         <rect x="0" y="0" width={VW} height={VH} fill="url(#skyG2)"/>
-
-        {/* sun */}
-        <circle cx="86" cy="80" r="56" fill="rgba(255,240,150,.25)" filter="url(#cloudBlur)"/>
-        <circle cx="86" cy="80" r="32" fill="rgba(255,225,60,.65)" filter="url(#cloudBlur)"/>
-        <circle cx="86" cy="80" r="20" fill="rgba(255,215,40,.90)"/>
-        {Array.from({length:8},(_,i)=>{const a=i*Math.PI/4,r1=26,r2=46;return(<line key={i} x1={86+r1*Math.cos(a)} y1={80+r1*Math.sin(a)} x2={86+r2*Math.cos(a)} y2={80+r2*Math.sin(a)} stroke="rgba(255,210,40,.50)" strokeWidth="2.5" strokeLinecap="round"/>);})}
-
-        {/* horizon ground ambient */}
-        <ellipse cx={TX} cy={GY} rx="480" ry="62" fill="rgba(140,210,80,.18)"/>
+        {/* sun — just a soft glow, no hard disc or visible rays */}
+        <circle cx="80" cy="74" r="68" fill="rgba(255,238,180,.12)" filter="url(#cloudBlur)"/>
+        <circle cx="80" cy="74" r="36" fill="rgba(255,228,110,.22)" filter="url(#cloudBlur)"/>
+        {/* horizon ambient */}
+        <ellipse cx={TX} cy={GY} rx="450" ry="48" fill="rgba(112,180,64,.10)"/>
 
         {/* ── WIND LINES ─────────────────────────────────────── */}
         {[{x:28,y:192,w:62,d:"0s",dr:"2.2s"},{x:20,y:218,w:76,d:".5s",dr:"2.5s"},{x:36,y:244,w:54,d:".9s",dr:"1.9s"}].map((wl,i)=>(
@@ -577,103 +539,98 @@ export default function TreeCanvas(){
             style={{animationDelay:wl.d,animationDuration:wl.dr}}/>
         ))}
 
-        {/* ── LEFT CLOUD — Marketing ──────────────────────────── */}
+        {/* ── LEFT CLOUD — Marketing — wispy, smaller ─────── */}
         <g className="cl" style={{cursor:"pointer"}} onClick={e=>openZone("mkt",e)}>
-          <ellipse cx="160" cy="108" rx="120" ry="76" fill="white" opacity=".14" filter="url(#cloudBlur)"/>
-          <circle cx="160" cy="116" r="66"  fill="white" opacity=".96"/>
-          <circle cx="94"  cy="128" r="52"  fill="white" opacity=".93"/>
-          <circle cx="226" cy="124" r="54"  fill="white" opacity=".93"/>
-          <circle cx="126" cy="84"  r="46"  fill="white" opacity=".94"/>
-          <circle cx="186" cy="78"  r="42"  fill="white" opacity=".93"/>
-          <circle cx="157" cy="60"  r="35"  fill="white" opacity=".89"/>
-          {mktP>25&&<ellipse cx="160" cy="106" rx="90" ry="54" fill={`rgba(236,72,153,${(mktP-25)/280})`}/>}
-          {/* label */}
-          <rect x="78" y="155" width="164" height={hovered==="mkt"?52:34} rx="9"
-            fill={hovered==="mkt"?"#ec4899":"rgba(12,16,28,.86)"} stroke="#f472b6" strokeWidth="1.8"/>
-          <text x="160" y="169" textAnchor="middle" fill="white" fontSize="12" fontWeight="800" style={{pointerEvents:"none"}}>📣 Marketing</text>
-          <text x="160" y="182" textAnchor="middle" fill={hovered==="mkt"?"white":"#f472b6"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>{mktP}% · {healthOf(mktP).dot} {healthOf(mktP).label}</text>
-          {hovered==="mkt"&&<text x="160" y="197" textAnchor="middle" fill="rgba(255,255,255,.85)" fontSize="9" style={{pointerEvents:"none"}}>✅ {mktS.done}/{mktS.total} việc</text>}
-          {/* large hit zone */}
-          <rect x="20" y="32" width="280" height="185" rx="14" fill="transparent"
+          <ellipse cx="146" cy="102" rx="82" ry="48" fill="rgba(255,255,255,.10)" filter="url(#cloudBlur)"/>
+          <circle cx="134" cy="110" r="36" fill="rgba(255,255,255,.95)"/>
+          <circle cx="172" cy="106" r="30" fill="rgba(255,255,255,.93)"/>
+          <circle cx="106" cy="116" r="24" fill="rgba(255,255,255,.91)"/>
+          <circle cx="156" cy="84"  r="22" fill="rgba(255,255,255,.89)"/>
+          <circle cx="124" cy="80"  r="16" fill="rgba(255,255,255,.86)"/>
+          <circle cx="192" cy="118" r="18" fill="rgba(255,255,255,.87)"/>
+          <circle cx="178" cy="78"  r="12" fill="rgba(255,255,255,.82)"/>
+          {mktP>20&&<ellipse cx="146" cy="102" rx="64" ry="34" fill={`rgba(236,72,153,${(mktP-20)/330})`}/>}
+          <rect x="68" y="150" width="156" height={hovered==="mkt"?52:34} rx="8"
+            fill={hovered==="mkt"?"#ec4899":"rgba(12,16,28,.86)"} stroke="#f472b6" strokeWidth="1.6"/>
+          <text x="146" y="164" textAnchor="middle" fill="white" fontSize="12" fontWeight="800" style={{pointerEvents:"none"}}>📣 Marketing</text>
+          <text x="146" y="177" textAnchor="middle" fill={hovered==="mkt"?"white":"#f472b6"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>{mktP}% · {healthOf(mktP).dot} {healthOf(mktP).label}</text>
+          {hovered==="mkt"&&<text x="146" y="192" textAnchor="middle" fill="rgba(255,255,255,.85)" fontSize="9" style={{pointerEvents:"none"}}>✅ {mktS.done}/{mktS.total} việc</text>}
+          <rect x="22" y="42" width="248" height="158" rx="12" fill="transparent"
             onMouseEnter={()=>setHovered("mkt")} onMouseLeave={()=>setHovered(null)}/>
         </g>
 
-        {/* ── RIGHT CLOUD — Thiên thời ────────────────────────── */}
+        {/* ── RIGHT CLOUD — Thiên Thời — wispy, smaller ────── */}
         <g className="cr" style={{cursor:"pointer"}} onClick={e=>openZone("heaven",e)}>
-          <ellipse cx="840" cy="108" rx="130" ry="78" fill="white" opacity=".14" filter="url(#cloudBlur)"/>
-          <circle cx="840" cy="116" r="70"  fill="white" opacity=".96"/>
-          <circle cx="768" cy="130" r="56"  fill="white" opacity=".93"/>
-          <circle cx="914" cy="126" r="58"  fill="white" opacity=".93"/>
-          <circle cx="804" cy="82"  r="50"  fill="white" opacity=".94"/>
-          <circle cx="866" cy="76"  r="46"  fill="white" opacity=".93"/>
-          <circle cx="836" cy="56"  r="40"  fill="white" opacity=".89"/>
-          {hvIdx>35&&<ellipse cx="840" cy="106" rx="98" ry="58" fill={`rgba(14,165,233,${(hvIdx-35)/280})`}/>}
-          {rainOn&&<g opacity=".80">{Array.from({length:7},(_,i)=>(<line key={i} x1={794+i*14} y1={148} x2={790+i*14} y2={164} stroke="#93c5fd" strokeWidth="1.8" strokeLinecap="round"/>))}</g>}
-          <rect x="700" y="155" width="280" height={hovered==="heaven"?52:34} rx="9"
-            fill={hovered==="heaven"?"#0ea5e9":"rgba(12,16,28,.86)"} stroke="#38bdf8" strokeWidth="1.8"/>
-          <text x="840" y="169" textAnchor="middle" fill="white" fontSize="12" fontWeight="800" style={{pointerEvents:"none"}}>🌦 Thiên Thời</text>
-          <text x="840" y="182" textAnchor="middle" fill={hovered==="heaven"?"white":"#38bdf8"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>Index: {hvIdx} · {rainOn?"🌧 Đang mưa":"☀️ Quang đãng"}</text>
-          {hovered==="heaven"&&<text x="840" y="197" textAnchor="middle" fill="rgba(255,255,255,.85)" fontSize="9" style={{pointerEvents:"none"}}>Bấm để xem chi tiết thiên thời</text>}
-          <rect x="700" y="32" width="290" height="185" rx="14" fill="transparent"
+          <ellipse cx="852" cy="102" rx="86" ry="50" fill="rgba(255,255,255,.10)" filter="url(#cloudBlur)"/>
+          <circle cx="860" cy="110" r="38" fill="rgba(255,255,255,.95)"/>
+          <circle cx="820" cy="116" r="28" fill="rgba(255,255,255,.93)"/>
+          <circle cx="894" cy="114" r="26" fill="rgba(255,255,255,.91)"/>
+          <circle cx="840" cy="82"  r="20" fill="rgba(255,255,255,.89)"/>
+          <circle cx="872" cy="78"  r="16" fill="rgba(255,255,255,.86)"/>
+          <circle cx="812" cy="124" r="14" fill="rgba(255,255,255,.84)"/>
+          <circle cx="900" cy="122" r="12" fill="rgba(255,255,255,.82)"/>
+          {hvIdx>28&&<ellipse cx="852" cy="102" rx="68" ry="36" fill={`rgba(14,165,233,${(hvIdx-28)/350})`}/>}
+          {rainOn&&<g opacity=".68">{Array.from({length:6},(_,i)=>(<line key={i} x1={826+i*11} y1={143} x2={823+i*11} y2={157} stroke="#93c5fd" strokeWidth="1.3" strokeLinecap="round"/>))}</g>}
+          <rect x="750" y="150" width="204" height={hovered==="heaven"?52:34} rx="8"
+            fill={hovered==="heaven"?"#0ea5e9":"rgba(12,16,28,.86)"} stroke="#38bdf8" strokeWidth="1.6"/>
+          <text x="852" y="164" textAnchor="middle" fill="white" fontSize="12" fontWeight="800" style={{pointerEvents:"none"}}>🌦 Thiên Thời</text>
+          <text x="852" y="177" textAnchor="middle" fill={hovered==="heaven"?"white":"#38bdf8"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>Index: {hvIdx} · {rainOn?"🌧 Đang mưa":"☀️ Quang đãng"}</text>
+          {hovered==="heaven"&&<text x="852" y="192" textAnchor="middle" fill="rgba(255,255,255,.85)" fontSize="9" style={{pointerEvents:"none"}}>Bấm để xem chi tiết thiên thời</text>}
+          <rect x="734" y="38" width="236" height="158" rx="12" fill="transparent"
             onMouseEnter={()=>setHovered("heaven")} onMouseLeave={()=>setHovered(null)}/>
         </g>
 
-        {/* ── RAIN ─────────────────────────────────────────────── */}
+        {/* ── RAIN — thin delicate drops ──────────────────── */}
         {rainOn&&RAIN_DROPS.map((r,i)=>(
-          <line key={i} className="rd" x1={r.x} y1={r.y} x2={r.x-3} y2={r.y+18}
-            stroke="rgba(90,140,220,.52)" strokeWidth="1.8" strokeLinecap="round"
+          <line key={i} className="rd" x1={r.x} y1={r.y} x2={r.x-2} y2={r.y+13}
+            stroke="rgba(90,140,220,.32)" strokeWidth="1.0" strokeLinecap="round"
             style={{animationDelay:`${r.del}s`,animationDuration:`${r.dur}s`}}/>
         ))}
 
-        {/* ═══════════════════════════════════════════════════
-               TREE (entire group sways together)
-        ═══════════════════════════════════════════════════ */}
+        {/* ═══════════════════════════════════════════════
+               TREE — organic, asymmetric
+        ═══════════════════════════════════════════════ */}
         <g className="tree-grp" filter="url(#leafShadow)">
 
-          {/* ── BRANCHES (rendered before canopy blobs) ─────── */}
-          {/* Left main branch: trunk fork → Piano cluster */}
-          <path d={branchPath(LBX,LBY,PIANO_CX,PIANO_CY+pianoR*0.55,22,11)} fill={tC}/>
-          {/* Right main branch: trunk fork → Assistant cluster */}
-          <path d={branchPath(RBX,RBY,ASST_CX, ASST_CY+asstR*0.55, 22,11)} fill={tC}/>
-          {/* Mid-left sub-branch */}
-          <path d={branchPath(TX-22,392,ML_CX,ML_CY+mlR*0.55,15,8)} fill={tA}/>
-          {/* Mid-right sub-branch */}
-          <path d={branchPath(TX+22,392,MR_CX,MR_CY+mrR*0.55,15,8)} fill={tA}/>
-
-          {/* ── PIANO LEFT CANOPY ────────────────────────────── */}
-          <BlobGroup blobs={pianoBlobs} rimColor="#8b5cf6" rimW={5}/>
-          <LeafCluster cx={PIANO_CX} cy={PIANO_CY} r={pianoR} done={pianoS.done} overdue={pianoS.overdue} prog={pianoP} seed={101}/>
-          <FlowerTip cx={PIANO_CX} cy={PIANO_CY-pianoR-6} prog={pianoP}/>
-
-          {/* ── ASSISTANT RIGHT CANOPY ───────────────────────── */}
-          <BlobGroup blobs={asstBlobs} rimColor="#3b82f6" rimW={5}/>
-          <LeafCluster cx={ASST_CX} cy={ASST_CY} r={asstR} done={asstS.done} overdue={asstS.overdue} prog={asstP} seed={202}/>
-          <FlowerTip cx={ASST_CX} cy={ASST_CY-asstR-6} prog={asstP}/>
-
-          {/* ── MID-LEFT sub-canopy (part of tech, no label) ─── */}
-          <BlobGroup blobs={mlBlobs}/>
-          <LeafCluster cx={ML_CX} cy={ML_CY} r={mlBlobs[0].r} done={Math.round(techS.done*0.3)} overdue={0} prog={techP} seed={404}/>
-
-          {/* ── MID-RIGHT sub-canopy ─────────────────────────── */}
-          <BlobGroup blobs={mrBlobs}/>
-          <LeafCluster cx={MR_CX} cy={MR_CY} r={mrBlobs[0].r} done={Math.round(techS.done*0.3)} overdue={0} prog={techP} seed={505}/>
-
-          {/* ── CENTER TECH CROWN ────────────────────────────── */}
-          <BlobGroup blobs={techBlobs} rimColor="#6366f1" rimW={6}/>
-          <LeafCluster cx={TECH_CX} cy={TECH_CY} r={techR} done={techS.done} overdue={techS.overdue} prog={techP} seed={303}/>
-          <FlowerTip cx={TECH_CX} cy={TECH_CY-techR-6} prog={techP}/>
-
-          {/* ── TRUNK ─────────────────────────────────────────── */}
+          {/* ── TRUNK (bottom layer) ──────────────────────────── */}
           <path d={TRUNK_PATH} fill="url(#trunkG)" filter="url(#trunkShd)"/>
-          <path d={TRUNK_PATH} fill="url(#barkPat)" opacity=".26"/>
-          {/* sheen */}
-          <path d={`M ${TX-6},${TRUNK_TOP_Y} C ${TX-7},${TRUNK_TOP_Y+80} ${TX-8},${GY-120} ${TX-10},${GY} L ${TX+2},${GY} C ${TX},${GY-120} ${TX+1},${TRUNK_TOP_Y+80} ${TX+2},${TRUNK_TOP_Y} Z`}
-            fill="rgba(200,140,50,.10)"/>
-          {/* subtle trunk label */}
-          <text x={TX} y={436} textAnchor="middle" fill="rgba(255,255,255,.18)" fontSize="9" fontWeight="700" letterSpacing="2.5">TECH CORE</text>
-          <text x={TX} y={450} textAnchor="middle" fill="rgba(255,255,255,.12)" fontSize="8">
+          <path d={TRUNK_PATH} fill="url(#barkPat)" opacity=".20"/>
+          {/* one-sided light sheen */}
+          <path d={`M 492,${TRUNK_TOP_Y} C 491,${TRUNK_TOP_Y+88} 490,${GY-130} 492,${GY} L 498,${GY} C 496,${GY-130} 495,${TRUNK_TOP_Y+88} 496,${TRUNK_TOP_Y} Z`}
+            fill="rgba(220,160,70,.12)"/>
+          <text x={TX} y={442} textAnchor="middle" fill="rgba(255,255,255,.14)" fontSize="8" fontWeight="700" letterSpacing="2.5">TECH CORE</text>
+          <text x={TX} y={456} textAnchor="middle" fill="rgba(255,255,255,.09)" fontSize="7.5">
             {app.projects.filter(p=>p.status==="live").length} live · {app.projects.filter(p=>p.status==="building").length} đang xây
           </text>
+
+          {/* ── MAIN BRANCHES — asymmetric ────────────────────── */}
+          {/* Left: longer, with one extra secondary branch (left has more sub-branches) */}
+          <path d={branchPath(LBX,LBY,PIANO_CX,PIANO_CY+42,24,10)} fill={tC}/>
+          <path d={branchPath(PIANO_CX-12,PIANO_CY+30,PIANO_CX-50,PIANO_CY-20,8,4)} fill={tA}/>
+          {/* Right: slightly different angle, one terminal only */}
+          <path d={branchPath(RBX,RBY,ASST_CX,ASST_CY+38,21,9)} fill={tC}/>
+          {/* Center vertical from trunk top to Tech crown */}
+          <path d={branchPath(499,TRUNK_TOP_Y,TECH_CX,TECH_CY+36,15,8)} fill={tC}/>
+          {/* Mid-left sub — nearly horizontal then lifts */}
+          <path d={branchPath(491,350,ML_CX,ML_CY+26,12,6)} fill={tA}/>
+          {/* Mid-right sub — shorter */}
+          <path d={branchPath(509,338,MR_CX,MR_CY+20,10,5)} fill={tA}/>
+
+          {/* ── ORGANIC CANOPIES — branches + leaves, no circles ──── */}
+          {/* Piano left */}
+          <OrganicCanopy cx={PIANO_CX} cy={PIANO_CY} prog={pianoP} color="#8b5cf6" done={pianoS.done} overdue={pianoS.overdue} seed={101}/>
+          <FlowerTip cx={PIANO_CX} cy={PIANO_CY-cR(pianoP)-8} prog={pianoP}/>
+          {/* Assistant right */}
+          <OrganicCanopy cx={ASST_CX} cy={ASST_CY} prog={asstP} color="#3b82f6" done={asstS.done} overdue={asstS.overdue} seed={202}/>
+          <FlowerTip cx={ASST_CX} cy={ASST_CY-cR(asstP)-8} prog={asstP}/>
+          {/* Mid-left (tech sub) */}
+          <OrganicCanopy cx={ML_CX} cy={ML_CY} prog={Math.round(techP*0.65)} color="#22c55e" done={Math.round(techS.done*0.3)} overdue={0} seed={404}/>
+          {/* Mid-right (tech sub) */}
+          <OrganicCanopy cx={MR_CX} cy={MR_CY} prog={Math.round(techP*0.65)} color="#22c55e" done={Math.round(techS.done*0.3)} overdue={0} seed={505}/>
+          {/* Tech center crown — on top */}
+          <OrganicCanopy cx={TECH_CX} cy={TECH_CY} prog={techP} color="#6366f1" done={techS.done} overdue={techS.overdue} seed={303}/>
+          <FlowerTip cx={TECH_CX} cy={TECH_CY-cR(techP)-8} prog={techP}/>
+
         </g>{/* end .tree-grp */}
 
         {/* ── GROUND LINE ─────────────────────────────────────── */}
@@ -683,18 +640,18 @@ export default function TreeCanvas(){
         <g style={{cursor:"pointer"}} onClick={e=>openZone("hr",e)}
            onMouseEnter={()=>setHovered("hr")} onMouseLeave={()=>setHovered(null)}>
           {/* large left root surfacing above ground */}
-          <path d={`M ${TX-TRUNK_BW},${GY} C ${TX-110},${GY+8} ${TX-220},${GY-14} ${TX-330},${GY+2}
+          <path d={`M ${TX-56},${GY} C ${TX-110},${GY+8} ${TX-220},${GY-14} ${TX-330},${GY+2}
             C ${TX-390},${GY+12} ${TX-420},${GY+28} ${TX-450},${GY+46}
             L ${TX-438},${GY+54} C ${TX-406},${GY+36} ${TX-374},${GY+20} ${TX-314},${GY+10}
             L ${TX-310},${GY+60} L ${TX-294},${GY+62} L ${TX-298},${GY+10}
-            C ${TX-200},${GY+0} ${TX-96},${GY+16} ${TX-TRUNK_BW+8},${GY+20} Z`}
+            C ${TX-200},${GY+0} ${TX-96},${GY+16} ${TX-48},${GY+20} Z`}
             fill="url(#hrRootG)" opacity=".94"/>
           {/* large right root */}
-          <path d={`M ${TX+TRUNK_BW},${GY} C ${TX+110},${GY+8} ${TX+220},${GY-14} ${TX+330},${GY+2}
+          <path d={`M ${TX+56},${GY} C ${TX+110},${GY+8} ${TX+220},${GY-14} ${TX+330},${GY+2}
             C ${TX+390},${GY+12} ${TX+420},${GY+28} ${TX+450},${GY+46}
             L ${TX+438},${GY+54} C ${TX+406},${GY+36} ${TX+374},${GY+20} ${TX+314},${GY+10}
             L ${TX+310},${GY+60} L ${TX+294},${GY+62} L ${TX+298},${GY+10}
-            C ${TX+200},${GY+0} ${TX+96},${GY+16} ${TX+TRUNK_BW-8},${GY+20} Z`}
+            C ${TX+200},${GY+0} ${TX+96},${GY+16} ${TX+48},${GY+20} Z`}
             fill="url(#hrRootG)" opacity=".94"/>
           {/* small tap root */}
           <path d={`M ${TX-16},${GY} L ${TX-12},${GY+74} L ${TX+12},${GY+74} L ${TX+16},${GY} Z`}
