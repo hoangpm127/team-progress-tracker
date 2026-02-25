@@ -340,6 +340,84 @@ function makeGrass(count:number){
 }
 
 // ─────────────────────────────────────────────────────────────
+//  LEAF CLUSTER  (individual SVG leaves at canopy perimeter)
+// ─────────────────────────────────────────────────────────────
+const GREEN_LEAF=["#2e8a1e","#368424","#3a9628","#2c801c","#44a032","#30961e"];
+function LeafCluster({cx,cy,r,done,overdue,prog,seed}:{cx:number;cy:number;r:number;done:number;overdue:number;prog:number;seed:number}){
+  const rng=mkRng(seed*7+13);
+  const greenCount=Math.min(done,38);
+  const yellowCount=Math.min(overdue,8);
+  if(greenCount+yellowCount===0) return null;
+  const leafSz=6.5+prog*0.045;
+  // arc: 130° → 410° (wraps top), skipping bottom 80° where branch attaches
+  const AS=130*Math.PI/180, AE=410*Math.PI/180, AT=AE-AS;
+  const out:React.ReactElement[]=[];
+  // green leaves
+  for(let i=0;i<greenCount;i++){
+    const t=rng();
+    const angle=AS+t*AT;
+    const dist=r*(0.82+rng()*0.30);
+    const lx=cx+Math.cos(angle)*dist;
+    const ly=cy+Math.sin(angle)*dist;
+    const rot=angle*180/Math.PI+90;
+    const sz=leafSz*(0.65+rng()*0.65);
+    const col=GREEN_LEAF[i%GREEN_LEAF.length];
+    out.push(<path key={`g${i}`}
+      d={`M 0,0 C ${sz*.36},${-sz*.28} ${sz*.30},${-sz*.82} 0,${-sz} C ${-sz*.30},${-sz*.82} ${-sz*.36},${-sz*.28} 0,0 Z`}
+      fill={col} opacity={0.72+rng()*.22}
+      transform={`translate(${lx},${ly}) rotate(${rot})`}/>);
+  }
+  // yellow overdue leaves (drooping — rotation offset +40°)
+  for(let i=0;i<yellowCount;i++){
+    const t=rng();
+    const angle=AS+30*Math.PI/180+t*(AT-60*Math.PI/180);
+    const dist=r*(0.78+rng()*.22);
+    const lx=cx+Math.cos(angle)*dist;
+    const ly=cy+Math.sin(angle)*dist;
+    const rot=angle*180/Math.PI+90+38+rng()*28;
+    const sz=leafSz*(0.55+rng()*.50);
+    out.push(<path key={`y${i}`}
+      d={`M 0,0 C ${sz*.36},${-sz*.28} ${sz*.30},${-sz*.82} 0,${-sz} C ${-sz*.30},${-sz*.82} ${-sz*.36},${-sz*.28} 0,0 Z`}
+      fill={i%2===0?"#fbbf24":"#f59e0b"} opacity="0.86"
+      transform={`translate(${lx},${ly}) rotate(${rot})`}/>);
+  }
+  return <g style={{pointerEvents:"none"}}>{out}</g>;
+}
+
+// ─────────────────────────────────────────────────────────────
+//  FLOWER / FRUIT (milestone: 80% → flower, 100% → fruit)
+// ─────────────────────────────────────────────────────────────
+function FlowerTip({cx,cy,prog}:{cx:number;cy:number;prog:number}){
+  if(prog<80) return null;
+  if(prog>=100){
+    return(
+      <g filter="url(#fruitGlow)" style={{pointerEvents:"none"}}>
+        <circle cx={cx} cy={cy} r={9} fill="url(#fruitG)"/>
+        <circle cx={cx-2.5} cy={cy-2.8} r={2.4} fill="rgba(255,255,255,.38)"/>
+        <path d={`M ${cx},${cy-9} Q ${cx+4},${cy-15} ${cx+2},${cy-18}`}
+          stroke="#3d6012" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+      </g>
+    );
+  }
+  // flower at 80–99%
+  const PR=5.5;
+  return(
+    <g style={{pointerEvents:"none"}}>
+      {Array.from({length:5},(_,i)=>{
+        const a=i*72*Math.PI/180-Math.PI/2;
+        const px=cx+Math.cos(a)*PR*1.85;
+        const py=cy+Math.sin(a)*PR*1.85;
+        return(<ellipse key={i} cx={px} cy={py} rx={PR} ry={PR*.52}
+          fill="#fff8c0" stroke="#fbbf24" strokeWidth="0.8" opacity=".94"
+          transform={`rotate(${i*72-90} ${px} ${py})`}/>);
+      })}
+      <circle cx={cx} cy={cy} r={PR*.62} fill="#fbbf24"/>
+      <circle cx={cx-1} cy={cy-1} r={PR*.22} fill="rgba(255,255,255,.45)"/>
+    </g>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
 //  MAIN COMPONENT
 // ─────────────────────────────────────────────────────────────
 export default function TreeCanvas(){
@@ -442,6 +520,14 @@ export default function TreeCanvas(){
           <filter id="cloudBlur">
             <feGaussianBlur in="SourceGraphic" stdDeviation="6"/>
           </filter>
+          <radialGradient id="fruitG" cx="38%" cy="32%" r="62%">
+            <stop offset="0%"   stopColor="#ff9a3c"/>
+            <stop offset="55%"  stopColor="#e85c00"/>
+            <stop offset="100%" stopColor="#aa2800"/>
+          </radialGradient>
+          <filter id="fruitGlow" x="-55%" y="-55%" width="210%" height="210%">
+            <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#ff9a3c" floodOpacity=".75"/>
+          </filter>
           <style>{`
             @keyframes sway{0%,100%{transform:rotate(-1deg)}50%{transform:rotate(1deg)}}
             @keyframes floatL{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
@@ -453,6 +539,8 @@ export default function TreeCanvas(){
             .cr{animation:floatR 9s 1.8s ease-in-out infinite}
             .rd{animation:rainFall linear infinite}
             .wl{animation:windGust ease-in-out infinite;transform-origin:left center}
+            @keyframes leafPop{0%{opacity:0;transform:scale(.15) rotate(var(--lr,0deg))}60%{transform:scale(1.12) rotate(var(--lr,0deg))}100%{opacity:1;transform:scale(1) rotate(var(--lr,0deg))}}
+            .leaf-new{animation:leafPop .45s ease-out both}
           `}</style>
         </defs>
 
@@ -547,9 +635,13 @@ export default function TreeCanvas(){
 
           {/* ── PIANO LEFT CANOPY ────────────────────────────── */}
           <BlobGroup blobs={pianoBlobs} rimColor="#8b5cf6" rimW={5}/>
+          <LeafCluster cx={PIANO_CX} cy={PIANO_CY} r={pianoR} done={pianoS.done} overdue={pianoS.overdue} prog={pianoP} seed={101}/>
+          <FlowerTip cx={PIANO_CX} cy={PIANO_CY-pianoR-6} prog={pianoP}/>
 
           {/* ── ASSISTANT RIGHT CANOPY ───────────────────────── */}
           <BlobGroup blobs={asstBlobs} rimColor="#3b82f6" rimW={5}/>
+          <LeafCluster cx={ASST_CX} cy={ASST_CY} r={asstR} done={asstS.done} overdue={asstS.overdue} prog={asstP} seed={202}/>
+          <FlowerTip cx={ASST_CX} cy={ASST_CY-asstR-6} prog={asstP}/>
 
           {/* ── MID-LEFT sub-canopy (part of tech, no label) ─── */}
           <BlobGroup blobs={mlBlobs}/>
@@ -559,6 +651,8 @@ export default function TreeCanvas(){
 
           {/* ── CENTER TECH CROWN ────────────────────────────── */}
           <BlobGroup blobs={techBlobs} rimColor="#6366f1" rimW={6}/>
+          <LeafCluster cx={TECH_CX} cy={TECH_CY} r={techR} done={techS.done} overdue={techS.overdue} prog={techP} seed={303}/>
+          <FlowerTip cx={TECH_CX} cy={TECH_CY-techR-6} prog={techP}/>
 
           {/* ── TRUNK ─────────────────────────────────────────── */}
           <path d={TRUNK_PATH} fill="url(#trunkG)" filter="url(#trunkShd)"/>
