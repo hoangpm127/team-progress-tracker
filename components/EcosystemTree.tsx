@@ -21,84 +21,55 @@ interface LayerDef {
 }
 
 const LAYERS: LayerDef[] = [
+  // ── 1. Mây (gộp cả 2 đám mây trái + phải) ───────────────────────
   {
-    id: "sky",
-    label: "Sky",
-    labelVi: "Bầu trời",
-    pct: "16.3%",
-    color: "#38bdf8",
-    shape: { type: "rect", x: 0, y: 0, w: 900, h: 95, rx: 0 },
-    tooltip: "Bầu trời — nền không gian tổng thể của hệ sinh thái",
-  },
-  {
-    id: "cloud_left",
-    label: "Cloud (Wind)",
-    labelVi: "Mây trái — Gió",
-    pct: "~8%",
+    id: "clouds",
+    label: "Clouds",
+    labelVi: "Mây",
+    pct: "~16%",
     color: "#22d3ee",
-    shape: { type: "ellipse", cx: 190, cy: 115, rx: 145, ry: 78 },
-    tooltip: "Mây gió (trái) — đại diện cho Marketing, tạo lực đẩy thương hiệu",
+    shape: {
+      type: "path",
+      // Mây trái (cx≈185, cy≈108) + Mây phải (cx≈695, cy≈95) — 2 sub-paths
+      d: "M185,68 C138,54 68,64 44,98 C22,132 50,168 104,176 C146,182 198,168 235,148 C268,130 292,104 278,84 C265,66 222,58 185,68 Z M695,52 C624,40 546,62 533,97 C520,132 556,165 622,174 C668,180 730,170 772,150 C810,132 844,106 830,80 C816,58 758,48 695,52 Z",
+    },
+    tooltip: "Mây — nguồn lực & cơ hội từ môi trường bên ngoài",
   },
-  {
-    id: "cloud_right",
-    label: "Cloud (Rain)",
-    labelVi: "Mây phải — Mưa",
-    pct: "~8%",
-    color: "#818cf8",
-    shape: { type: "ellipse", cx: 700, cy: 100, rx: 165, ry: 82 },
-    tooltip: "Mây mưa (phải) — đại diện Thiên thời, cơ hội từ thị trường",
-  },
+
+  // ── 2. Gió (trái — vùng luồng gió cuộn) ─────────────────────────
   {
     id: "wind",
     label: "Wind",
     labelVi: "Gió",
     pct: "0.1%",
     color: "#06b6d4",
-    shape: { type: "rect", x: 80, y: 110, w: 220, h: 155, rx: 20 },
-    tooltip: "Gió — luồng Marketing thổi đưa thương hiệu ra thị trường",
+    shape: { type: "rect", x: 58, y: 98, w: 268, h: 188, rx: 30 },
+    tooltip: "Gió — Marketing, luồng lực đẩy thương hiệu ra thị trường",
   },
+
+  // ── 3. Mưa (phải — vùng hạt mưa rơi) ────────────────────────────
   {
     id: "rain",
     label: "Rain",
     labelVi: "Mưa",
     pct: "0.4%",
     color: "#60a5fa",
-    shape: { type: "rect", x: 560, y: 85, w: 165, h: 105, rx: 20 },
+    shape: { type: "rect", x: 524, y: 72, w: 202, h: 158, rx: 24 },
     tooltip: "Mưa — Thiên thời, nguồn lực & cơ hội từ môi trường bên ngoài",
   },
-  {
-    id: "canopy",
-    label: "Canopy",
-    labelVi: "Tán lá",
-    pct: "32.1%",
-    color: "#4ade80",
-    shape: {
-      type: "path",
-      d: "M450,80 C300,75 150,130 90,200 C40,260 60,330 130,360 C200,390 320,400 380,390 L380,430 L520,430 L520,390 C580,400 700,390 770,360 C840,330 860,260 810,200 C750,130 600,75 450,80 Z",
-    },
-    tooltip: "Tán lá — 5 phòng ban, hiệu quả hoạt động, sức sống của tổ chức",
-  },
-  {
-    id: "branches",
-    label: "Branches",
-    labelVi: "Cành cây",
-    pct: "5.2%",
-    color: "#d97706",
-    shape: {
-      type: "path",
-      d: "M370,300 C280,280 180,260 120,235 L135,255 C190,270 280,295 375,320 Z M530,300 C620,280 720,260 780,235 L765,255 C710,270 620,295 525,320 Z M400,350 C350,330 260,320 200,315 L210,332 C265,335 355,345 405,368 Z M500,350 C550,330 640,320 700,315 L690,332 C635,335 545,345 495,368 Z",
-    },
-    tooltip: "Cành cây — kết nối giữa thân (Technology) và tán lá (các phòng ban)",
-  },
+
+  // ── 4. Thân cây (trunk) ──────────────────────────────────────────
   {
     id: "trunk",
     label: "Trunk",
     labelVi: "Thân cây",
     pct: "3.2%",
     color: "#a78bfa",
-    shape: { type: "rect", x: 393, y: 290, w: 114, h: 185, rx: 8 },
+    shape: { type: "rect", x: 400, y: 296, w: 100, h: 178, rx: 10 },
     tooltip: "Thân cây — Technology Core, nền tảng kỹ thuật dẫn đến 30 Projects",
   },
+
+  // ── 5. Rễ cây (roots — toả ra từ gốc thân) ──────────────────────
   {
     id: "roots",
     label: "Roots",
@@ -107,18 +78,21 @@ const LAYERS: LayerDef[] = [
     color: "#fb923c",
     shape: {
       type: "path",
-      d: "M420,470 C370,468 300,475 250,488 C210,498 195,510 205,520 L215,518 C225,510 250,502 295,494 C340,486 390,482 430,482 L430,470 Z M480,470 C530,468 600,475 650,488 C690,498 705,510 695,520 L685,518 C675,510 650,502 605,494 C560,486 510,482 470,482 L470,470 Z M440,474 L440,525 L460,525 L460,474 Z",
+      // Rễ trái + rễ phải + rễ trung tâm thẳng đứng
+      d: "M424,468 Q382,464 336,472 Q284,482 252,496 Q225,510 230,522 Q240,528 262,522 Q294,512 342,502 Q388,492 426,490 Z M476,468 Q518,464 564,472 Q616,482 648,496 Q675,510 670,522 Q660,528 638,522 Q606,512 558,502 Q512,492 474,490 Z M448,468 L448,526 L452,526 L452,468 Z",
     },
     tooltip: "Rễ cây — Personnel System, nền tảng nhân sự HR của tổ chức",
   },
+
+  // ── 6. Cỏ & hoa lá dưới mặt đất (grass / ground cover) ──────────
   {
     id: "grass",
     label: "Grass / Ground",
-    labelVi: "Cỏ & Mặt đất",
-    pct: "11.8%",
+    labelVi: "Cỏ & Hoa lá đất",
+    pct: "~12%",
     color: "#34d399",
-    shape: { type: "rect", x: 0, y: 485, w: 900, h: 45, rx: 0 },
-    tooltip: "Mặt đất — Partner Block: Suppliers, HR Partners, Knowledge Partners, Financial Partners",
+    shape: { type: "rect", x: 0, y: 472, w: 900, h: 58, rx: 0 },
+    tooltip: "Mặt đất — tất cả cỏ, hoa, lá dưới mặt đất; Partner Block bên ngoài",
   },
 ];
 
