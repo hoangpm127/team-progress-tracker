@@ -148,6 +148,9 @@ export default function DashboardPage() {
   const { teams, tasks, lastUpdated, loading, getTeamProgress, getTeamStats, getTeamObjectives, getCompanyObjectives } = useApp();
   const [projectModalOpen, setProjectModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<string[]>([]);
+  const [aiLoading, setAiLoading]   = useState(false);
+  const [aiError, setAiError]       = useState<string | null>(null);
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
@@ -189,6 +192,58 @@ export default function DashboardPage() {
   }
 
   const timeElapsedPct = Math.round((Q1_ELAPSED / Q1_TOTAL) * 100);
+
+  // ── AI Quick Analysis ──────────────────────────────────────────────────
+  async function handleAIAnalysis() {
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const snapshot = {
+        date: TODAY.toLocaleDateString("vi-VN"),
+        q1ElapsedDays: Q1_ELAPSED,
+        q1TotalDays: Q1_TOTAL,
+        q1ElapsedPct: timeElapsedPct,
+        avgOKR: avgOKRPct,
+        totalOverdue,
+        bottleneck: bottleneck ? bottleneck[0] : null,
+        kpis: ANNUAL_KPIS.map((k) => ({
+          label: k.label,
+          current: k.current,
+          target: k.target,
+          pct: Math.min(100, Math.round((Number(k.current) / Number(k.target)) * 100)),
+        })),
+        teams: teams.map((t) => {
+          const pct   = getTeamProgress(t.id);
+          const stats = getTeamStats(t.id);
+          return {
+            id:       t.id,
+            name:     t.name,
+            progress: pct,
+            done:     stats.done,
+            total:    stats.total,
+            overdue:  stats.overdue,
+            forecast: q1Forecast(pct),
+            health:   getHealth(pct).label,
+          };
+        }),
+      };
+      const res  = await fetch("/api/ai-analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(snapshot),
+      });
+      const data = await res.json() as { bullets?: string[]; error?: string };
+      if (!res.ok || data.error) {
+        setAiError(data.error ?? "Lỗi không xác định từ server");
+      } else {
+        setAiAnalysis(data.bullets ?? []);
+      }
+    } catch {
+      setAiError("Không thể kết nối server. Kiểm tra lại mạng hoặc API key.");
+    } finally {
+      setAiLoading(false);
+    }
+  }
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
@@ -336,37 +391,67 @@ export default function DashboardPage() {
       {/* ── Row 4: Bottleneck + Strategic alerts ──────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
 
-        {/* Bottleneck + insights (now first) */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
-          <h3 className="font-bold text-slate-800 text-sm mb-3 text-center" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.08em" }}>🔍 PHÂN TÍCH NHANH</h3>
-          <div className="space-y-3">
-            {bottleneck && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-                <p className="text-xs font-bold text-amber-800 mb-0.5">⚠ Bottleneck tiềm năng</p>
-                <p className="text-sm font-semibold text-amber-900">{bottleneck[0]}</p>
-                <p className="text-[11px] text-amber-600">{bottleneck[1]} công việc đang chờ xử lý</p>
+        {/* AI Quick Analysis */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4 flex flex-col">
+          <h3 className="font-bold text-slate-800 text-sm mb-3 text-center" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.08em" }}>🤖 PHÂN TÍCH NHANH · AI</h3>
+
+          {/* Content area */}
+          <div className="flex-1 space-y-2">
+
+            {/* Loading */}
+            {aiLoading && (
+              <div className="flex items-center gap-3 py-5 text-indigo-500">
+                <div className="w-4 h-4 border-2 border-indigo-200 border-t-indigo-500 rounded-full animate-spin shrink-0" />
+                <p className="text-xs leading-relaxed">AI đang đọc toàn bộ dữ liệu hệ thống và phân tích...</p>
               </div>
             )}
-            <div className={`rounded-xl px-4 py-3 ${avgOKRPct >= 60 ? "bg-emerald-50 border border-emerald-200" : avgOKRPct >= 40 ? "bg-amber-50 border border-amber-200" : "bg-red-50 border border-red-200"}`}>
-              <p className={`text-xs font-bold mb-0.5 ${avgOKRPct >= 60 ? "text-emerald-800" : avgOKRPct >= 40 ? "text-amber-800" : "text-red-800"}`}>
-                {avgOKRPct >= 60 ? "✅" : avgOKRPct >= 40 ? "🟡" : "🔴"} OKR toàn công ty: {avgOKRPct}%
-              </p>
-              <p className={`text-[11px] ${avgOKRPct >= 60 ? "text-emerald-700" : avgOKRPct >= 40 ? "text-amber-700" : "text-red-600"}`}>
-                {avgOKRPct >= 60 ? "Kết quả then chốt đang tiến triển tốt" : avgOKRPct >= 40 ? "Một số mục tiêu cần thúc đẩy thêm" : "Cần review lại OKR ngay"}
-              </p>
-            </div>
-            {totalOverdue > 0 && (
+
+            {/* Error */}
+            {aiError && !aiLoading && (
               <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                <p className="text-xs font-bold text-red-800 mb-0.5">🚨 {totalOverdue} công việc quá hạn</p>
-                <p className="text-[11px] text-red-600">Cần xử lý ngay để tránh trễ mục tiêu Q1</p>
+                <p className="text-xs font-bold text-red-700 mb-0.5">⚠ Không thể phân tích</p>
+                <p className="text-[11px] text-red-600">{aiError}</p>
               </div>
             )}
-            {totalOverdue === 0 && (
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
-                <p className="text-xs font-bold text-emerald-800">✅ Không có công việc quá hạn</p>
+
+            {/* Empty state */}
+            {!aiLoading && !aiError && aiAnalysis.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-6 text-slate-400 gap-2">
+                <span className="text-3xl">🧠</span>
+                <p className="text-xs text-center leading-relaxed">
+                  Bấm nút bên dưới để AI đọc toàn bộ số liệu<br />
+                  và đưa ra nhận xét chiến lược ngay lập tức
+                </p>
               </div>
+            )}
+
+            {/* AI bullets */}
+            {!aiLoading && aiAnalysis.length > 0 && (
+              <ul className="space-y-2">
+                {aiAnalysis.map((bullet, i) => (
+                  <li key={i} className="flex gap-2.5 items-start bg-indigo-50 border border-indigo-100 rounded-xl px-3 py-2.5">
+                    <span className="text-indigo-400 font-black text-xs mt-0.5 shrink-0 w-4">{i + 1}.</span>
+                    <p className="text-xs text-slate-700 leading-relaxed">{bullet}</p>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
+
+          {/* Trigger button */}
+          <button
+            onClick={handleAIAnalysis}
+            disabled={aiLoading}
+            className="mt-4 w-full py-2 rounded-xl text-xs font-semibold transition-all border
+              disabled:opacity-50 disabled:cursor-not-allowed
+              bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700 active:scale-[0.98]"
+          >
+            {aiLoading
+              ? "⏳ Đang phân tích..."
+              : aiAnalysis.length > 0
+                ? "🔄 Phân tích lại"
+                : "🤖 Phân tích với AI"}
+          </button>
         </div>
 
         {/* Strategic alerts (now second) */}
