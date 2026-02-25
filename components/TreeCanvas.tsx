@@ -342,44 +342,49 @@ function makeGrass(count:number){
 // ─────────────────────────────────────────────────────────────
 //  LEAF CLUSTER  (individual SVG leaves at canopy perimeter)
 // ─────────────────────────────────────────────────────────────
-const GREEN_LEAF=["#2e8a1e","#368424","#3a9628","#2c801c","#44a032","#30961e"];
+// Bright yellow-green palette — clearly visible against dark green blobs
+const LEAF_BRIGHT=["#aee84e","#bef460","#c8f472","#9ee040","#d0f47a","#8cd83a"];
+const LEAF_MID   =["#7cc82c","#88d636","#68be1e","#74ca28","#6ab820"];
 function LeafCluster({cx,cy,r,done,overdue,prog,seed}:{cx:number;cy:number;r:number;done:number;overdue:number;prog:number;seed:number}){
   const rng=mkRng(seed*7+13);
-  const greenCount=Math.min(done,38);
-  const yellowCount=Math.min(overdue,8);
-  if(greenCount+yellowCount===0) return null;
-  const leafSz=6.5+prog*0.045;
-  // arc: 130° → 410° (wraps top), skipping bottom 80° where branch attaches
-  const AS=130*Math.PI/180, AE=410*Math.PI/180, AT=AE-AS;
+  // Always show leaves: minimum 10, scaling up to 44 with progress + done
+  const greenCount=Math.min(Math.max(10,Math.round(prog*0.30+done*2.2)),44);
+  const yellowCount=Math.min(overdue,10);
+  // Leaf size: large enough to see (14px min → 28px at 100%)
+  const leafSz=14+prog*0.14;
+  // arc: 115° → 425° — nearly full circle; skip small bottom wedge where branch attaches
+  const AS=115*Math.PI/180, AE=425*Math.PI/180, AT=AE-AS;
   const out:React.ReactElement[]=[];
-  // green leaves
+  // green leaves — alternating bright / mid-tone for depth
   for(let i=0;i<greenCount;i++){
     const t=rng();
     const angle=AS+t*AT;
-    const dist=r*(0.82+rng()*0.30);
+    // scatter from 60% radius (inner) to 110% (bursting slightly outside)
+    const dist=r*(0.60+rng()*0.52);
     const lx=cx+Math.cos(angle)*dist;
     const ly=cy+Math.sin(angle)*dist;
-    const rot=angle*180/Math.PI+90;
-    const sz=leafSz*(0.65+rng()*0.65);
-    const col=GREEN_LEAF[i%GREEN_LEAF.length];
+    const rot=angle*180/Math.PI+90+(rng()-0.5)*38;
+    const sz=leafSz*(0.62+rng()*0.70);
+    const col=i%3===0?LEAF_BRIGHT[i%LEAF_BRIGHT.length]:LEAF_MID[i%LEAF_MID.length];
+    // teardrop leaf path, with thin dark outline for definition
     out.push(<path key={`g${i}`}
-      d={`M 0,0 C ${sz*.36},${-sz*.28} ${sz*.30},${-sz*.82} 0,${-sz} C ${-sz*.30},${-sz*.82} ${-sz*.36},${-sz*.28} 0,0 Z`}
-      fill={col} opacity={0.72+rng()*.22}
-      transform={`translate(${lx},${ly}) rotate(${rot})`}/>);
+      d={`M 0,0 C ${sz*.38},${-sz*.26} ${sz*.32},${-sz*.80} 0,${-sz} C ${-sz*.32},${-sz*.80} ${-sz*.38},${-sz*.26} 0,0 Z`}
+      fill={col} stroke="rgba(0,60,0,.22)" strokeWidth="0.6" opacity={0.80+rng()*.18}
+      transform={`translate(${lx.toFixed(1)},${ly.toFixed(1)}) rotate(${rot.toFixed(1)})`}/>);
   }
-  // yellow overdue leaves (drooping — rotation offset +40°)
+  // yellow/amber overdue leaves — drooping (rotation +42°)
   for(let i=0;i<yellowCount;i++){
     const t=rng();
-    const angle=AS+30*Math.PI/180+t*(AT-60*Math.PI/180);
-    const dist=r*(0.78+rng()*.22);
+    const angle=AS+35*Math.PI/180+t*(AT-70*Math.PI/180);
+    const dist=r*(0.72+rng()*0.32);
     const lx=cx+Math.cos(angle)*dist;
     const ly=cy+Math.sin(angle)*dist;
-    const rot=angle*180/Math.PI+90+38+rng()*28;
-    const sz=leafSz*(0.55+rng()*.50);
+    const rot=angle*180/Math.PI+90+42+rng()*30;
+    const sz=leafSz*(0.58+rng()*0.52);
     out.push(<path key={`y${i}`}
-      d={`M 0,0 C ${sz*.36},${-sz*.28} ${sz*.30},${-sz*.82} 0,${-sz} C ${-sz*.30},${-sz*.82} ${-sz*.36},${-sz*.28} 0,0 Z`}
-      fill={i%2===0?"#fbbf24":"#f59e0b"} opacity="0.86"
-      transform={`translate(${lx},${ly}) rotate(${rot})`}/>);
+      d={`M 0,0 C ${sz*.38},${-sz*.26} ${sz*.32},${-sz*.80} 0,${-sz} C ${-sz*.32},${-sz*.80} ${-sz*.38},${-sz*.26} 0,0 Z`}
+      fill={i%2===0?"#fcd34d":"#fbbf24"} stroke="rgba(120,60,0,.25)" strokeWidth="0.6" opacity="0.88"
+      transform={`translate(${lx.toFixed(1)},${ly.toFixed(1)}) rotate(${rot.toFixed(1)})`}/>);
   }
   return <g style={{pointerEvents:"none"}}>{out}</g>;
 }
@@ -392,27 +397,29 @@ function FlowerTip({cx,cy,prog}:{cx:number;cy:number;prog:number}){
   if(prog>=100){
     return(
       <g filter="url(#fruitGlow)" style={{pointerEvents:"none"}}>
-        <circle cx={cx} cy={cy} r={9} fill="url(#fruitG)"/>
-        <circle cx={cx-2.5} cy={cy-2.8} r={2.4} fill="rgba(255,255,255,.38)"/>
-        <path d={`M ${cx},${cy-9} Q ${cx+4},${cy-15} ${cx+2},${cy-18}`}
-          stroke="#3d6012" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+        <circle cx={cx} cy={cy} r={13} fill="url(#fruitG)"/>
+        <circle cx={cx-3.5} cy={cy-4} r={3.4} fill="rgba(255,255,255,.42)"/>
+        <path d={`M ${cx},${cy-13} Q ${cx+6},${cy-21} ${cx+3},${cy-25}`}
+          stroke="#3d6012" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+        <ellipse cx={cx+5} cy={cy-22} rx="5" ry="3"
+          fill="#3d6012" opacity=".8" transform={`rotate(-25 ${cx+5} ${cy-22})`}/>
       </g>
     );
   }
-  // flower at 80–99%
-  const PR=5.5;
+  // flower at 80–99% — larger petals, visible against the sky
+  const PR=9;
   return(
-    <g style={{pointerEvents:"none"}}>
-      {Array.from({length:5},(_,i)=>{
-        const a=i*72*Math.PI/180-Math.PI/2;
-        const px=cx+Math.cos(a)*PR*1.85;
-        const py=cy+Math.sin(a)*PR*1.85;
-        return(<ellipse key={i} cx={px} cy={py} rx={PR} ry={PR*.52}
-          fill="#fff8c0" stroke="#fbbf24" strokeWidth="0.8" opacity=".94"
-          transform={`rotate(${i*72-90} ${px} ${py})`}/>);
+    <g style={{pointerEvents:"none"}} filter="url(#fruitGlow)">
+      {Array.from({length:6},(_,i)=>{
+        const a=i*60*Math.PI/180-Math.PI/2;
+        const px=cx+Math.cos(a)*PR*2;
+        const py=cy+Math.sin(a)*PR*2;
+        return(<ellipse key={i} cx={px} cy={py} rx={PR} ry={PR*.48}
+          fill="#fef9c3" stroke="#fbbf24" strokeWidth="1.2" opacity=".96"
+          transform={`rotate(${i*60-90} ${px} ${py})`}/>);
       })}
-      <circle cx={cx} cy={cy} r={PR*.62} fill="#fbbf24"/>
-      <circle cx={cx-1} cy={cy-1} r={PR*.22} fill="rgba(255,255,255,.45)"/>
+      <circle cx={cx} cy={cy} r={PR*.72} fill="#fbbf24" stroke="#f59e0b" strokeWidth="1"/>
+      <circle cx={cx-1.5} cy={cy-1.5} r={PR*.28} fill="rgba(255,255,255,.5)"/>
     </g>
   );
 }
@@ -645,9 +652,11 @@ export default function TreeCanvas(){
 
           {/* ── MID-LEFT sub-canopy (part of tech, no label) ─── */}
           <BlobGroup blobs={mlBlobs}/>
+          <LeafCluster cx={ML_CX} cy={ML_CY} r={mlBlobs[0].r} done={Math.round(techS.done*0.3)} overdue={0} prog={techP} seed={404}/>
 
           {/* ── MID-RIGHT sub-canopy ─────────────────────────── */}
           <BlobGroup blobs={mrBlobs}/>
+          <LeafCluster cx={MR_CX} cy={MR_CY} r={mrBlobs[0].r} done={Math.round(techS.done*0.3)} overdue={0} prog={techP} seed={505}/>
 
           {/* ── CENTER TECH CROWN ────────────────────────────── */}
           <BlobGroup blobs={techBlobs} rimColor="#6366f1" rimW={6}/>
