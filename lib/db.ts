@@ -5,7 +5,7 @@
  * Tables: teams · tasks · objectives · key_results · activity
  */
 import { supabase } from "./supabase";
-import { Team, Task, TaskStatus, ActivityEntry, Objective, KeyResult } from "./types";
+import { Team, Task, TaskStatus, ActivityEntry, Objective, KeyResult, KrDocument } from "./types";
 
 // ── helpers ──────────────────────────────────────────────────
 
@@ -214,4 +214,85 @@ export async function dbUpdateKeyResult(krId: string, current: number): Promise<
 export async function dbDeleteKeyResult(krId: string): Promise<void> {
   const { error } = await supabase.from("key_results").delete().eq("id", krId);
   if (error) console.error("[db] deleteKeyResult", error);
+}
+
+// ── KR DOCUMENTS ──────────────────────────────────────────────
+
+export async function fetchKrDocuments(krId: string): Promise<KrDocument[]> {
+  const { data, error } = await supabase
+    .from("kr_documents")
+    .select("*")
+    .eq("kr_id", krId)
+    .order("uploaded_at", { ascending: false });
+  if (error) { console.error("[db] fetchKrDocuments", error); return []; }
+  return (data ?? []).map((r) => ({
+    id:         r.id          as string,
+    krId:       r.kr_id       as string,
+    fileName:   r.file_name   as string,
+    filePath:   r.file_path   as string,
+    fileSize:   r.file_size   as number,
+    uploadedAt: r.uploaded_at as string,
+  }));
+}
+
+export async function dbUploadKrDocument(
+  krId: string,
+  file: File
+): Promise<KrDocument | null> {
+  const id = `krdoc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  // Sanitize filename: replace spaces and special chars to avoid Supabase "Invalid key" error
+  const safeName = file.name
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")   // strip diacritics
+    .replace(/[^a-zA-Z0-9._-]/g, "_")                    // keep only safe chars
+    .replace(/_+/g, "_");                                 // collapse multiple underscores
+  const ext = safeName.split(".").pop() ?? "bin";
+  const filePath = `${krId}/${id}.${ext}`;
+
+  // 1. Upload to storage
+  const { error: uploadErr } = await supabase.storage
+    .from("kr-documents")
+    .upload(filePath, file, { contentType: file.type, upsert: false });
+  if (uploadErr) { console.error("[db] uploadKrDocument storage", uploadErr); return null; }
+
+  // 2. Insert metadata row
+  const doc: KrDocument = {
+    id,
+    krId,
+    fileName: file.name,
+    filePath,
+    fileSize: file.size,
+    uploadedAt: new Date().toISOString(),
+  };
+  const { error: metaErr } = await supabase.from("kr_documents").insert({
+    id:          doc.id,
+    kr_id:       doc.krId,
+    file_name:   doc.fileName,
+    file_path:   doc.filePath,
+    file_size:   doc.fileSize,
+    uploaded_at: doc.uploadedAt,
+  });
+  if (metaErr) { console.error("[db] uploadKrDocument meta", metaErr); return null; }
+  return doc;
+}
+
+export async function dbDeleteKrDocument(doc: KrDocument): Promise<void> {
+  // 1. Delete from storage
+  const { error: storageErr } = await supabase.storage
+    .from("kr-documents")
+    .remove([doc.filePath]);
+  if (storageErr) console.error("[db] deleteKrDocument storage", storageErr);
+
+  // 2. Delete metadata row
+  const { error: metaErr } = await supabase
+    .from("kr_documents")
+    .delete()
+    .eq("id", doc.id);
+  if (metaErr) console.error("[db] deleteKrDocument meta", metaErr);
+}
+
+export function getKrDocumentUrl(filePath: string): string {
+  const { data } = supabase.storage
+    .from("kr-documents")
+    .getPublicUrl(filePath);
+  return data.publicUrl;
 }

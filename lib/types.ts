@@ -42,3 +42,13 @@ export interface Objective {
   title: string;
   keyResults: KeyResult[];
 }
+
+// ── KR Documents ─────────────────────────────────────────────
+export interface KrDocument {
+  id: string;
+  krId: string;
+  fileName: string;
+  filePath: string;   // storage path in bucket
+  fileSize: number;
+  uploadedAt: string; // ISO timestamp
+}

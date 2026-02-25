@@ -146,6 +146,8 @@ function avgOKR(krs: { current: number; target: number }[]) {
 
 export default function DashboardPage() {
   const { teams, tasks, lastUpdated, loading, getTeamProgress, getTeamStats, getTeamObjectives, getCompanyObjectives } = useApp();
+  const [projectModalOpen, setProjectModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
@@ -186,8 +188,6 @@ export default function DashboardPage() {
     return Math.min(100, Math.round(pct + velocity * Q1_REMAINING));
   }
 
-  const [projectModalOpen, setProjectModalOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const timeElapsedPct = Math.round((Q1_ELAPSED / Q1_TOTAL) * 100);
 
   return (

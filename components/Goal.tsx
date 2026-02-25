@@ -3,6 +3,7 @@
 import { useApp } from "@/lib/AppContext";
 import { Objective, KeyResult } from "@/lib/types";
 import { useState } from "react";
+import KrDocuments from "./KrDocuments";
 
 /* ── helpers ─────────────────────────────────────────────── */
 
@@ -52,6 +53,7 @@ function KrRow({ kr, onUpdateCurrent, onUpdateKr, onDelete }: {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editCurrent, setEditCurrent] = useState(false);
   const [currentVal, setCurrentVal] = useState(String(kr.current));
+  const [showDocs, setShowDocs] = useState(false);
 
   let barColor = "#6366f1";
   if (pct >= 100) barColor = "#10b981";
@@ -70,6 +72,7 @@ function KrRow({ kr, onUpdateCurrent, onUpdateKr, onDelete }: {
 
   return (
     <div className={`py-2.5 border-b border-slate-100 last:border-0 ${editing ? "bg-slate-50 -mx-3 px-3 rounded-lg" : ""}`}>
+      {showDocs && <KrDocuments krId={kr.id} krTitle={kr.title} onClose={() => setShowDocs(false)} />}
       {editing ? (
         <div className="flex flex-col gap-2">
           <input value={draft.title} onChange={e => setDraft(d => ({ ...d, title: e.target.value }))}
@@ -118,6 +121,10 @@ function KrRow({ kr, onUpdateCurrent, onUpdateKr, onDelete }: {
                 {kr.current} / {kr.target} {kr.unit}
               </button>
             )}
+            <button onClick={() => setShowDocs(true)}
+              className="p-1 rounded hover:bg-blue-100 text-slate-400 hover:text-blue-600 transition" title="Tài liệu chứng minh">
+              <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
+            </button>
             <button onClick={() => { setDraft({ title: kr.title, current: String(kr.current), target: String(kr.target), unit: kr.unit }); setEditing(true); }}
               className="p-1 rounded hover:bg-indigo-100 text-slate-400 hover:text-indigo-600 transition" title="Sửa KR">
               <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
