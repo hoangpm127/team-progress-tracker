@@ -35,7 +35,7 @@ function AddObjModal({ onClose, defaultTeam }: { onClose: () => void; defaultTea
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" style={{ boxShadow: "0 20px 60px -8px rgba(99,102,241,0.18), 0 4px 12px rgba(0,0,0,0.06)" }} onClick={e => e.stopPropagation()}>
         <h2 className="text-lg font-bold text-slate-800 mb-4 text-center">Thêm mục tiêu mới</h2>
         <div className="flex flex-col gap-3">
           <div>
@@ -62,7 +62,8 @@ function AddObjModal({ onClose, defaultTeam }: { onClose: () => void; defaultTea
         </div>
         <div className="flex gap-3 mt-5">
           <button onClick={submit} disabled={!title.trim()}
-            className="flex-1 bg-indigo-600 disabled:opacity-40 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-indigo-700">
+            className="flex-1 disabled:opacity-40 text-white py-2.5 rounded-xl font-bold text-sm"
+            style={{ background: "linear-gradient(135deg, #6366f1, #7c3aed)", boxShadow: "0 4px 14px -2px rgba(99,102,241,0.4)" }}>
             Tạo mục tiêu
           </button>
           <button onClick={onClose} className="flex-1 bg-slate-100 text-slate-600 py-2.5 rounded-xl font-semibold text-sm hover:bg-slate-200">
@@ -357,27 +358,31 @@ export default function OKRPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 uppercase tracking-wide"
-            style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
-            Mục tiêu & Kết quả then chốt (OKR)
-</h1>
-          <p className="text-slate-500 mt-1 text-sm">Ấn vào phòng ban trên biểu đồ để xem chi tiết mục tiêu</p>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-50 border border-violet-100/80 mb-3">
+            <span className="text-xs font-bold text-violet-600 tracking-wide">🎯 OKR Dashboard</span>
+          </div>
+          <h1 className="text-3xl font-extrabold tracking-tight leading-tight"
+            style={{ background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 40%, #6d28d9 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+            Mục Tiêu & Kết Quả Then Chốt
+          </h1>
+          <p className="text-slate-500 mt-1.5 text-sm">Ấn vào phòng ban trên biểu đồ để xem chi tiết mục tiêu</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {openDepts.size < 6 && (
             <button onClick={() => setOpenDepts(new Set(SEGMENT_ORDER))}
-              className="text-xs px-3 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition font-medium">
+              className="text-xs px-3 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition font-semibold">
               Mở tất cả
             </button>
           )}
           {openDepts.size > 0 && (
             <button onClick={() => setOpenDepts(new Set())}
-              className="text-xs px-3 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition font-medium">
+              className="text-xs px-3 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition font-semibold">
               Đóng tất cả
             </button>
           )}
           <button onClick={() => { setAddObjTeam(undefined); setShowAddObj(true); }}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition shadow-sm">
+            className="flex items-center gap-2 px-4 py-2 text-white text-sm font-bold rounded-xl transition"
+            style={{ background: "linear-gradient(135deg, #6366f1, #7c3aed)", boxShadow: "0 4px 14px -2px rgba(99,102,241,0.35)" }}>
             <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
             Thêm mục tiêu
           </button>
@@ -387,14 +392,17 @@ export default function OKRPage() {
       {/* Summary stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Tổng mục tiêu", value: totalObjs - 1, color: "#6366f1" },
-          { label: "Hoàn thành", value: completedObjs, color: "#10b981" },
-          { label: "Kết quả then chốt", value: totalKRs, color: "#f59e0b" },
-          { label: "Tiến độ TB", value: `${avgOverall}%`, color: "#3b82f6" },
+          { label: "Tổng mục tiêu", value: totalObjs - 1, accent: "#6366f1" },
+          { label: "Hoàn thành",       value: completedObjs,   accent: "#10b981" },
+          { label: "Kết quả then chốt", value: totalKRs,      accent: "#f59e0b" },
+          { label: "Tiến độ TB",       value: `${avgOverall}%`, accent: "#3b82f6" },
         ].map(s => (
-          <div key={s.label} className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col gap-1">
-            <span className="text-xs text-slate-500 font-medium">{s.label}</span>
-            <span className="text-2xl font-bold" style={{ color: s.color }}>{s.value}</span>
+          <div key={s.label} className="stat-card rounded-2xl p-4 flex flex-col gap-1 relative overflow-hidden"
+            style={{ background: "rgba(255,255,255,0.88)", border: "1px solid rgba(255,255,255,0.7)", boxShadow: `0 2px 16px -4px ${s.accent}26, 0 1px 3px rgba(0,0,0,0.04)` }}>
+            <div className="absolute top-0 inset-x-0 h-[3px] rounded-t-2xl"
+              style={{ background: `linear-gradient(90deg, transparent, ${s.accent}cc, transparent)` }} />
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{s.label}</span>
+            <span className="text-2xl font-black tabular-nums" style={{ color: s.accent }}>{s.value}</span>
           </div>
         ))}
       </div>

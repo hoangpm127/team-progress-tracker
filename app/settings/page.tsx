@@ -4,7 +4,8 @@ export default function SettingsPage() {
   return (
     <div className="p-6 md:p-8 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900 mb-1 uppercase tracking-tight text-center" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", letterSpacing: "0.12em" }}>Cài đặt</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight mb-1"
+          style={{ background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 40%, #6d28d9 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Cài đặt</h1>
         <p className="text-slate-500 text-sm">Tùy chỉnh ứng dụng và các cấu hình hệ thống.</p>
       </div>
 
@@ -18,8 +19,8 @@ export default function SettingsPage() {
         ].map((section) => (
           <div
             key={section.label}
-            className="flex items-center justify-between bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-5"
-          >
+            className="flex items-center justify-between rounded-2xl px-6 py-5"
+            style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.7)", boxShadow: "0 4px 24px -4px rgba(15,23,42,0.07), 0 1px 3px rgba(0,0,0,0.04)" }}
             <div>
               <p className="font-semibold text-slate-800">{section.label}</p>
               <p className="text-sm text-slate-400 mt-0.5">{section.desc}</p>
@@ -31,7 +32,8 @@ export default function SettingsPage() {
         ))}
       </div>
 
-      <div className="mt-8 bg-indigo-50 border border-indigo-100 rounded-2xl px-6 py-5">
+      <div className="mt-8 rounded-2xl px-6 py-5"
+        style={{ background: "linear-gradient(135deg, rgba(238,242,255,0.9), rgba(245,243,255,0.9))", backdropFilter: "blur(12px)", border: "1px solid rgba(199,210,254,0.5)", boxShadow: "0 4px 20px -4px rgba(99,102,241,0.12)" }}>
         <p className="text-sm font-semibold text-indigo-700 mb-1">Chế độ Demo</p>
         <p className="text-sm text-indigo-500">
           Ứng dụng chạy hoàn toàn trên trình duyệt, dữ liệu được lưu qua localStorage. Không có dữ liệu nào gửi lên máy chủ.

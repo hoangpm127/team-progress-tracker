@@ -122,7 +122,7 @@ export default function TeamDetailPage() {
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold mb-1 text-center" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.10em" }}>{team.name.toUpperCase()}</h1>
+            <h1 className="text-2xl font-bold mb-1 text-center">{team.name}</h1>
             <p className="text-white/70 text-sm">{allTasks.length} công việc · {allTasks.filter((t) => t.done).length} hoàn thành</p>
           </div>
           <div className="flex flex-col items-end gap-2 sm:w-72 w-full">
@@ -226,7 +226,8 @@ export default function TeamDetailPage() {
               {/* Add task */}
               <button
                 onClick={() => setShowModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm shrink-0"
+                className="flex items-center gap-2 px-4 py-2 text-white text-sm font-bold rounded-xl transition shrink-0"
+                style={{ background: "linear-gradient(135deg, #6366f1, #7c3aed)", boxShadow: "0 4px 14px -2px rgba(99,102,241,0.4)" }}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-4 h-4">
                   <line x1="12" y1="5" x2="12" y2="19" />
@@ -426,21 +427,21 @@ export default function TeamDetailPage() {
       )}
 
       {activeTab === "kanban" && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+        <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.7)", boxShadow: "0 4px 24px -4px rgba(15,23,42,0.08), 0 1px 3px rgba(0,0,0,0.04)" }}>
           <h3 className="font-semibold text-slate-700 mb-4 text-sm text-center">Bảng Kanban</h3>
           <KanbanBoard tasks={allTasks} teamColor={team.color} />
         </div>
       )}
 
       {activeTab === "gantt" && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+        <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.7)", boxShadow: "0 4px 24px -4px rgba(15,23,42,0.08), 0 1px 3px rgba(0,0,0,0.04)" }}>
           <h3 className="font-semibold text-slate-700 mb-4 text-sm text-center">Biểu đồ Gantt</h3>
           <GanttChart tasks={allTasks} teamColor={team.color} />
         </div>
       )}
 
       {activeTab === "activity" && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-4">
+        <div className="rounded-2xl px-6 py-4" style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.7)", boxShadow: "0 4px 24px -4px rgba(15,23,42,0.08), 0 1px 3px rgba(0,0,0,0.04)" }}>
           <h3 className="font-semibold text-slate-700 mb-4 text-sm text-center">Nhật ký hoạt động</h3>
           <ActivityLog entries={activity} />
         </div>

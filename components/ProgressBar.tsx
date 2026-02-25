@@ -23,10 +23,14 @@ export default function ProgressBar({
 
   return (
     <div className="flex items-center gap-3 w-full">
-      <div className={`flex-1 rounded-full bg-slate-100 overflow-hidden ${sizeMap[size]}`}>
+      <div className={`flex-1 rounded-full bg-slate-100/80 overflow-hidden ${sizeMap[size]}`}>
         <div
           className={`h-full rounded-full ${animated ? "transition-all duration-700 ease-out" : ""}`}
-          style={{ width: `${clamped}%`, backgroundColor: color }}
+          style={{
+            width: `${clamped}%`,
+            background: clamped > 0 ? `linear-gradient(90deg, ${color}99, ${color})` : "transparent",
+            boxShadow: clamped > 5 ? `0 0 8px -1px ${color}66` : "none",
+          }}
         />
       </div>
       {showLabel && (

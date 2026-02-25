@@ -42,7 +42,8 @@ export default function TeamsPage() {
     <div className="p-6 md:p-8 max-w-7xl mx-auto">
       <div className="mb-6 flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-1 uppercase tracking-tight" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", letterSpacing: "0.12em" }}>Phòng ban</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight"
+            style={{ background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 40%, #6d28d9 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Phòng ban</h1>
           <p className="text-slate-500 text-sm">Danh sách tất cả các phòng ban.</p>
         </div>
         <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
