@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useApp } from "@/lib/AppContext";
 import TeamCard from "@/components/TeamCard";
-import EcosystemTree from "@/components/EcosystemTree";
+import TreeCanvas from "@/components/TreeCanvas";
 
 export default function TeamsPage() {
   const { teams, loading } = useApp();
@@ -53,7 +53,7 @@ export default function TeamsPage() {
       </div>
 
       {view === "tree" ? (
-        <EcosystemTree />
+        <TreeCanvas />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {teams.map((team) => (

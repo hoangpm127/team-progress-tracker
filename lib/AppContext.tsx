@@ -6,13 +6,18 @@ import React, {
   useState,
   useCallback,
 } from "react";
-import { Team, Task, ActivityEntry, TaskStatus, Objective, KeyResult } from "./types";
+import { Team, Task, ActivityEntry, TaskStatus, Objective, KeyResult,
+         Project, Partner, Market, HeavenTiming } from "./types";
 import { TEAMS, SEED_TASKS, SEED_OBJECTIVES } from "./seedData";
 import {
   fetchTeams, fetchTasks, fetchObjectives, fetchActivity,
   dbAddTask, dbUpdateTask, dbDeleteTask, dbAddActivity,
   dbAddObjective, dbUpdateObjective, dbDeleteObjective,
   dbAddKeyResult, dbUpdateKeyResult, dbDeleteKeyResult,
+  fetchProjects, dbUpdateProject,
+  fetchPartners, dbAddPartner, dbUpdatePartner,
+  fetchMarket, dbUpdateMarket,
+  fetchHeavenTiming, dbUpdateHeavenTiming,
 } from "./db";
 
 interface AppState {
@@ -20,6 +25,10 @@ interface AppState {
   tasks: Task[];
   objectives: Objective[];
   activity: ActivityEntry[];
+  projects: Project[];
+  partners: Partner[];
+  market: Market;
+  heavenTiming: HeavenTiming;
   lastUpdated: string | null;
 }
 
@@ -36,6 +45,11 @@ interface AppContextValue extends AppState {
   deleteObjective: (objId: string) => void;
   addKeyResult: (objId: string, kr: Omit<KeyResult, "id">) => void;
   deleteKeyResult: (objId: string, krId: string) => void;
+  updateProject: (id: string, updates: Partial<Omit<Project,"id">>) => void;
+  addPartner: (p: Omit<Partner,"id">) => void;
+  updatePartner: (id: string, updates: Partial<Omit<Partner,"id">>) => void;
+  setMarket: (updates: Partial<Market>) => void;
+  setHeavenTiming: (updates: Partial<HeavenTiming>) => void;
   getTeamTasks: (teamId: string) => Task[];
   getTeamProgress: (teamId: string) => number;
   getTeamStats: (teamId: string) => { done: number; total: number; overdue: number };
@@ -44,14 +58,21 @@ interface AppContextValue extends AppState {
   getCompanyObjectives: () => Objective[];
 }
 
+const DEFAULT_MARKET: Market = { marketIndex: 55, notes: "", updatedAt: "" };
+const DEFAULT_HEAVEN: HeavenTiming = { heavenTimingIndex: 60, rainEnabled: true, updatedAt: "" };
+
 const AppContext = createContext<AppContextValue | null>(null);
 
 const INITIAL_STATE: AppState = {
-  teams:       TEAMS,
-  tasks:       SEED_TASKS,
-  objectives:  SEED_OBJECTIVES,
-  activity:    [],
-  lastUpdated: null,
+  teams:        TEAMS,
+  tasks:        SEED_TASKS,
+  objectives:   SEED_OBJECTIVES,
+  activity:     [],
+  projects:     [],
+  partners:     [],
+  market:       DEFAULT_MARKET,
+  heavenTiming: DEFAULT_HEAVEN,
+  lastUpdated:  null,
 };
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
@@ -63,19 +84,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     (async () => {
       try {
-        const [teams, tasks, objectives, activity] = await Promise.all([
+        const [teams, tasks, objectives, activity, projects, partners, market, heaven] = await Promise.all([
           fetchTeams(),
           fetchTasks(),
           fetchObjectives(),
           fetchActivity(),
+          fetchProjects(),
+          fetchPartners(),
+          fetchMarket(),
+          fetchHeavenTiming(),
         ]);
         if (cancelled) return;
         setState({
-          teams:       teams.length      ? teams      : TEAMS,
-          tasks:       tasks.length      ? tasks      : SEED_TASKS,
-          objectives:  objectives.length ? objectives : SEED_OBJECTIVES,
+          teams:        teams.length      ? teams      : TEAMS,
+          tasks:        tasks.length      ? tasks      : SEED_TASKS,
+          objectives:   objectives.length ? objectives : SEED_OBJECTIVES,
           activity,
-          lastUpdated: new Date().toISOString(),
+          projects:     projects,
+          partners:     partners,
+          market:       market      ?? DEFAULT_MARKET,
+          heavenTiming: heaven      ?? DEFAULT_HEAVEN,
+          lastUpdated:  new Date().toISOString(),
         });
       } catch (err) {
         console.error("[AppContext] Supabase fetch failed, using seed data:", err);
@@ -302,6 +331,41 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [state.objectives]
   );
 
+  // ── Projects ────────────────────────────────────────────────
+  const updateProject = useCallback((id: string, updates: Partial<Omit<Project,"id">>) => {
+    dbUpdateProject(id, { ...updates, lastUpdateAt: new Date().toISOString() });
+    setState((prev) => ({
+      ...prev,
+      projects: prev.projects.map((p) => p.id !== id ? p : { ...p, ...updates }),
+    }));
+  }, []);
+
+  // ── Partners ────────────────────────────────────────────────
+  const addPartner = useCallback((data: Omit<Partner,"id">) => {
+    const p: Partner = { ...data, id: `pr-${Date.now()}`, createdAt: new Date().toISOString() };
+    dbAddPartner(p);
+    setState((prev) => ({ ...prev, partners: [...prev.partners, p] }));
+  }, []);
+
+  const updatePartner = useCallback((id: string, updates: Partial<Omit<Partner,"id">>) => {
+    dbUpdatePartner(id, updates);
+    setState((prev) => ({
+      ...prev,
+      partners: prev.partners.map((p) => p.id !== id ? p : { ...p, ...updates }),
+    }));
+  }, []);
+
+  // ── Market & Heaven ─────────────────────────────────────────
+  const setMarket = useCallback((updates: Partial<Market>) => {
+    dbUpdateMarket(updates);
+    setState((prev) => ({ ...prev, market: { ...prev.market, ...updates } }));
+  }, []);
+
+  const setHeavenTiming = useCallback((updates: Partial<HeavenTiming>) => {
+    dbUpdateHeavenTiming(updates);
+    setState((prev) => ({ ...prev, heavenTiming: { ...prev.heavenTiming, ...updates } }));
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
@@ -310,6 +374,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         toggleTask, addTask, editTask, deleteTask, updateTaskStatus,
         updateKeyResult, addObjective, updateObjective, deleteObjective,
         addKeyResult, deleteKeyResult,
+        updateProject, addPartner, updatePartner, setMarket, setHeavenTiming,
         getTeamTasks, getTeamProgress, getTeamStats,
         getTeamActivity, getTeamObjectives, getCompanyObjectives,
       }}

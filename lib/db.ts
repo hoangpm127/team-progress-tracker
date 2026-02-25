@@ -3,9 +3,11 @@
  *
  * All raw Supabase queries live here so AppContext stays clean.
  * Tables: teams · tasks · objectives · key_results · activity
+ *         projects · partners · market · heaven_timing
  */
 import { supabase } from "./supabase";
-import { Team, Task, TaskStatus, ActivityEntry, Objective, KeyResult, KrDocument } from "./types";
+import { Team, Task, TaskStatus, ActivityEntry, Objective, KeyResult, KrDocument,
+         Project, Partner, Market, HeavenTiming } from "./types";
 
 // ── helpers ──────────────────────────────────────────────────
 
@@ -295,4 +297,103 @@ export function getKrDocumentUrl(filePath: string): string {
     .from("kr-documents")
     .getPublicUrl(filePath);
   return data.publicUrl;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Projects (Technology / Trunk)
+// ══════════════════════════════════════════════════════════════
+
+export async function fetchProjects(): Promise<Project[]> {
+  const { data, error } = await supabase.from("projects").select("*").order("id");
+  if (error) { console.error("[db] fetchProjects", error); return []; }
+  return (data ?? []).map((r) => ({
+    id:           r.id           as string,
+    name:         r.name         as string,
+    status:       r.status       as Project["status"],
+    owner:        r.owner        as string,
+    lastUpdateAt: r.last_update_at as string,
+  }));
+}
+
+export async function dbUpdateProject(id: string, updates: Partial<Omit<Project, "id">>): Promise<void> {
+  const row: Record<string, unknown> = {};
+  if (updates.name          !== undefined) row.name           = updates.name;
+  if (updates.status        !== undefined) row.status         = updates.status;
+  if (updates.owner         !== undefined) row.owner          = updates.owner;
+  if (updates.lastUpdateAt  !== undefined) row.last_update_at = updates.lastUpdateAt;
+  const { error } = await supabase.from("projects").update(row).eq("id", id);
+  if (error) console.error("[db] dbUpdateProject", error);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Partners (Grass / Partnerships)
+// ══════════════════════════════════════════════════════════════
+
+export async function fetchPartners(): Promise<Partner[]> {
+  const { data, error } = await supabase.from("partners").select("*").order("category");
+  if (error) { console.error("[db] fetchPartners", error); return []; }
+  return (data ?? []).map((r) => ({
+    id:        r.id        as string,
+    category:  r.category  as Partner["category"],
+    name:      r.name      as string,
+    status:    r.status    as Partner["status"],
+    createdAt: r.created_at as string,
+  }));
+}
+
+export async function dbAddPartner(p: Partner): Promise<void> {
+  const { error } = await supabase.from("partners").insert({
+    id: p.id, category: p.category, name: p.name,
+    status: p.status, created_at: p.createdAt,
+  });
+  if (error) console.error("[db] dbAddPartner", error);
+}
+
+export async function dbUpdatePartner(id: string, updates: Partial<Omit<Partner,"id">>): Promise<void> {
+  const { error } = await supabase.from("partners").update(updates).eq("id", id);
+  if (error) console.error("[db] dbUpdatePartner", error);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Market (Soil singleton)
+// ══════════════════════════════════════════════════════════════
+
+export async function fetchMarket(): Promise<Market | null> {
+  const { data, error } = await supabase.from("market").select("*").eq("id","singleton").single();
+  if (error) { console.error("[db] fetchMarket", error); return null; }
+  return {
+    marketIndex: data.market_index as number,
+    notes:       data.notes as string,
+    updatedAt:   data.updated_at as string,
+  };
+}
+
+export async function dbUpdateMarket(updates: Partial<Market>): Promise<void> {
+  const row: Record<string, unknown> = { id: "singleton", updated_at: new Date().toISOString() };
+  if (updates.marketIndex !== undefined) row.market_index = updates.marketIndex;
+  if (updates.notes       !== undefined) row.notes        = updates.notes;
+  const { error } = await supabase.from("market").upsert(row);
+  if (error) console.error("[db] dbUpdateMarket", error);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Heaven Timing (Rain singleton)
+// ══════════════════════════════════════════════════════════════
+
+export async function fetchHeavenTiming(): Promise<HeavenTiming | null> {
+  const { data, error } = await supabase.from("heaven_timing").select("*").eq("id","singleton").single();
+  if (error) { console.error("[db] fetchHeavenTiming", error); return null; }
+  return {
+    heavenTimingIndex: data.heaven_timing_index as number,
+    rainEnabled:       data.rain_enabled        as boolean,
+    updatedAt:         data.updated_at          as string,
+  };
+}
+
+export async function dbUpdateHeavenTiming(updates: Partial<HeavenTiming>): Promise<void> {
+  const row: Record<string, unknown> = { id: "singleton", updated_at: new Date().toISOString() };
+  if (updates.heavenTimingIndex !== undefined) row.heaven_timing_index = updates.heavenTimingIndex;
+  if (updates.rainEnabled       !== undefined) row.rain_enabled        = updates.rainEnabled;
+  const { error } = await supabase.from("heaven_timing").upsert(row);
+  if (error) console.error("[db] dbUpdateHeavenTiming", error);
 }
