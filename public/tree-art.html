@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🌳 Corporate Growth Tree — Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #f0f7ff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+
+  /* === TOP BAR === */
+  .topbar {
+    width: 100%; max-width: 960px;
+    padding: 10px 20px;
+    display: flex; align-items: center; gap: 16px;
+    background: rgba(255,255,255,0.92);
+    border-bottom: 1px solid #c7dff5;
+    backdrop-filter: blur(8px);
+  }
+  .topbar-title { font-size: 15px; font-weight: 700; color: #0f172a; white-space: nowrap; }
+  .lushness-wrap { flex: 1; display: flex; align-items: center; gap: 8px; }
+  .lushness-label { font-size: 11px; color: #64748b; white-space: nowrap; }
+  .lushness-bar { flex: 1; height: 8px; background: #e2f0ff; border-radius: 4px; overflow: hidden; }
+  .lushness-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #34d399, #10b981); transition: width 0.6s; }
+  .lushness-badge { font-size: 11px; color: #10b981; font-weight: 600; white-space: nowrap; }
+  .hint { font-size: 11px; color: #94a3b8; white-space: nowrap; }
+  .dark-btn {
+    padding: 5px 10px; border-radius: 6px; border: 1px solid #c7dff5;
+    background: transparent; cursor: pointer; font-size: 11px; color: #64748b;
+    transition: all .2s;
+  }
+  .dark-btn:hover { background: #e8f0fe; }
+
+  /* === DARK MODE === */
+  body.dark { background: #080f1a; }
+  body.dark .topbar { background: rgba(14,28,52,0.95); border-color: #1a3660; }
+  body.dark .topbar-title { color: #f1f5f9; }
+  body.dark .lushness-label { color: #94a3b8; }
+  body.dark .hint { color: #94a3b8; }
+  body.dark .dark-btn { border-color: #1a3660; color: #94a3b8; }
+  body.dark .dark-btn:hover { background: #0e1c34; }
+  body.dark .lushness-bar { background: #0e1c34; }
+
+  /* === SVG CONTAINER === */
+  .svg-wrap {
+    width: 100%; max-width: 960px; padding: 0;
+    display: flex; justify-content: center;
+  }
+  svg { width: 100%; max-width: 900px; height: auto; display: block; }
+
+  /* === CSS ANIMATIONS === */
+  @keyframes rain-sv {
+    0%   { transform: translate(0, 0);     opacity: 0; }
+    20%  { opacity: 0.72; }
+    80%  { opacity: 0.62; }
+    100% { transform: translate(-5px, 35px); opacity: 0; }
+  }
+  @keyframes wind-sv {
+    0%   { transform: scaleX(0.15) translateX(-20px); opacity: 0; }
+    35%  { opacity: 0.75; }
+    65%  { opacity: 0.75; }
+    100% { transform: scaleX(0.3) translateX(30px); opacity: 0; }
+  }
+  @keyframes float-u {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-6px); }
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.35; }
+    50%       { opacity: 0.70; }
+  }
+  @keyframes sway {
+    0%, 100% { transform: rotate(-1.2deg); transform-origin: 450px 580px; }
+    50%       { transform: rotate(1.2deg);  transform-origin: 450px 580px; }
+  }
+  @keyframes pulse-ring {
+    0%   { r: 4; opacity: 0.9; }
+    100% { r: 14; opacity: 0; }
+  }
+
+  .rain-drop { animation: rain-sv linear infinite; }
+  .wind-line { animation: wind-sv ease-in-out infinite; transform-origin: left center; }
+  .float-badge { animation: float-u ease-in-out 3.5s infinite; }
+  .float-badge-delay { animation: float-u ease-in-out 3.5s 0.9s infinite; }
+  .breathe { animation: breathe ease-in-out 2.8s infinite; }
+  .canopy-sway { animation: sway ease-in-out 5s infinite; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-title">🌳 Corporate Growth Tree</div>
+  <div class="lushness-wrap">
+    <span class="lushness-label">🌿 Sức khoẻ hệ sinh thái</span>
+    <div class="lushness-bar">
+      <div class="lushness-fill" style="width:61%"></div>
+    </div>
+    <span class="lushness-badge">61%</span>
+  </div>
+  <span class="hint">🌿 Hover nhánh · Click để xem chi tiết</span>
+  <button class="dark-btn" onclick="document.body.classList.toggle('dark');this.textContent=document.body.classList.contains('dark')?'☀ Light':'🌙 Dark'">🌙 Dark</button>
+</div>
+
+<!-- SVG DRAWING -->
+<div class="svg-wrap">
+<svg viewBox="0 0 900 700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Sky gradient -->
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#a8d8f0"/>
+      <stop offset="55%"  stop-color="#d6eeff"/>
+      <stop offset="100%" stop-color="#eef7ff"/>
+    </linearGradient>
+
+    <!-- Ground gradient -->
+    <linearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#4a7c3f"/>
+      <stop offset="40%"  stop-color="#3d6b34"/>
+      <stop offset="100%" stop-color="#2e5527"/>
+    </linearGradient>
+
+    <!-- Underground gradient -->
+    <linearGradient id="underGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#2c1a0e"/>
+      <stop offset="100%" stop-color="#1a0f08"/>
+    </linearGradient>
+
+    <!-- Trunk gradient -->
+    <linearGradient id="trunkGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#6b3f1c"/>
+      <stop offset="30%"  stop-color="#8b5a2b"/>
+      <stop offset="60%"  stop-color="#9c6535"/>
+      <stop offset="100%" stop-color="#6b3f1c"/>
+    </linearGradient>
+    <linearGradient id="trunkGrad2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#5a3018"/>
+      <stop offset="40%"  stop-color="#7a4a22"/>
+      <stop offset="100%" stop-color="#5a3018"/>
+    </linearGradient>
+
+    <!-- Canopy greens -->
+    <radialGradient id="canopyMain" cx="50%" cy="40%" r="50%">
+      <stop offset="0%"   stop-color="#52c472"/>
+      <stop offset="100%" stop-color="#1e7c3a"/>
+    </radialGradient>
+    <radialGradient id="canopyDeep" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#3aaa5a"/>
+      <stop offset="100%" stop-color="#145c2c"/>
+    </radialGradient>
+    <radialGradient id="canopyLight" cx="30%" cy="30%" r="60%">
+      <stop offset="0%"   stop-color="#72da8f"/>
+      <stop offset="100%" stop-color="#2ea050"/>
+    </radialGradient>
+
+    <!-- Root gradient -->
+    <linearGradient id="rootGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#7a4a22"/>
+      <stop offset="100%" stop-color="#4a2a0e"/>
+    </linearGradient>
+
+    <!-- Cloud -->
+    <filter id="cloud-blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3"/>
+    </filter>
+    <filter id="glow-indigo">
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#6366f1" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glow-amber">
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#f59e0b" flood-opacity="0.5"/>
+    </filter>
+    <filter id="shadow-card">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.25"/>
+    </filter>
+
+    <!-- Clip for SVG boundary -->
+    <clipPath id="svgClip">
+      <rect width="900" height="700"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#svgClip)">
+
+  <!-- ══════════════════════════════════ BACKGROUND ══════════════════════════════════ -->
+
+  <!-- Sky -->
+  <rect x="0" y="0" width="900" height="635" fill="url(#skyGrad)"/>
+
+  <!-- Subtle sky lines (atmosphere) -->
+  <line x1="0" y1="180" x2="900" y2="180" stroke="#c0dcf0" stroke-width="0.5" opacity="0.4"/>
+  <line x1="0" y1="310" x2="900" y2="310" stroke="#c0dcf0" stroke-width="0.5" opacity="0.3"/>
+
+  <!-- Ground strip -->
+  <rect x="0" y="630" width="900" height="35" fill="url(#groundGrad)"/>
+
+  <!-- Ground surface texture -->
+  <ellipse cx="150" cy="632" rx="60" ry="8" fill="#3a6630" opacity="0.5"/>
+  <ellipse cx="420" cy="631" rx="90" ry="7" fill="#3a6630" opacity="0.4"/>
+  <ellipse cx="700" cy="632" rx="70" ry="7" fill="#4a7a3c" opacity="0.5"/>
+
+  <!-- Underground (market) -->
+  <rect x="0" y="665" width="900" height="35" fill="url(#underGrad)"/>
+
+  <!-- ══════════════════════════════════ CLOUDS ══════════════════════════════════ -->
+
+  <!-- LEFT CLOUD — Marketing -->
+  <!-- Soft bloom behind -->
+  <ellipse cx="165" cy="95" rx="100" ry="55" fill="white" opacity="0.25" filter="url(#cloud-blur)"/>
+  <!-- Main cloud body -->
+  <ellipse cx="155" cy="105" rx="72" ry="38" fill="white" opacity="0.92"/>
+  <ellipse cx="115" cy="112" rx="48" ry="30" fill="white" opacity="0.90"/>
+  <ellipse cx="200" cy="110" rx="52" ry="28" fill="white" opacity="0.88"/>
+  <ellipse cx="138" cy="85"  rx="42" ry="28" fill="white" opacity="0.93"/>
+  <ellipse cx="175" cy="82"  rx="38" ry="26" fill="white" opacity="0.89"/>
+  <ellipse cx="155" cy="78"  rx="30" ry="20" fill="white" opacity="0.85"/>
+
+  <!-- RIGHT CLOUD — Thiên thời -->
+  <ellipse cx="730" cy="80"  rx="110" ry="60" fill="white" opacity="0.25" filter="url(#cloud-blur)"/>
+  <ellipse cx="725" cy="95"  rx="82" ry="42" fill="white" opacity="0.92"/>
+  <ellipse cx="670" cy="102" rx="54" ry="32" fill="white" opacity="0.90"/>
+  <ellipse cx="778" cy="98"  rx="58" ry="30" fill="white" opacity="0.88"/>
+  <ellipse cx="700" cy="72"  rx="46" ry="30" fill="white" opacity="0.93"/>
+  <ellipse cx="748" cy="68"  rx="42" ry="28" fill="white" opacity="0.89"/>
+  <ellipse cx="725" cy="62"  rx="34" ry="22" fill="white" opacity="0.85"/>
+
+  <!-- ══════════════════════════════════ RAIN (Right cloud) ══════════════════════════════════ -->
+  <!-- 20 rain drops — exact coords from TREE_RULES -->
+  <line class="rain-drop" x1="658" y1="40" x2="655" y2="52" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.78s;animation-delay:0s"/>
+  <line class="rain-drop" x1="672" y1="55" x2="669" y2="67" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.82s;animation-delay:0.12s"/>
+  <line class="rain-drop" x1="686" y1="35" x2="683" y2="47" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.71s;animation-delay:0.25s"/>
+  <line class="rain-drop" x1="700" y1="60" x2="697" y2="72" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.86s;animation-delay:0.08s"/>
+  <line class="rain-drop" x1="714" y1="42" x2="711" y2="54" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.74s;animation-delay:0.33s"/>
+  <line class="rain-drop" x1="728" y1="50" x2="725" y2="62" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.80s;animation-delay:0.18s"/>
+  <line class="rain-drop" x1="742" y1="38" x2="739" y2="50" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.77s;animation-delay:0.42s"/>
+  <line class="rain-drop" x1="756" y1="62" x2="753" y2="74" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.88s;animation-delay:0.05s"/>
+  <line class="rain-drop" x1="663" y1="90" x2="660" y2="102" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.73s;animation-delay:0.29s"/>
+  <line class="rain-drop" x1="680" y1="100" x2="677" y2="112" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.85s;animation-delay:0.15s"/>
+  <line class="rain-drop" x1="697" y1="85"  x2="694" y2="97"  stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.70s;animation-delay:0.38s"/>
+  <line class="rain-drop" x1="715" y1="95"  x2="712" y2="107" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.83s;animation-delay:0.22s"/>
+  <line class="rain-drop" x1="732" y1="80"  x2="729" y2="92"  stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.76s;animation-delay:0.46s"/>
+  <line class="rain-drop" x1="749" y1="98"  x2="746" y2="110" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.89s;animation-delay:0.10s"/>
+  <line class="rain-drop" x1="660" y1="140" x2="657" y2="152" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.79s;animation-delay:0.35s"/>
+  <line class="rain-drop" x1="690" y1="130" x2="687" y2="142" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.72s;animation-delay:0.20s"/>
+  <line class="rain-drop" x1="710" y1="145" x2="707" y2="157" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.87s;animation-delay:0.44s"/>
+  <line class="rain-drop" x1="735" y1="125" x2="732" y2="137" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.75s;animation-delay:0.06s"/>
+  <line class="rain-drop" x1="752" y1="138" x2="749" y2="150" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.84s;animation-delay:0.28s"/>
+  <line class="rain-drop" x1="770" y1="118" x2="767" y2="130" stroke="rgba(99,136,219,0.62)" stroke-width="1.5" stroke-linecap="round" style="animation-duration:0.90s;animation-delay:0.16s"/>
+
+  <!-- ══════════════════════════════════ WIND LINES (Left) ══════════════════════════════════ -->
+  <!-- 6 wind streams — exact coords from TREE_RULES -->
+  <line class="wind-line" x1="108" y1="185" x2="163" y2="185" stroke="rgba(148,200,255,0.65)" stroke-width="2.5" stroke-linecap="round" style="animation-duration:1.9s;animation-delay:0s"/>
+  <line class="wind-line" x1="100" y1="215" x2="168" y2="215" stroke="rgba(148,200,255,0.65)" stroke-width="2.5" stroke-linecap="round" style="animation-duration:2.2s;animation-delay:0.3s"/>
+  <line class="wind-line" x1="112" y1="248" x2="160" y2="248" stroke="rgba(148,200,255,0.65)" stroke-width="2.5" stroke-linecap="round" style="animation-duration:1.7s;animation-delay:0.6s"/>
+  <line class="wind-line" x1="98"  y1="278" x2="158" y2="278" stroke="rgba(148,200,255,0.65)" stroke-width="2.5" stroke-linecap="round" style="animation-duration:2.4s;animation-delay:0.2s"/>
+  <line class="wind-line" x1="105" y1="308" x2="157" y2="308" stroke="rgba(148,200,255,0.65)" stroke-width="2.5" stroke-linecap="round" style="animation-duration:2.1s;animation-delay:0.5s"/>
+  <line class="wind-line" x1="115" y1="338" x2="159" y2="338" stroke="rgba(148,200,255,0.65)" stroke-width="2.5" stroke-linecap="round" style="animation-duration:2.6s;animation-delay:0.1s"/>
+
+  <!-- ══════════════════════════════════ TREE TRUNK ══════════════════════════════════ -->
+
+  <!-- Trunk shadow -->
+  <path d="M442,248 L462,248 L472,590 L428,590 Z" fill="#3a1e08" opacity="0.35" transform="translate(8,0)"/>
+
+  <!-- Main trunk body -->
+  <path d="M435,240 L465,240 L478,585 L422,585 Z" fill="url(#trunkGrad)"/>
+
+  <!-- Trunk bark texture lines -->
+  <path d="M445,270 Q448,310 444,350 Q441,390 445,430" stroke="#5a3018" stroke-width="1.2" fill="none" opacity="0.5"/>
+  <path d="M455,275 Q458,320 454,365 Q450,410 454,455" stroke="#5a3018" stroke-width="1"   fill="none" opacity="0.4"/>
+  <path d="M463,285 Q460,330 462,370 Q463,415 460,460" stroke="#9c6535" stroke-width="0.8" fill="none" opacity="0.35"/>
+
+  <!-- Trunk highlight (light from left) -->
+  <path d="M438,242 L448,242 L456,582 L432,582 Z" fill="rgba(200,150,80,0.18)"/>
+
+  <!-- Bark knot details -->
+  <ellipse cx="449" cy="345" rx="7" ry="5" fill="#5a3018" opacity="0.4"/>
+  <ellipse cx="456" cy="480" rx="6" ry="4" fill="#5a3018" opacity="0.35"/>
+
+  <!-- ══════════════════════════════════ CANOPY ══════════════════════════════════ -->
+  <g class="canopy-sway">
+    <!-- Deep shadow base -->
+    <ellipse cx="450" cy="295" rx="195" ry="155" fill="#145c2c" opacity="0.6"/>
+
+    <!-- Main canopy blobs — layered for depth -->
+    <!-- Back layer (darker) -->
+    <ellipse cx="450" cy="260" rx="160" ry="130" fill="#1e7c3a" opacity="0.85"/>
+    <ellipse cx="340" cy="300" rx="120" ry="105" fill="#1a6e33" opacity="0.80"/>
+    <ellipse cx="560" cy="285" rx="128" ry="110" fill="#1c7436" opacity="0.80"/>
+    <ellipse cx="390" cy="190" rx="108" ry="90"  fill="#228040" opacity="0.80"/>
+    <ellipse cx="510" cy="200" rx="112" ry="92"  fill="#227a3c" opacity="0.80"/>
+
+    <!-- Mid layer -->
+    <ellipse cx="450" cy="230" rx="140" ry="112" fill="url(#canopyMain)" opacity="0.85"/>
+    <ellipse cx="355" cy="265" rx="105" ry="92"  fill="#28904a" opacity="0.82"/>
+    <ellipse cx="538" cy="252" rx="112" ry="95"  fill="#2a8e48" opacity="0.82"/>
+    <ellipse cx="400" cy="170" rx="92"  ry="78"  fill="#32a058" opacity="0.80"/>
+    <ellipse cx="505" cy="175" rx="96"  ry="80"  fill="#309a54" opacity="0.80"/>
+    <ellipse cx="450" cy="148" rx="82"  ry="68"  fill="#38b060" opacity="0.78"/>
+
+    <!-- Front / highlight layer -->
+    <ellipse cx="430" cy="210" rx="110" ry="88"  fill="url(#canopyLight)" opacity="0.75"/>
+    <ellipse cx="358" cy="238" rx="82"  ry="72"  fill="#48c870" opacity="0.60"/>
+    <ellipse cx="525" cy="228" rx="88"  ry="74"  fill="#44c46c" opacity="0.60"/>
+    <ellipse cx="450" cy="168" rx="70"  ry="58"  fill="#5ed880" opacity="0.55"/>
+    <ellipse cx="395" cy="148" rx="58"  ry="50"  fill="#62da84" opacity="0.52"/>
+    <ellipse cx="505" cy="155" rx="60"  ry="52"  fill="#5ed880" opacity="0.52"/>
+
+    <!-- Specular highlights (light catching tops of foliage) -->
+    <ellipse cx="435" cy="152" rx="28" ry="18"  fill="#90eaa8" opacity="0.38"/>
+    <ellipse cx="380" cy="138" rx="22" ry="15"  fill="#8eea9e" opacity="0.32"/>
+    <ellipse cx="490" cy="148" rx="24" ry="16"  fill="#8eea9e" opacity="0.30"/>
+    <ellipse cx="340" cy="222" rx="20" ry="14"  fill="#80e898" opacity="0.28"/>
+    <ellipse cx="558" cy="210" rx="22" ry="14"  fill="#80e898" opacity="0.28"/>
+  </g>
+
+  <!-- ══════════════════════════════════ ROOTS ══════════════════════════════════ -->
+
+  <!-- Root zone base from TREE_RULES: M310,570 C360,555 440,550 490,552 C540,550 610,555 640,570 L650,640 C600,625 530,618 450,618 C370,618 300,625 260,640 Z -->
+  <path d="M310,570 C360,555 440,550 490,552 C540,550 610,555 640,570 L650,640 C600,625 530,618 450,618 C370,618 300,625 260,640 Z"
+        fill="#2c1a0e" opacity="0.65"/>
+
+  <!-- Individual root fingers -->
+  <!-- Left spread roots -->
+  <path d="M432,578 C410,585 375,592 340,600 C310,607 280,614 255,618"
+        stroke="url(#rootGrad)" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M435,580 C415,590 390,598 365,608 C340,618 320,625 298,630"
+        stroke="url(#rootGrad)" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M438,582 C428,595 418,608 408,618 C395,628 378,635 360,638"
+        stroke="url(#rootGrad)" stroke-width="7" fill="none" stroke-linecap="round"/>
+
+  <!-- Right spread roots -->
+  <path d="M468,578 C490,585 525,592 560,600 C592,607 620,614 645,618"
+        stroke="url(#rootGrad)" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M465,580 C485,590 510,598 535,608 C558,618 578,624 600,630"
+        stroke="url(#rootGrad)" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M462,582 C472,595 482,608 492,618 C504,628 520,635 538,638"
+        stroke="url(#rootGrad)" stroke-width="7" fill="none" stroke-linecap="round"/>
+
+  <!-- Center deep root -->
+  <path d="M450,580 C450,598 448,615 450,628"
+        stroke="url(#rootGrad)" stroke-width="14" fill="none" stroke-linecap="round"/>
+
+  <!-- Root bark highlights -->
+  <path d="M432,578 C412,585 377,591 344,598"
+        stroke="#a06030" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.4"/>
+  <path d="M468,578 C488,585 522,591 556,598"
+        stroke="#a06030" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- ══════════════════════════════════ GRASS / GROUND COVER ══════════════════════════════════ -->
+
+  <!-- Grass tufts above ground line -->
+  <path d="M0,632 Q45,618 90,625 Q135,615 180,622 Q225,612 270,620 Q315,610 360,618 Q405,609 450,616 Q495,609 540,618 Q585,610 630,619 Q675,612 720,620 Q765,614 810,622 Q855,616 900,623" stroke="#3d8030" stroke-width="3" fill="none" opacity="0.6"/>
+  <path d="M0,634 Q50,622 100,628 Q150,619 200,626 Q250,617 300,624 Q350,615 400,622 Q450,614 500,621 Q550,615 600,622 Q650,615 700,623 Q750,616 800,624 Q850,618 900,625" stroke="#4a9038" stroke-width="2" fill="none" opacity="0.4"/>
+
+  <!-- Grass blades (tiny triangles) -->
+  <g opacity="0.7" fill="#4a9038">
+    <polygon points="80,632 84,618 88,632"/>
+    <polygon points="160,632 164,620 168,632"/>
+    <polygon points="245,632 249,615 253,632"/>
+    <polygon points="330,632 334,619 338,632"/>
+    <polygon points="415,632 419,617 423,632"/>
+    <polygon points="500,632 504,618 508,632"/>
+    <polygon points="585,632 589,616 593,632"/>
+    <polygon points="668,632 672,619 676,632"/>
+    <polygon points="750,632 754,620 758,632"/>
+    <polygon points="832,632 836,617 840,632"/>
+  </g>
+
+  <!-- ══════════════════════════════════ BRANCH CONNECTOR LINES ══════════════════════════════════ -->
+  <!-- Lines from canopy branch tips to card edges -->
+  <!-- Slot 0: (610,130) right — from canopy right to card -->
+  <line x1="545" y1="218" x2="608" y2="130" stroke="#6366f1" stroke-width="2" stroke-dasharray="5,3" opacity="0.70"/>
+  <!-- Slot 1: (290,155) left — from canopy left to card -->
+  <line x1="352" y1="220" x2="292" y2="155" stroke="#ec4899" stroke-width="2" stroke-dasharray="5,3" opacity="0.70"/>
+  <!-- Slot 2: (590,240) right — from trunk right to card -->
+  <line x1="520" y1="262" x2="588" y2="240" stroke="#10b981" stroke-width="2" stroke-dasharray="5,3" opacity="0.70"/>
+  <!-- Slot 3: (250,265) left — from trunk/canopy left to card -->
+  <line x1="370" y1="270" x2="252" y2="265" stroke="#3b82f6" stroke-width="2" stroke-dasharray="5,3" opacity="0.70"/>
+  <!-- Slot 4: (230,355) left — from lower canopy/trunk left to card -->
+  <line x1="418" y1="355" x2="232" y2="355" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,3" opacity="0.70"/>
+
+  <!-- Branch dots at junction points -->
+  <circle cx="545" cy="218" r="4" fill="#6366f1" opacity="0.8"/>
+  <circle cx="352" cy="220" r="4" fill="#ec4899" opacity="0.8"/>
+  <circle cx="520" cy="262" r="4" fill="#10b981" opacity="0.8"/>
+  <circle cx="370" cy="270" r="4" fill="#3b82f6" opacity="0.8"/>
+  <circle cx="418" cy="355" r="4" fill="#f59e0b" opacity="0.8"/>
+
+  <!-- Pulse rings at junctions -->
+  <circle cx="545" cy="218" r="4" fill="none" stroke="#6366f1" stroke-width="1.5" opacity="0.8">
+    <animate attributeName="r" values="4;14;4" dur="2.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;0;0.8" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="352" cy="220" r="4" fill="none" stroke="#ec4899" stroke-width="1.5" opacity="0.8">
+    <animate attributeName="r" values="4;14;4" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;0;0.8" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- ══════════════════════════════════ BRANCH CARDS ══════════════════════════════════ -->
+
+  <!--
+    Teams sorted by progress desc:
+    0: Tech        75% → slot 0 (610,130) right   color #6366f1
+    1: Partnerships 70% → slot 1 (290,155) left   color #10b981
+    2: Marketing   60% → slot 2 (590,240) right   color #ec4899
+    3: Assistant   55% → slot 3 (250,265) left    color #3b82f6
+    4: HR          45% → slot 4 (230,355) left    color #f59e0b
+    EXPECTED = 61%
+    Health:
+      Tech(75):  75/61=1.23 → 🟢 Đúng tiến độ
+      Part(70):  70/61=1.15 → 🟢 Đúng tiến độ
+      Mkt(60):   60/61=0.98 → 🟢 Đúng tiến độ
+      Asst(55):  55/61=0.90 → 🟢 Đúng tiến độ
+      HR(45):    45/61=0.74 → 🟡 Hơi chậm
+  -->
+
+  <!-- CARD MACRO: Slot 0 — Technology (610,130) right, card rect (610,94)→(740,166) -->
+  <g filter="url(#shadow-card)">
+    <rect x="612" y="94" width="130" height="72" rx="8" fill="rgba(8,15,26,0.90)" stroke="#6366f1" stroke-width="1.5"/>
+    <!-- Row 1: icon + name -->
+    <text x="622" y="114" fill="#f1f5f9" font-size="12" font-weight="700" font-family="Segoe UI,sans-serif">⚙️ Technology</text>
+    <!-- Row 2: progress bar bg -->
+    <rect x="622" y="121" width="110" height="6" rx="3" fill="rgba(99,102,241,0.20)"/>
+    <!-- Row 2: progress fill 75% -->
+    <rect x="622" y="121" width="82.5" height="6" rx="3" fill="#6366f1"/>
+    <!-- Expected marker at 61% -->
+    <line x1="689" y1="119" x2="689" y2="129" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="2,1"/>
+    <!-- Row 3: % + health -->
+    <text x="622" y="142" fill="#c7d2fe" font-size="11" font-family="Segoe UI,sans-serif">75%  🟢 Đúng tiến độ</text>
+    <!-- Row 4: growth -->
+    <text x="622" y="158" fill="#818cf8" font-size="8.5" font-family="Segoe UI,sans-serif">🌿 Xum xuê</text>
+  </g>
+
+  <!-- CARD: Slot 1 — Partnerships (290,155) left, card rect (160,119)→(290,191) -->
+  <g filter="url(#shadow-card)">
+    <rect x="158" y="119" width="130" height="72" rx="8" fill="rgba(8,15,26,0.90)" stroke="#10b981" stroke-width="1.5"/>
+    <text x="168" y="139" fill="#f1f5f9" font-size="12" font-weight="700" font-family="Segoe UI,sans-serif">🤝 Partnerships</text>
+    <rect x="168" y="146" width="110" height="6" rx="3" fill="rgba(16,185,129,0.20)"/>
+    <rect x="168" y="146" width="77"  height="6" rx="3" fill="#10b981"/>
+    <line x1="235" y1="144" x2="235" y2="154" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="2,1"/>
+    <text x="168" y="167" fill="#6ee7b7" font-size="11" font-family="Segoe UI,sans-serif">70%  🟢 Đúng tiến độ</text>
+    <text x="168" y="183" fill="#34d399" font-size="8.5" font-family="Segoe UI,sans-serif">🌿 Xum xuê</text>
+  </g>
+
+  <!-- CARD: Slot 2 — Marketing (590,240) right, card rect (590,204)→(720,276) -->
+  <g filter="url(#shadow-card)">
+    <rect x="592" y="204" width="130" height="72" rx="8" fill="rgba(8,15,26,0.90)" stroke="#ec4899" stroke-width="1.5"/>
+    <text x="602" y="224" fill="#f1f5f9" font-size="12" font-weight="700" font-family="Segoe UI,sans-serif">📣 Marketing</text>
+    <rect x="602" y="231" width="110" height="6" rx="3" fill="rgba(236,72,153,0.20)"/>
+    <rect x="602" y="231" width="66"  height="6" rx="3" fill="#ec4899"/>
+    <line x1="669" y1="229" x2="669" y2="239" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="2,1"/>
+    <text x="602" y="252" fill="#f9a8d4" font-size="11" font-family="Segoe UI,sans-serif">60%  🟢 Đúng tiến độ</text>
+    <text x="602" y="268" fill="#f472b6" font-size="8.5" font-family="Segoe UI,sans-serif">🌿 Xum xuê</text>
+  </g>
+
+  <!-- CARD: Slot 3 — Assistant/BOD (250,265) left, card rect (118,229)→(248,301) -->
+  <g filter="url(#shadow-card)">
+    <rect x="118" y="229" width="130" height="72" rx="8" fill="rgba(8,15,26,0.90)" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="128" y="249" fill="#f1f5f9" font-size="12" font-weight="700" font-family="Segoe UI,sans-serif">📋 BOD / Assist.</text>
+    <rect x="128" y="256" width="110" height="6" rx="3" fill="rgba(59,130,246,0.20)"/>
+    <rect x="128" y="256" width="60.5" height="6" rx="3" fill="#3b82f6"/>
+    <line x1="195" y1="254" x2="195" y2="264" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="2,1"/>
+    <text x="128" y="277" fill="#93c5fd" font-size="11" font-family="Segoe UI,sans-serif">55%  🟢 Đúng tiến độ</text>
+    <text x="128" y="293" fill="#60a5fa" font-size="8.5" font-family="Segoe UI,sans-serif">🌿 Xum xuê</text>
+  </g>
+
+  <!-- CARD: Slot 4 — Human Resources (230,355) left, card rect (98,319)→(228,391) -->
+  <g filter="url(#shadow-card)">
+    <rect x="98" y="319" width="130" height="72" rx="8" fill="rgba(8,15,26,0.90)" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="108" y="339" fill="#f1f5f9" font-size="12" font-weight="700" font-family="Segoe UI,sans-serif">👥 Human Res.</text>
+    <rect x="108" y="346" width="110" height="6" rx="3" fill="rgba(245,158,11,0.20)"/>
+    <rect x="108" y="346" width="49.5" height="6" rx="3" fill="#f59e0b"/>
+    <line x1="175" y1="344" x2="175" y2="354" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="2,1"/>
+    <text x="108" y="367" fill="#fde68a" font-size="11" font-family="Segoe UI,sans-serif">45%  🟡 Hơi chậm</text>
+    <text x="108" y="383" fill="#fbbf24" font-size="8.5" font-family="Segoe UI,sans-serif">🌱 Đang mọc</text>
+  </g>
+
+  <!-- ══════════════════════════════════ FLOATING BADGES ══════════════════════════════════ -->
+
+  <!-- Marketing Badge — left cloud, x=98 y=58, size 112×30 -->
+  <g class="float-badge">
+    <rect x="98" y="48" width="118" height="30" rx="6" fill="rgba(37,99,235,0.90)" stroke="#93c5fd" stroke-width="1"/>
+    <text x="157" y="68" fill="white" font-size="12" font-weight="600" font-family="Segoe UI,sans-serif" text-anchor="middle">📢 Marketing</text>
+  </g>
+
+  <!-- Thiên thời Badge — right cloud, x=628 y=30, size 160×42 -->
+  <g class="float-badge-delay">
+    <rect x="618" y="18" width="166" height="44" rx="6" fill="rgba(67,56,202,0.90)" stroke="#a5b4fc" stroke-width="1"/>
+    <text x="701" y="36" fill="white" font-size="11" font-weight="600" font-family="Segoe UI,sans-serif" text-anchor="middle">⏱ Timely Opportunity</text>
+    <text x="701" y="53" fill="#c7d2fe" font-size="10" font-family="Segoe UI,sans-serif" text-anchor="middle">(Thiên thời)</text>
+  </g>
+
+  <!-- ══════════════════════════════════ TRUNK HOVER ZONE LABEL ══════════════════════════════════ -->
+
+  <!-- Clickable trunk zone: M410,230 L490,230 L500,600 L400,600 Z -->
+  <path d="M410,230 L490,230 L500,600 L400,600 Z"
+        fill="rgba(99,102,241,0.10)" stroke="#6366f1" stroke-width="1.5"
+        stroke-dasharray="6,3" opacity="0.55" cursor="pointer"/>
+
+  <!-- Trunk label (center of trunk zone) -->
+  <text x="450" y="418" fill="#818cf8" font-size="10" font-weight="600"
+        font-family="Segoe UI,sans-serif" text-anchor="middle" opacity="0.80">⚙️ Tech Core</text>
+  <text x="450" y="432" fill="#6366f1" font-size="9"
+        font-family="Segoe UI,sans-serif" text-anchor="middle" opacity="0.70">30 Dự Án ↗</text>
+
+  <!-- ══════════════════════════════════ PERSONNEL SYSTEM LABEL (on roots) ══════════════════════════════════ -->
+  <!-- x=345 y=595; size 210×28 from rules -->
+  <rect x="340" y="582" width="218" height="26" rx="5"
+        fill="rgba(92,60,10,0.75)" stroke="#f59e0b" stroke-width="1.2"/>
+  <text x="449" y="599" fill="#fde68a" font-size="11" font-weight="600"
+        font-family="Segoe UI,sans-serif" text-anchor="middle">🌱 Personnel System</text>
+
+  <!-- ══════════════════════════════════ PARTNER BLOCK LABELS (y=642–673) ══════════════════════════════════ -->
+
+  <!-- Dividers between partner sections -->
+  <line x1="190" y1="642" x2="190" y2="663" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <line x1="435" y1="642" x2="435" y2="663" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <line x1="695" y1="642" x2="695" y2="663" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+
+  <!-- Partner 0: Suppliers — cx=100, color #f59e0b -->
+  <text x="100" y="653" fill="#f59e0b" font-size="10" font-weight="700"
+        font-family="Segoe UI,sans-serif" text-anchor="middle">📦 Suppliers</text>
+  <text x="100" y="666" fill="rgba(255,255,255,0.55)" font-size="8"
+        font-family="Segoe UI,sans-serif" text-anchor="middle">Nhà cung cấp HH &amp; DV</text>
+
+  <!-- Partner 1: HR Partners — cx=280, color #8b5cf6 -->
+  <text x="300" y="653" fill="#8b5cf6" font-size="10" font-weight="700"
+        font-family="Segoe UI,sans-serif" text-anchor="middle">👥 HR Partners</text>
+  <text x="300" y="666" fill="rgba(255,255,255,0.55)" font-size="8"
+        font-family="Segoe UI,sans-serif" text-anchor="middle">Đối tác nhân sự</text>
+
+  <!-- Partner 2: Knowledge Partners — cx=580, color #10b981 -->
+  <text x="565" y="653" fill="#10b981" font-size="10" font-weight="700"
+        font-family="Segoe UI,sans-serif" text-anchor="middle">🎓 Knowledge Partners</text>
+  <text x="565" y="666" fill="rgba(255,255,255,0.55)" font-size="8"
+        font-family="Segoe UI,sans-serif" text-anchor="middle">Kiến thức &amp; trải nghiệm</text>
+
+  <!-- Partner 3: Financial Partners — cx=790, color #3b82f6 -->
+  <text x="800" y="653" fill="#3b82f6" font-size="10" font-weight="700"
+        font-family="Segoe UI,sans-serif" text-anchor="middle">💰 Financial Partners</text>
+  <text x="800" y="666" fill="rgba(255,255,255,0.55)" font-size="8"
+        font-family="Segoe UI,sans-serif" text-anchor="middle">Đối tác tài chính</text>
+
+  <!-- ══════════════════════════════════ FOOTER — THE MARKET ══════════════════════════════════ -->
+  <text x="450" y="687" fill="rgba(255,255,255,0.45)" font-size="9"
+        letter-spacing="2.5" font-family="Segoe UI,sans-serif" text-anchor="middle"
+        font-weight="300">THE MARKET · Thị trường  ·  PARTNER BLOCK · Khối Đối Tác</text>
+
+  <!-- ══════════════════════════════════ EXPECTED MARKER LEGEND ══════════════════════════════════ -->
+  <rect x="762" y="172" width="130" height="46" rx="5" fill="rgba(8,15,26,0.78)" stroke="rgba(148,163,184,0.30)" stroke-width="1"/>
+  <text x="772" y="186" fill="#94a3b8" font-size="8.5" font-family="Segoe UI,sans-serif">Q1: 54/89 ngày đã qua</text>
+  <line x1="772" y1="194" x2="784" y2="194" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="2,1"/>
+  <text x="787" y="197" fill="#94a3b8" font-size="8" font-family="Segoe UI,sans-serif"> = Kỳ vọng 61%</text>
+  <text x="772" y="210" fill="#10b981" font-size="8.5" font-family="Segoe UI,sans-serif">🌿 Hệ sinh thái: 61%</text>
+
+  </g><!-- end clip -->
+</svg>
+</div>
+
+<script>
+// Dark mode persistence
+const saved = localStorage.getItem('tree-dark');
+if (saved === 'true') {
+  document.body.classList.add('dark');
+  document.querySelector('.dark-btn').textContent = '☀ Light';
+}
+document.querySelector('.dark-btn').addEventListener('click', function() {
+  localStorage.setItem('tree-dark', document.body.classList.contains('dark').toString());
+});
+</script>
+</body>
+</html>
