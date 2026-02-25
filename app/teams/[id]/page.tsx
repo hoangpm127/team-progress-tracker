@@ -122,7 +122,7 @@ export default function TeamDetailPage() {
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-extrabold mb-1 uppercase tracking-tight text-center" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", letterSpacing: "0.12em" }}>{team.name}</h1>
+            <h1 className="text-2xl font-bold mb-1 text-center" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.10em" }}>{team.name.toUpperCase()}</h1>
             <p className="text-white/70 text-sm">{allTasks.length} công việc · {allTasks.filter((t) => t.done).length} hoàn thành</p>
           </div>
           <div className="flex flex-col items-end gap-2 sm:w-72 w-full">

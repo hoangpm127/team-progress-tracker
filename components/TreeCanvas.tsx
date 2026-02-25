@@ -325,53 +325,61 @@ function OrganicCanopy({cx,cy,prog,color,done,overdue,seed}:{
   cx:number;cy:number;prog:number;color:string;done:number;overdue:number;seed:number;
 }){
   const rng=mkRng(seed*3+19);
-  const bCnt=Math.max(4,Math.round(3+prog*0.07));    // 4→~11 branches
-  const bLen=48+prog*0.64;                            // 48→112 px reach
-  const lPer=Math.max(3,Math.round(2+prog*0.07));    // 3→~9 leaves/branch
+  const bCnt=Math.max(5,Math.round(4+prog*0.08));    // 5–12 branches
+  const bLen=70+prog*0.82;                            // 70→152 px reach
+  const lPer=Math.max(4,Math.round(3+prog*0.06));    // 4–10 leaves/branch
   const els:React.ReactElement[]=[];
-  // Very subtle identity-colour ambient glow (barely visible depth hint)
-  els.push(<circle key="amb" cx={cx} cy={cy} r={bLen*1.08}
-    fill={color} opacity={0.055} filter="url(#cloudBlur)"/>);
-  const BASE_ANG=-Math.PI/2; // fan upward
-  const SPREAD=1.35+prog*0.0028;
+  const BASE_ANG=-Math.PI/2;
+  const SPREAD=1.55+prog*0.003;
   for(let i=0;i<bCnt;i++){
     const ni=bCnt>1?i/(bCnt-1):0.5;
-    const ang=BASE_ANG-SPREAD/2+ni*SPREAD+(rng()-0.5)*0.18;
-    const bL=bLen*(0.64+rng()*0.52);
-    const cAng=ang+(rng()-0.5)*0.36;
-    const mx=cx+Math.cos(cAng)*bL*0.50;
-    const my=cy+Math.sin(cAng)*bL*0.50;
-    const ex=cx+Math.cos(ang+(rng()-0.5)*0.10)*bL;
-    const ey=cy+Math.sin(ang+(rng()-0.5)*0.10)*bL;
-    const bw=Math.max(0.6,(2.0-ni*0.8)*(0.5+rng()*0.7));
+    const ang=BASE_ANG-SPREAD/2+ni*SPREAD+(rng()-0.5)*0.15;
+    const bL=bLen*(0.72+rng()*0.42);
+    const cAng=ang+(rng()-0.5)*0.30;
+    const mx=cx+Math.cos(cAng)*bL*0.52;
+    const my=cy+Math.sin(cAng)*bL*0.52;
+    const ex=cx+Math.cos(ang+(rng()-0.5)*0.08)*bL;
+    const ey=cy+Math.sin(ang+(rng()-0.5)*0.08)*bL;
+    const bw=Math.max(0.5,(1.8-ni*0.6)*(0.4+rng()*0.8));
     // thin branch stroke
     els.push(<path key={`b${i}`}
       d={`M ${cx.toFixed(1)} ${cy.toFixed(1)} Q ${mx.toFixed(1)} ${my.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`}
-      stroke={i%2===0?"#4a2808":"#5a3210"} strokeWidth={bw.toFixed(1)}
-      fill="none" strokeLinecap="round" opacity="0.78"/>);
-    // leaves scattered along the bezier curve
+      stroke={i%2===0?"#3d2006":"#4e2c0a"} strokeWidth={bw.toFixed(1)}
+      fill="none" strokeLinecap="round" opacity="0.82"/>);
+    // leaves concentrated in outer 50% of branch (t=0.52 to 1.0)
     for(let j=0;j<lPer;j++){
-      const t=0.22+rng()*0.80; const t1=1-t;
-      const lx=t1*t1*cx+2*t*t1*mx+t*t*ex+(rng()-0.5)*12;
-      const ly=t1*t1*cy+2*t*t1*my+t*t*ey+(rng()-0.5)*12;
-      const rot=ang*180/Math.PI+(rng()-0.5)*96;
-      const sz=8+rng()*14;
-      const col=rng()<0.40?LEAF_BRIGHT[Math.floor(rng()*LEAF_BRIGHT.length)]:LEAF_MID[Math.floor(rng()*LEAF_MID.length)];
+      const t=0.52+rng()*0.52;
+      const t1=1-t;
+      const lx=t1*t1*cx+2*t*t1*mx+t*t*ex+(rng()-0.5)*9;
+      const ly=t1*t1*cy+2*t*t1*my+t*t*ey+(rng()-0.5)*9;
+      const rot=ang*180/Math.PI+(rng()-0.5)*88;
+      const sz=9+rng()*13;
+      const col=rng()<0.42?LEAF_BRIGHT[Math.floor(rng()*LEAF_BRIGHT.length)]:LEAF_MID[Math.floor(rng()*LEAF_MID.length)];
       els.push(<path key={`l${i}_${j}`}
         d={`M 0,0 C ${(sz*.38).toFixed(1)},${(-sz*.26).toFixed(1)} ${(sz*.32).toFixed(1)},${(-sz*.80).toFixed(1)} 0,${(-sz).toFixed(1)} C ${(-sz*.32).toFixed(1)},${(-sz*.80).toFixed(1)} ${(-sz*.38).toFixed(1)},${(-sz*.26).toFixed(1)} 0,0 Z`}
-        fill={col} stroke="rgba(0,45,0,.15)" strokeWidth="0.5"
-        opacity={(0.74+rng()*.24).toFixed(2)}
+        fill={col} stroke="rgba(0,38,0,.14)" strokeWidth="0.5"
+        opacity={(0.72+rng()*.26).toFixed(2)}
         transform={`translate(${lx.toFixed(1)},${ly.toFixed(1)}) rotate(${rot.toFixed(1)})`}/>);
     }
-    // yellow drooping overdue leaf at branch tip
-    if(overdue>0 && i<Math.min(overdue,3)){
-      const lx=ex+(rng()-0.5)*7; const ly=ey+rng()*8;
-      const sz=8+rng()*6; const rot=ang*180/Math.PI+44+rng()*22;
+    // overdue yellow leaf near tip
+    if(overdue>0 && i<Math.min(overdue,4)){
+      const lx=ex+(rng()-0.5)*6; const ly=ey+rng()*7;
+      const sz=8+rng()*5; const rot=ang*180/Math.PI+46+rng()*20;
       els.push(<path key={`ov${i}`}
         d={`M 0,0 C ${(sz*.38).toFixed(1)},${(-sz*.26).toFixed(1)} ${(sz*.32).toFixed(1)},${(-sz*.80).toFixed(1)} 0,${(-sz).toFixed(1)} C ${(-sz*.32).toFixed(1)},${(-sz*.80).toFixed(1)} ${(-sz*.38).toFixed(1)},${(-sz*.26).toFixed(1)} 0,0 Z`}
-        fill="#fcd34d" stroke="rgba(120,60,0,.20)" strokeWidth="0.5" opacity="0.86"
+        fill="#fcd34d" stroke="rgba(120,60,0,.18)" strokeWidth="0.5" opacity="0.88"
         transform={`translate(${lx.toFixed(1)},${ly.toFixed(1)}) rotate(${rot.toFixed(1)})`}/>);
     }
+  }
+  // Done-task marker: small bright dots at the very end of random completed branches
+  const dotCount=Math.min(done,Math.floor(bCnt*0.6));
+  for(let d=0;d<dotCount;d++){
+    const bi=Math.floor(rng()*bCnt);
+    const ni2=bCnt>1?bi/(bCnt-1):0.5;
+    const ang2=BASE_ANG-SPREAD/2+ni2*SPREAD;
+    const ex2=cx+Math.cos(ang2)*bLen*(0.72+rng()*0.42);
+    const ey2=cy+Math.sin(ang2)*bLen*(0.72+rng()*0.42);
+    els.push(<circle key={`dk${d}`} cx={ex2} cy={ey2} r={2.5} fill="#d0f47a" opacity="0.7"/>);
   }
   return <g style={{pointerEvents:"none"}}>{els}</g>;
 }
@@ -483,8 +491,8 @@ export default function TreeCanvas(){
           <pattern id="barkPat" x="0" y="0" width="10" height="30" patternUnits="userSpaceOnUse">
             <path d="M5,0 Q3,9 5,15 Q7,21 5,30" stroke="rgba(0,0,0,.08)" strokeWidth="1" fill="none"/>
           </pattern>
-          <filter id="leafShadow" x="-12%" y="-12%" width="124%" height="124%">
-            <feDropShadow dx="0" dy="10" stdDeviation="13" floodColor="#09200e" floodOpacity=".20"/>
+          <filter id="leafShadow" x="-18%" y="-18%" width="136%" height="136%">
+            <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#09200e" floodOpacity=".10"/>
           </filter>
           <filter id="trunkShd">
             <feDropShadow dx="5" dy="8" stdDeviation="9" floodColor="#030602" floodOpacity=".26"/>

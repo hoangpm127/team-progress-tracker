@@ -196,7 +196,7 @@ export default function DashboardPage() {
       {/* ── Page header ───────────────────────────────────────────────────── */}
       <div className="mb-8 text-center">
         <p className="text-xs text-slate-400 mb-1">Q1 2026 · Ngày {Q1_ELAPSED}/{Q1_TOTAL} của quý</p>
-        <h1 className="text-2xl font-bold text-slate-900 uppercase tracking-tight" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", letterSpacing: "0.12em" }}>Tổng Quan Điều Hành</h1>
+        <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.10em" }}>TỔNG QUAN ĐIỀU HÀNH</h1>
         <p className="text-slate-500 text-sm mt-1">Bám sát chiến lược từ GSX · Mọi mục tiêu, tiến độ & rủi ro đều hiện diện tại đây</p>
         {lastUpdated && (
           <p className="text-xs text-slate-400 mt-1">
@@ -226,8 +226,8 @@ export default function DashboardPage() {
       {/* ── Row 2: Annual KPI targets ──────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-5 mb-6">
         <div className="text-center mb-4">
-          <h2 className="font-bold text-slate-800 text-sm uppercase tracking-wider">🎯 KPI CHIẾN LƯỢC NĂM 2026</h2>
-          <p className="text-xs text-slate-400 mt-0.5 uppercase tracking-wide">MỤC TIÊU CẤP HỆ SINH THÁI · NĂM ĐÃ QUA {Math.round(YEAR_ELAPSED / YEAR_TOTAL * 100)}%</p>
+          <h2 className="font-bold text-slate-800 text-sm" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.08em" }}>🎯 KPI CHIẾN LƯỢC NĂM 2026</h2>
+          <p className="text-xs text-slate-400 mt-0.5" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.07em" }}>MỤC TIÊU CẤP HỆ SINH THÁI · NĂM ĐÃ QUA {Math.round(YEAR_ELAPSED / YEAR_TOTAL * 100)}%</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
           {ANNUAL_KPIS.map((kpi) => {
@@ -262,7 +262,7 @@ export default function DashboardPage() {
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-50">
           <div>
-            <h2 className="font-bold text-slate-800 text-base text-center">Tiến độ các phòng ban</h2>
+            <h2 className="font-bold text-slate-800 text-base" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.08em" }}>TIẾN ĐỘ CÁC PHÒNG BAN</h2>
             <p className="text-xs text-slate-400 mt-0.5">Tính theo trọng số · Đường dọc = mức kỳ vọng tại thời điểm hiện tại ({timeElapsedPct}%)</p>
           </div>
         </div>
@@ -338,7 +338,7 @@ export default function DashboardPage() {
 
         {/* Bottleneck + insights (now first) */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
-          <h3 className="font-bold text-slate-800 text-sm mb-3 text-center">🔍 Phân tích nhanh</h3>
+          <h3 className="font-bold text-slate-800 text-sm mb-3 text-center" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.08em" }}>🔍 PHÂN TÍCH NHANH</h3>
           <div className="space-y-3">
             {bottleneck && (
               <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
@@ -371,7 +371,7 @@ export default function DashboardPage() {
 
         {/* Strategic alerts (now second) */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
-          <h3 className="font-bold text-slate-800 text-sm mb-3 text-center">⚡ Cảnh báo chiến lược</h3>
+          <h3 className="font-bold text-slate-800 text-sm mb-3 text-center" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.08em" }}>⚡ CẢNH BÁO CHIẾN LƯỢC</h3>
           <div className="space-y-2">
             {teamHealthData.filter((d) => d.health.label !== "Đúng tiến độ").length === 0 && (
               <p className="text-xs text-emerald-600 font-semibold">✅ Tất cả phòng ban đang đúng tiến độ!</p>
@@ -415,7 +415,7 @@ export default function DashboardPage() {
             {/* Modal header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
               <div>
-                <h2 className="font-bold text-slate-800 text-lg text-center">🚀 30 Dự Án Triển Khai</h2>
+                <h2 className="font-bold text-slate-800 text-lg" style={{ fontFamily: "'Times New Roman', Georgia, serif", letterSpacing: "0.08em" }}>🚀 30 DỰ ÁN TRIỂN KHAI</h2>
                 <p className="text-xs text-slate-400 mt-0.5">8 đang triển khai · 22 đang lên kế hoạch</p>
               </div>
               <button onClick={() => setProjectModalOpen(false)} className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 text-lg">✕</button>
