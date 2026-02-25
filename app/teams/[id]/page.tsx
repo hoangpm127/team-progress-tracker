@@ -122,7 +122,7 @@ export default function TeamDetailPage() {
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-extrabold mb-1">{team.name}</h1>
+            <h1 className="text-2xl font-extrabold mb-1 uppercase tracking-tight text-center" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", letterSpacing: "0.12em" }}>{team.name}</h1>
             <p className="text-white/70 text-sm">{allTasks.length} công việc · {allTasks.filter((t) => t.done).length} hoàn thành</p>
           </div>
           <div className="flex flex-col items-end gap-2 sm:w-72 w-full">
@@ -427,21 +427,21 @@ export default function TeamDetailPage() {
 
       {activeTab === "kanban" && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
-          <h3 className="font-semibold text-slate-700 mb-4 text-sm">Bảng Kanban</h3>
+          <h3 className="font-semibold text-slate-700 mb-4 text-sm text-center">Bảng Kanban</h3>
           <KanbanBoard tasks={allTasks} teamColor={team.color} />
         </div>
       )}
 
       {activeTab === "gantt" && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
-          <h3 className="font-semibold text-slate-700 mb-4 text-sm">Biểu đồ Gantt</h3>
+          <h3 className="font-semibold text-slate-700 mb-4 text-sm text-center">Biểu đồ Gantt</h3>
           <GanttChart tasks={allTasks} teamColor={team.color} />
         </div>
       )}
 
       {activeTab === "activity" && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-4">
-          <h3 className="font-semibold text-slate-700 mb-4 text-sm">Nhật ký hoạt động</h3>
+          <h3 className="font-semibold text-slate-700 mb-4 text-sm text-center">Nhật ký hoạt động</h3>
           <ActivityLog entries={activity} />
         </div>
       )}

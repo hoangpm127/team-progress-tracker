@@ -21,7 +21,7 @@ export default function TeamsPage() {
     <div className="p-6 md:p-8 max-w-7xl mx-auto">
       <div className="mb-6 flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-1">Phòng ban</h1>
+          <h1 className="text-2xl font-bold text-slate-900 mb-1 uppercase tracking-tight text-center" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", letterSpacing: "0.12em" }}>Phòng ban</h1>
           <p className="text-slate-500 text-sm">
             {view === "tree"
               ? "Trực quan hoá hệ sinh thái phòng ban — nhấn vào cành để xem chi tiết."

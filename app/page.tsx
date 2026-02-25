@@ -1,5 +1,6 @@
 ﻿"use client";
 import Link from "next/link";
+import { useState } from "react";
 import { useApp } from "@/lib/AppContext";
 
 // ─── Q1 2026 time reference ────────────────────────────────────────────────
@@ -15,11 +16,110 @@ const YEAR_ELAPSED = Math.round((TODAY.getTime() - YEAR_START.getTime()) / 86400
 
 // ─── Annual company KPIs ───────────────────────────────────────────────────
 const ANNUAL_KPIS = [
-  { id: "k1", label: "Dự án triển khai", current: 8,     target: 30,     unit: "dự án",      color: "#6366f1" },
-  { id: "k2", label: "Thành viên nền tảng", current: 12400, target: 100000, unit: "thành viên", color: "#ec4899" },
-  { id: "k3", label: "Đối tác ký kết",   current: 41,    target: 136,    unit: "đối tác",    color: "#10b981" },
-  { id: "k4", label: "Doanh thu năm",    current: 1.4,   target: 10,     unit: "tỷ VND",     color: "#f59e0b" },
+  { id: "k1", label: "Dự án triển khai", current: 8,     target: 30,     unit: "dự án",      color: "#6366f1", clickable: true },
+  { id: "k2", label: "Thành viên nền tảng", current: 12400, target: 100000, unit: "thành viên", color: "#ec4899", clickable: false },
+  { id: "k3", label: "Đối tác ký kết",   current: 41,    target: 136,    unit: "đối tác",    color: "#10b981", clickable: false },
+  { id: "k5", label: "GMV năm",          current: 8.2,   target: 50,     unit: "tỷ VND",     color: "#8b5cf6", clickable: false },
+  { id: "k4", label: "Doanh thu năm",    current: 1.4,   target: 10,     unit: "tỷ VND",     color: "#f59e0b", clickable: false },
 ];
+
+// ─── 30 Projects ─────────────────────────────────────────────────────────────
+type ProjectDoc = { icon: string; name: string; type: string; url?: string; desc: string };
+type Project = { id: number; name: string; active: boolean; stages: string[]; note: string; docs: ProjectDoc[] };
+const PROJECTS: Project[] = [
+  { id: 1,  name: "Xgroup Platform Web",           active: true,  stages: ["done","done","active"], note: "Ra thị trường Q1 2026",
+    docs: [
+      { icon: "📋", name: "Tài liệu nghiệp vụ tổng thể", type: "PDF", desc: "Mô tả toàn bộ luồng nghiệp vụ nền tảng web" },
+      { icon: "🎨", name: "Thiết kế UI/UX Figma", type: "Figma", url: "#", desc: "Mockup & prototype giao diện người dùng" },
+      { icon: "🔧", name: "Tài liệu kỹ thuật API", type: "Notion", url: "#", desc: "Đặc tả endpoint REST, auth, rate limit" },
+      { icon: "✅", name: "Test cases & QA Checklist", type: "Sheet", desc: "Danh sách kiểm thử chức năng & regression" },
+    ]
+  },
+  { id: 2,  name: "Xgroup Mobile App",              active: true,  stages: ["done","active","pending"], note: "Đang phát triển demo",
+    docs: [
+      { icon: "📋", name: "Product Requirements Document", type: "PDF", desc: "PRD đầy đủ cho iOS & Android" },
+      { icon: "🎨", name: "Mobile UI Prototype", type: "Figma", url: "#", desc: "Prototype tương tác, user flow" },
+      { icon: "📱", name: "Tech Stack & Architecture", type: "Notion", desc: "React Native, state management, CI/CD" },
+    ]
+  },
+  { id: 3,  name: "AI Content Assistant",           active: true,  stages: ["done","active","pending"], note: "Tích hợp AI nội bộ",
+    docs: [
+      { icon: "🤖", name: "AI Model Specification", type: "PDF", desc: "Đặc tả mô hình LLM, fine-tuning strategy" },
+      { icon: "📋", name: "Luồng nghiệp vụ AI Assistant", type: "Notion", desc: "Use case, prompt engineering, safety" },
+      { icon: "🔧", name: "Integration Guide", type: "Doc", desc: "Hướng dẫn tích hợp vào hệ thống hiện tại" },
+    ]
+  },
+  { id: 4,  name: "Partner Management System",      active: true,  stages: ["done","done","done"],   note: "Đã vận hành",
+    docs: [
+      { icon: "📋", name: "Hướng dẫn sử dụng", type: "PDF", desc: "User manual cho partner & admin" },
+      { icon: "🔧", name: "System Architecture", type: "Notion", desc: "Sơ đồ kiến trúc & database schema" },
+      { icon: "📊", name: "SLA & KPI Dashboard", type: "Sheet", desc: "Chỉ tiêu vận hành & báo cáo định kỳ" },
+    ]
+  },
+  { id: 5,  name: "Payment Gateway Integration",    active: true,  stages: ["done","done","active"], note: "Kết nối cổng thanh toán",
+    docs: [
+      { icon: "💳", name: "Payment Flow Diagram", type: "PDF", desc: "Luồng thanh toán, refund, dispute handling" },
+      { icon: "🔒", name: "Security & Compliance", type: "Doc", desc: "PCI-DSS, mã hóa dữ liệu thẻ" },
+      { icon: "🔧", name: "Webhook & API Docs", type: "Notion", desc: "Tích hợp webhook thông báo trạng thái" },
+    ]
+  },
+  { id: 6,  name: "Business Intelligence Dashboard",active: true,  stages: ["done","done","active"], note: "Phân tích kinh doanh",
+    docs: [
+      { icon: "📊", name: "Dashboard Requirements", type: "PDF", desc: "Danh sách metrics, biểu đồ, drill-down" },
+      { icon: "🗄️", name: "Data Model & ETL Pipeline", type: "Notion", desc: "Sơ đồ data warehouse, cronjob" },
+      { icon: "📋", name: "Báo cáo mẫu & Template", type: "Sheet", desc: "Các template báo cáo định kỳ" },
+    ]
+  },
+  { id: 7,  name: "Developer API Marketplace",      active: true,  stages: ["done","active","pending"], note: "Marketplace API mở",
+    docs: [
+      { icon: "🔧", name: "API Catalog & Docs", type: "Notion", url: "#", desc: "Danh mục API public, sandbox, pricing" },
+      { icon: "📋", name: "Onboarding Developer Guide", type: "PDF", desc: "Hướng dẫn đăng ký & tích hợp cho dev" },
+      { icon: "📊", name: "Usage Analytics Spec", type: "Doc", desc: "Theo dõi lượt gọi, quota, billing" },
+    ]
+  },
+  { id: 8,  name: "Internal CRM System",            active: true,  stages: ["done","done","active"], note: "CRM nội bộ",
+    docs: [
+      { icon: "📋", name: "Luồng nghiệp vụ CRM", type: "PDF", desc: "Pipeline sale, chăm sóc khách hàng, escalation" },
+      { icon: "🎨", name: "CRM UI Wireframe", type: "Figma", desc: "Thiết kế giao diện CRM nội bộ" },
+      { icon: "🗄️", name: "Database Schema", type: "Notion", desc: "Cấu trúc bảng dữ liệu khách hàng, contact" },
+    ]
+  },
+  { id: 9,  name: "E-learning Platform",            active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Ý tưởng & Scope ban đầu", type: "Doc", desc: "Brainstorm, target user, MVP features" }] },
+  { id: 10, name: "Customer Loyalty Program",       active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Loyalty Program Concept", type: "Doc", desc: "Cơ chế điểm thưởng, tier, redemption" }] },
+  { id: 11, name: "Supply Chain Management",        active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 12, name: "HR Performance Portal",          active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "HR Portal Requirements", type: "Doc", desc: "KPI cá nhân, review 360, OKR cá nhân" }] },
+  { id: 13, name: "Event Management System",        active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 14, name: "B2B Commerce Portal",            active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "B2B Commerce Scope", type: "Doc", desc: "Luồng đặt hàng B2B, pricing, approval" }] },
+  { id: 15, name: "Social Commerce Features",       active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 16, name: "Inventory Management",           active: false, stages: ["pending","pending","pending"], note: "Q4 2026", docs: [] },
+  { id: 17, name: "Customer Support System",        active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Support Ticket Flow", type: "Doc", desc: "Luồng xử lý ticket, SLA, escalation" }] },
+  { id: 18, name: "Affiliate Marketing Platform",   active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 19, name: "Data Warehouse v2",              active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "DWH v2 Migration Plan", type: "Doc", desc: "Kế hoạch nâng cấp data warehouse" }] },
+  { id: 20, name: "Security Audit System",          active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 21, name: "Multi-language Support",         active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "i18n Scope & Language List", type: "Doc", desc: "Danh sách ngôn ngữ, chiến lược dịch thuật" }] },
+  { id: 22, name: "Partner API v2",                 active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 23, name: "Mobile Payment App",             active: false, stages: ["pending","pending","pending"], note: "Q4 2026", docs: [] },
+  { id: 24, name: "Business Process Automation",    active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 25, name: "Marketing Automation Suite",     active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Marketing Automation Blueprint", type: "Doc", desc: "Email, SMS, push workflow tự động" }] },
+  { id: 26, name: "Revenue Analytics Engine",       active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 27, name: "Customer Segmentation AI",       active: false, stages: ["pending","pending","pending"], note: "Q4 2026", docs: [] },
+  { id: 28, name: "Chatbot Support 24/7",           active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Chatbot Flow & Intent Map", type: "Doc", desc: "Kịch bản hội thoại, intent, fallback" }] },
+  { id: 29, name: "Document Management System",     active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 30, name: "Enterprise Analytics Dashboard", active: false, stages: ["pending","pending","pending"], note: "Q4 2026", docs: [] },
+];
+
+// ─── Team icons ────────────────────────────────────────────────────────────────
+const TEAM_ICONS: Record<string, string> = {
+  tech: "⚙️",
+  mkt: "📣",
+  marketing: "📣",
+  hr: "👥",
+  partnerships: "🤝",
+  assistant: "📋",
+};
+function teamIcon(id: string) {
+  return TEAM_ICONS[id] ?? "🏢";
+}
 
 function getHealth(pct: number) {
   const expected = (Q1_ELAPSED / Q1_TOTAL) * 100;
@@ -86,23 +186,20 @@ export default function DashboardPage() {
     return Math.min(100, Math.round(pct + velocity * Q1_REMAINING));
   }
 
+  const [projectModalOpen, setProjectModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const timeElapsedPct = Math.round((Q1_ELAPSED / Q1_TOTAL) * 100);
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
 
       {/* ── Page header ───────────────────────────────────────────────────── */}
-      <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">Control Center</span>
-            <span className="text-xs text-slate-400">Q1 2026 · Ngày {Q1_ELAPSED}/{Q1_TOTAL} của quý</span>
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900">Tổng quan Điều hành</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Kiểm soát chiến lược toàn hệ sinh thái · Đã qua {timeElapsedPct}% thời gian Q1</p>
-        </div>
+      <div className="mb-8 text-center">
+        <p className="text-xs text-slate-400 mb-1">Q1 2026 · Ngày {Q1_ELAPSED}/{Q1_TOTAL} của quý</p>
+        <h1 className="text-2xl font-bold text-slate-900 uppercase tracking-tight" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", letterSpacing: "0.12em" }}>Tổng Quan Điều Hành</h1>
+        <p className="text-slate-500 text-sm mt-1">Bám sát chiến lược từ GSX · Mọi mục tiêu, tiến độ & rủi ro đều hiện diện tại đây</p>
         {lastUpdated && (
-          <p className="text-xs text-slate-400 shrink-0">
+          <p className="text-xs text-slate-400 mt-1">
             Cập nhật lúc {new Date(lastUpdated).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}
           </p>
         )}
@@ -111,14 +208,14 @@ export default function DashboardPage() {
       {/* ── Row 1: Summary stat cards ──────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         {[
-          { label: "Tiến độ tổng",    value: `${overallPct}%`,              sub: "theo trọng số",       color: "text-indigo-600",  bg: "bg-indigo-50"  },
-          { label: "Công việc xong",  value: `${totalDone}/${tasks.length}`, sub: "weighted progress",   color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "OKR trung bình",  value: `${avgOKRPct}%`,               sub: "tất cả kết quả then chốt",color: "text-violet-600",bg: "bg-violet-50"  },
-          { label: "Team nguy hiểm",  value: `${atRiskCount}`,              sub: `${onTrackCount} đúng hạn`, color: atRiskCount > 0 ? "text-red-600" : "text-emerald-600", bg: atRiskCount > 0 ? "bg-red-50" : "bg-emerald-50" },
-          { label: "Quá hạn",         value: `${totalOverdue}`,             sub: "cần xử lý ngay",      color: totalOverdue > 0 ? "text-red-500" : "text-slate-400", bg: totalOverdue > 0 ? "bg-red-50" : "bg-slate-50" },
-          { label: "Thời gian Q1",    value: `${timeElapsedPct}%`,          sub: `${Q1_REMAINING} ngày còn lại`, color: "text-amber-600",bg: "bg-amber-50"  },
+          { label: "Xgroup",          value: `${overallPct}%`,              sub: "theo trọng số",            color: "text-indigo-600",  bg: "bg-indigo-50",  border: "border-indigo-200"  },
+          { label: "Công việc xong",  value: `${totalDone}/${tasks.length}`, sub: "weighted progress",        color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200" },
+          { label: "OKR trung bình",  value: `${avgOKRPct}%`,               sub: "kết quả then chốt",        color: "text-violet-600",  bg: "bg-violet-50",  border: "border-violet-200"  },
+          { label: "Team nguy hiểm",  value: `${atRiskCount}`,              sub: `${onTrackCount} đúng hạn`, color: atRiskCount > 0 ? "text-red-600" : "text-emerald-600", bg: atRiskCount > 0 ? "bg-red-50" : "bg-emerald-50", border: atRiskCount > 0 ? "border-red-200" : "border-emerald-200" },
+          { label: "Quá hạn",         value: `${totalOverdue}`,             sub: "cần xử lý ngay",           color: totalOverdue > 0 ? "text-red-500" : "text-slate-400", bg: totalOverdue > 0 ? "bg-red-50" : "bg-slate-50", border: totalOverdue > 0 ? "border-red-200" : "border-slate-200" },
+          { label: "Thời gian Q1",    value: `${timeElapsedPct}%`,          sub: `${Q1_REMAINING} ngày còn lại`, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-200" },
         ].map((s) => (
-          <div key={s.label} className={`${s.bg} rounded-2xl px-4 py-4`}>
+          <div key={s.label} className={`${s.bg} border-2 ${s.border} rounded-2xl px-4 py-4 text-center`}>
             <p className="text-[11px] font-medium text-slate-400 mb-1 leading-tight">{s.label}</p>
             <p className={`text-2xl font-extrabold leading-none mb-1 ${s.color}`}>{s.value}</p>
             <p className="text-[10px] text-slate-400 leading-tight">{s.sub}</p>
@@ -128,18 +225,20 @@ export default function DashboardPage() {
 
       {/* ── Row 2: Annual KPI targets ──────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-5 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="font-bold text-slate-800 text-sm">🎯 KPI Chiến lược Năm 2026</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Mục tiêu cấp hệ sinh thái · Năm đã qua {Math.round(YEAR_ELAPSED / YEAR_TOTAL * 100)}%</p>
-          </div>
+        <div className="text-center mb-4">
+          <h2 className="font-bold text-slate-800 text-sm uppercase tracking-wider">🎯 KPI CHIẾN LƯỢC NĂM 2026</h2>
+          <p className="text-xs text-slate-400 mt-0.5 uppercase tracking-wide">MỤC TIÊU CẤP HỆ SINH THÁI · NĂM ĐÃ QUA {Math.round(YEAR_ELAPSED / YEAR_TOTAL * 100)}%</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
           {ANNUAL_KPIS.map((kpi) => {
             const pct = Math.min(100, Math.round((kpi.current / kpi.target) * 100));
             const yearForecast = Math.min(100, Math.round(pct / (YEAR_ELAPSED / YEAR_TOTAL)));
             return (
-              <div key={kpi.id} className="flex flex-col gap-2">
+              <div key={kpi.id}
+                className={`flex flex-col gap-2 ${'clickable' in kpi && kpi.clickable ? 'cursor-pointer hover:bg-indigo-50 rounded-xl p-2 -m-2 transition-colors' : ''}`}
+                onClick={'clickable' in kpi && kpi.clickable ? () => setProjectModalOpen(true) : undefined}
+                title={'clickable' in kpi && kpi.clickable ? 'Click để xem 30 dự án' : undefined}
+              >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-600">{kpi.label}</span>
                   <span className="text-xs font-bold" style={{ color: kpi.color }}>{pct}%</span>
@@ -163,7 +262,7 @@ export default function DashboardPage() {
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mb-6">
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-50">
           <div>
-            <h2 className="font-bold text-slate-800 text-base">Tiến độ các phòng ban</h2>
+            <h2 className="font-bold text-slate-800 text-base text-center">Tiến độ các phòng ban</h2>
             <p className="text-xs text-slate-400 mt-0.5">Tính theo trọng số · Đường dọc = mức kỳ vọng tại thời điểm hiện tại ({timeElapsedPct}%)</p>
           </div>
         </div>
@@ -178,9 +277,9 @@ export default function DashboardPage() {
                 <div className="group rounded-xl px-3 py-3 -mx-3 hover:bg-slate-50 transition-colors cursor-pointer">
                   {/* Top row: name + health badge + stats */}
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-white font-bold text-xs shadow-sm"
+                    <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center shadow-sm text-base"
                       style={{ backgroundColor: team.color }}>
-                      {team.name.slice(0, 2).toUpperCase()}
+                      {teamIcon(team.id)}
                     </div>
                     <span className="text-sm font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors w-28 shrink-0 truncate">{team.name}</span>
                     <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${health.cls} shrink-0`}>
@@ -234,12 +333,45 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ── Row 4: Strategic alerts + Bottleneck ──────────────────────────── */}
+      {/* ── Row 4: Bottleneck + Strategic alerts ──────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
 
-        {/* Strategic alerts */}
+        {/* Bottleneck + insights (now first) */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
-          <h3 className="font-bold text-slate-800 text-sm mb-3">⚡ Cảnh báo chiến lược</h3>
+          <h3 className="font-bold text-slate-800 text-sm mb-3 text-center">🔍 Phân tích nhanh</h3>
+          <div className="space-y-3">
+            {bottleneck && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                <p className="text-xs font-bold text-amber-800 mb-0.5">⚠ Bottleneck tiềm năng</p>
+                <p className="text-sm font-semibold text-amber-900">{bottleneck[0]}</p>
+                <p className="text-[11px] text-amber-600">{bottleneck[1]} công việc đang chờ xử lý</p>
+              </div>
+            )}
+            <div className={`rounded-xl px-4 py-3 ${avgOKRPct >= 60 ? "bg-emerald-50 border border-emerald-200" : avgOKRPct >= 40 ? "bg-amber-50 border border-amber-200" : "bg-red-50 border border-red-200"}`}>
+              <p className={`text-xs font-bold mb-0.5 ${avgOKRPct >= 60 ? "text-emerald-800" : avgOKRPct >= 40 ? "text-amber-800" : "text-red-800"}`}>
+                {avgOKRPct >= 60 ? "✅" : avgOKRPct >= 40 ? "🟡" : "🔴"} OKR toàn công ty: {avgOKRPct}%
+              </p>
+              <p className={`text-[11px] ${avgOKRPct >= 60 ? "text-emerald-700" : avgOKRPct >= 40 ? "text-amber-700" : "text-red-600"}`}>
+                {avgOKRPct >= 60 ? "Kết quả then chốt đang tiến triển tốt" : avgOKRPct >= 40 ? "Một số mục tiêu cần thúc đẩy thêm" : "Cần review lại OKR ngay"}
+              </p>
+            </div>
+            {totalOverdue > 0 && (
+              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                <p className="text-xs font-bold text-red-800 mb-0.5">🚨 {totalOverdue} công việc quá hạn</p>
+                <p className="text-[11px] text-red-600">Cần xử lý ngay để tránh trễ mục tiêu Q1</p>
+              </div>
+            )}
+            {totalOverdue === 0 && (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+                <p className="text-xs font-bold text-emerald-800">✅ Không có công việc quá hạn</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Strategic alerts (now second) */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
+          <h3 className="font-bold text-slate-800 text-sm mb-3 text-center">⚡ Cảnh báo chiến lược</h3>
           <div className="space-y-2">
             {teamHealthData.filter((d) => d.health.label !== "Đúng tiến độ").length === 0 && (
               <p className="text-xs text-emerald-600 font-semibold">✅ Tất cả phòng ban đang đúng tiến độ!</p>
@@ -255,9 +387,9 @@ export default function DashboardPage() {
                 return (
                   <Link key={team.id} href={`/teams/${team.id}`}>
                     <div className="flex items-center gap-3 py-1.5 hover:bg-slate-50 rounded-lg px-2 -mx-2 transition-colors">
-                      <div className="w-5 h-5 rounded flex items-center justify-center text-white text-[10px] font-bold shrink-0"
+                      <div className="w-5 h-5 rounded flex items-center justify-center shrink-0 text-sm"
                         style={{ backgroundColor: team.color }}>
-                        {team.name.slice(0, 2).toUpperCase()}
+                        {teamIcon(team.id)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-slate-700">{team.name} — {pct}%</p>
@@ -273,46 +405,143 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Bottleneck + insights */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-5 py-4">
-          <h3 className="font-bold text-slate-800 text-sm mb-3">🔍 Phân tích nhanh</h3>
-          <div className="space-y-3">
-            {/* Bottleneck */}
-            {bottleneck && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-                <p className="text-xs font-bold text-amber-800 mb-0.5">⚠ Bottleneck tiềm năng</p>
-                <p className="text-sm font-semibold text-amber-900">{bottleneck[0]}</p>
-                <p className="text-[11px] text-amber-600">{bottleneck[1]} công việc đang chờ xử lý</p>
+      </div>
+
+      {/* ── Projects Modal ─────────────────────────────────────────────────── */}
+      {projectModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setProjectModalOpen(false)}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+              <div>
+                <h2 className="font-bold text-slate-800 text-lg text-center">🚀 30 Dự Án Triển Khai</h2>
+                <p className="text-xs text-slate-400 mt-0.5">8 đang triển khai · 22 đang lên kế hoạch</p>
               </div>
-            )}
-            {/* OKR insight */}
-            <div className={`rounded-xl px-4 py-3 ${avgOKRPct >= 60 ? "bg-emerald-50 border border-emerald-200" : avgOKRPct >= 40 ? "bg-amber-50 border border-amber-200" : "bg-red-50 border border-red-200"}`}>
-              <p className={`text-xs font-bold mb-0.5 ${avgOKRPct >= 60 ? "text-emerald-800" : avgOKRPct >= 40 ? "text-amber-800" : "text-red-800"}`}>
-                {avgOKRPct >= 60 ? "✅" : avgOKRPct >= 40 ? "🟡" : "🔴"} OKR toàn công ty: {avgOKRPct}%
-              </p>
-              <p className={`text-[11px] ${avgOKRPct >= 60 ? "text-emerald-700" : avgOKRPct >= 40 ? "text-amber-700" : "text-red-600"}`}>
-                {avgOKRPct >= 60 ? "Kết quả then chốt đang tiến triển tốt" : avgOKRPct >= 40 ? "Một số mục tiêu cần thúc đẩy thêm" : "Cần review lại OKR ngay"}
-              </p>
+              <button onClick={() => setProjectModalOpen(false)} className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 text-lg">✕</button>
             </div>
-            {/* Overdue */}
-            {totalOverdue > 0 && (
-              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                <p className="text-xs font-bold text-red-800 mb-0.5">🚨 {totalOverdue} công việc quá hạn</p>
-                <p className="text-[11px] text-red-600">Cần xử lý ngay để tránh trễ mục tiêu Q1</p>
+            {/* Modal body */}
+            <div className="overflow-y-auto p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {PROJECTS.map((p) => {
+                  const stageLabels = ["Ý tưởng", "Demo", "Ra thị trường"];
+                  const stageColors = { done: "bg-emerald-500", active: "bg-indigo-500", pending: "bg-slate-200" };
+                  const stageText  = { done: "text-emerald-700", active: "text-indigo-700", pending: "text-slate-400" };
+                  return (
+                    <div key={p.id}
+                      onClick={() => setSelectedProject(p)}
+                      className={`rounded-xl border-2 p-4 transition-all cursor-pointer ${
+                        p.active
+                          ? "border-indigo-200 bg-indigo-50 shadow-sm hover:border-indigo-400 hover:shadow-md"
+                          : "border-slate-100 bg-white opacity-50 hover:opacity-75 hover:border-slate-300"
+                      }`}
+                    >
+                      <div className="flex items-start gap-2 mb-3">
+                        <span className={`mt-0.5 text-xs font-bold px-1.5 py-0.5 rounded ${
+                          p.active ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-500"
+                        }`}>{String(p.id).padStart(2, "0")}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-slate-800 leading-tight">{p.name}</p>
+                          <p className="text-[11px] text-slate-400 mt-0.5">{p.note}</p>
+                        </div>
+                        {p.docs.length > 0 && (
+                          <span className="shrink-0 text-[10px] bg-indigo-100 text-indigo-600 font-bold px-1.5 py-0.5 rounded-full">{p.docs.length} tài liệu</span>
+                        )}
+                      </div>
+                      {/* Stages */}
+                      <div className="flex gap-1.5">
+                        {p.stages.map((s, si) => (
+                          <div key={si} className="flex-1 text-center">
+                            <div className={`h-1.5 rounded-full mb-1 ${stageColors[s as keyof typeof stageColors]}`} />
+                            <p className={`text-[10px] font-medium ${stageText[s as keyof typeof stageText]}`}>{stageLabels[si]}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            )}
-            {totalOverdue === 0 && (
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
-                <p className="text-xs font-bold text-emerald-800">✅ Không có công việc quá hạn</p>
-              </div>
-            )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <p className="text-xs text-slate-400 text-center">
         Nhấn vào phòng ban để xem chi tiết công việc · Đường dọc trên biểu đồ = mức kỳ vọng tiến độ hôm nay
       </p>
+
+      {/* ── Project Document Detail Modal ─────────────────────────────── */}
+      {selectedProject && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" onClick={() => setSelectedProject(null)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg flex flex-col" onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-slate-100">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+                      selectedProject.active ? "bg-indigo-600 text-white" : "bg-slate-200 text-slate-500"
+                    }`}>{String(selectedProject.id).padStart(2, "0")}</span>
+                    {selectedProject.active && <span className="text-xs bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full">🟢 Đang triển khai</span>}
+                  </div>
+                  <h3 className="font-bold text-slate-800 text-base text-center">{selectedProject.name}</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">{selectedProject.note}</p>
+                </div>
+                <button onClick={() => setSelectedProject(null)} className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">✕</button>
+              </div>
+              {/* Stages recap */}
+              <div className="flex gap-2 mt-3">
+                {(["Ý tưởng", "Demo", "Ra thị trường"] as const).map((lbl, si) => {
+                  const s = selectedProject.stages[si];
+                  const dot = s === "done" ? "bg-emerald-500" : s === "active" ? "bg-indigo-500" : "bg-slate-200";
+                  const txt = s === "done" ? "text-emerald-700" : s === "active" ? "text-indigo-700" : "text-slate-400";
+                  return (
+                    <div key={si} className="flex-1 text-center">
+                      <div className={`h-1.5 rounded-full mb-1 ${dot}`} />
+                      <p className={`text-[10px] font-medium ${txt}`}>{lbl}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            {/* Docs */}
+            <div className="p-5">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">📂 Tài liệu đính kèm</p>
+              {selectedProject.docs.length === 0 ? (
+                <div className="text-center py-8 text-slate-400">
+                  <p className="text-3xl mb-2">📭</p>
+                  <p className="text-sm">Chưa có tài liệu nào</p>
+                  <p className="text-xs mt-1">Dự án đang trong giai đoạn lên kế hoạch</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {selectedProject.docs.map((doc, di) => (
+                    <div key={di}
+                      onClick={() => doc.url && window.open(doc.url, "_blank")}
+                      className={`flex items-start gap-3 p-3 rounded-xl border transition-all ${
+                        doc.url
+                          ? "border-indigo-100 bg-indigo-50 hover:border-indigo-300 hover:shadow-sm cursor-pointer"
+                          : "border-slate-100 bg-slate-50"
+                      }`}
+                    >
+                      <span className="text-xl shrink-0">{doc.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-slate-800 truncate">{doc.name}</p>
+                          <span className="shrink-0 text-[10px] font-bold bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded">{doc.type}</span>
+                          {doc.url && <span className="shrink-0 text-[10px] text-indigo-500">↗ Mở</span>}
+                        </div>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{doc.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

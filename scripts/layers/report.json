@@ -1,0 +1,143 @@
+{
+  "image": {
+    "width": 2150,
+    "height": 1266
+  },
+  "svgViewBox_900x": {
+    "scaleX": 0.418605,
+    "scaleY": 0.588837,
+    "note": "Multiply y-coords by 0.5888 to get SVG y when viewBox=900x530"
+  },
+  "layers": [
+    {
+      "layer": "1_sky",
+      "pct": 18.0,
+      "y": [
+        57,
+        1003
+      ],
+      "x": [
+        0,
+        2149
+      ],
+      "note": "Sky & background"
+    },
+    {
+      "layer": "2_clouds",
+      "pct": 11.2,
+      "y": [
+        54,
+        1181
+      ],
+      "x": [
+        0,
+        2149
+      ],
+      "note": "Clouds (white puffs)"
+    },
+    {
+      "layer": "3_rain",
+      "pct": 0.0,
+      "y": [
+        310,
+        689
+      ],
+      "x": [
+        547,
+        1708
+      ],
+      "note": "Rain streaks"
+    },
+    {
+      "layer": "4_wind",
+      "pct": 0.1,
+      "y": [
+        282,
+        752
+      ],
+      "x": [
+        388,
+        1708
+      ],
+      "note": "Wind wisps"
+    },
+    {
+      "layer": "5_canopy",
+      "pct": 30.3,
+      "y": [
+        262,
+        1265
+      ],
+      "x": [
+        0,
+        2149
+      ],
+      "note": "Canopy / leaves (greens)"
+    },
+    {
+      "layer": "6_branches",
+      "pct": 5.4,
+      "y": [
+        376,
+        1265
+      ],
+      "x": [
+        0,
+        2149
+      ],
+      "note": "Branches (brown)"
+    },
+    {
+      "layer": "7_trunk",
+      "pct": 2.5,
+      "y": [
+        399,
+        1265
+      ],
+      "x": [
+        23,
+        2149
+      ],
+      "note": "Trunk (dark brown)"
+    },
+    {
+      "layer": "8_roots",
+      "pct": 1.6,
+      "y": [
+        759,
+        1265
+      ],
+      "x": [
+        23,
+        2149
+      ],
+      "note": "Roots (trunk bottom zone)"
+    },
+    {
+      "layer": "9_grass_ground",
+      "pct": 4.5,
+      "y": [
+        759,
+        1265
+      ],
+      "x": [
+        0,
+        2149
+      ],
+      "note": "Grass & ground (bottom)"
+    },
+    {
+      "layer": "0_uncategorised",
+      "pct": 34.8,
+      "y": [
+        0,
+        1265
+      ],
+      "x": [
+        0,
+        2149
+      ],
+      "note": "Pixels not matched by any rule"
+    }
+  ]
+}

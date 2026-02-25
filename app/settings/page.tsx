@@ -4,7 +4,7 @@ export default function SettingsPage() {
   return (
     <div className="p-6 md:p-8 max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900 mb-1">Cài đặt</h1>
+        <h1 className="text-2xl font-bold text-slate-900 mb-1 uppercase tracking-tight text-center" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", letterSpacing: "0.12em" }}>Cài đặt</h1>
         <p className="text-slate-500 text-sm">Tùy chỉnh ứng dụng và các cấu hình hệ thống.</p>
       </div>
 

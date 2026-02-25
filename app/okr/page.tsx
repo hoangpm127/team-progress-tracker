@@ -279,7 +279,7 @@ function AddObjModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
-        <h2 className="text-lg font-bold text-slate-800 mb-4">Thêm mục tiêu mới</h2>
+        <h2 className="text-lg font-bold text-slate-800 mb-4 text-center">Thêm mục tiêu mới</h2>
         <div className="flex flex-col gap-3">
           <div>
             <label className="text-xs font-semibold text-slate-500 mb-1 block">Tiêu đề mục tiêu *</label>
@@ -346,7 +346,7 @@ export default function OKRPage() {
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Mục tiêu &amp; Kết quả then chốt (OKR)</h1>
+          <h1 className="text-2xl font-bold text-slate-800 uppercase tracking-tight text-center" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", letterSpacing: "0.12em" }}>Mục tiêu &amp; Kết quả then chốt (OKR)</h1>
           <p className="text-slate-500 mt-1 text-sm">Theo dõi và chỉnh sửa OKR theo phòng ban</p>
         </div>
         <button onClick={() => setShowAddObj(true)}
@@ -379,7 +379,7 @@ export default function OKRPage() {
           <div key={teamId} className="mb-8">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-1 h-7 rounded-full" style={{ background: meta.color }} />
-              <h2 className="text-base font-bold text-slate-700">{meta.name}</h2>
+              <h2 className="text-base font-bold text-slate-700 text-center">{meta.name}</h2>
               <span className="text-sm text-slate-400 ml-auto">
                 Tiến độ TB: <strong style={{ color: meta.color }}>{teamAvg}%</strong>
               </span>
