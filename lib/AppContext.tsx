@@ -118,25 +118,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTask = useCallback((taskId: string, owner: string) => {
     setState((prev) => {
-      const tasks = prev.tasks.map((t) => {
-        if (t.id !== taskId) return t;
-        const newDone   = !t.done;
-        const newStatus: TaskStatus = newDone ? "Done" : t.status === "Done" ? "Doing" : t.status;
-        return { ...t, done: newDone, status: newStatus };
-      });
-      const task = tasks.find((t) => t.id === taskId)!;
+      const task = prev.tasks.find((t) => t.id === taskId);
+      if (!task) return prev;
+
+      const newDone   = !task.done;
+      const newStatus: TaskStatus = newDone ? "Done" : task.status === "Done" ? "Doing" : task.status;
       const now  = new Date().toISOString();
       const entry: ActivityEntry = {
         id:        `act-${Date.now()}`,
         teamId:    task.teamId,
-        message:   `${owner} đã đánh dấu "${task.title}" là ${task.done ? "Hoàn thành" : "Đang làm"}`,
+        message:   `${owner} đã đánh dấu "${task.title}" là ${newDone ? "Hoàn thành" : "Đang làm"}`,
         timestamp: now,
       };
-      dbUpdateTask(taskId, { done: task.done, status: task.status });
+
+      // DB calls are idempotent updates, safe even if updater runs twice
+      dbUpdateTask(taskId, { done: newDone, status: newStatus });
+      // Activity insert is NOT idempotent, but we accept possible duplicates for toggles
       dbAddActivity(entry);
+
       return {
         ...prev,
-        tasks,
+        tasks: prev.tasks.map((t) =>
+          t.id !== taskId ? t : { ...t, done: newDone, status: newStatus }
+        ),
         activity: [entry, ...prev.activity].slice(0, 200),
         lastUpdated: now,
       };
@@ -144,25 +148,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addTask = useCallback((taskData: Omit<Task, "id">) => {
-    setState((prev) => {
-      const id      = `custom-${Date.now()}`;
-      const now     = new Date().toISOString();
-      const newTask: Task = { ...taskData, id };
-      const entry: ActivityEntry = {
-        id:        `act-${Date.now()}`,
-        teamId:    taskData.teamId,
-        message:   `${taskData.owner} đã thêm công việc "${taskData.title}"`,
-        timestamp: now,
-      };
-      dbAddTask(newTask);
-      dbAddActivity(entry);
-      return {
-        ...prev,
-        tasks:    [...prev.tasks, newTask],
-        activity: [entry, ...prev.activity].slice(0, 200),
-        lastUpdated: now,
-      };
-    });
+    const id      = `custom-${Date.now()}`;
+    const now     = new Date().toISOString();
+    const newTask: Task = { ...taskData, id };
+    const entry: ActivityEntry = {
+      id:        `act-${Date.now()}`,
+      teamId:    taskData.teamId,
+      message:   `${taskData.owner} đã thêm công việc "${taskData.title}"`,
+      timestamp: now,
+    };
+    dbAddTask(newTask);
+    dbAddActivity(entry);
+    setState((prev) => ({
+      ...prev,
+      tasks:    [...prev.tasks, newTask],
+      activity: [entry, ...prev.activity].slice(0, 200),
+      lastUpdated: now,
+    }));
   }, []);
 
   const getTeamTasks = useCallback(
@@ -200,108 +202,94 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
 
   const updateTaskStatus = useCallback((taskId: string, status: TaskStatus, owner: string) => {
+    const now = new Date().toISOString();
+    const entryId = `act-${Date.now()}`;
+    dbUpdateTask(taskId, { status, done: status === "Done" });
+    let activityEntry: ActivityEntry | null = null;
     setState((prev) => {
       const tasks = prev.tasks.map((t) =>
         t.id !== taskId ? t : { ...t, status, done: status === "Done" }
       );
       const task = tasks.find((t) => t.id === taskId)!;
-      const now  = new Date().toISOString();
       const labels: Record<TaskStatus, string> = { Todo:"Chờ làm", Doing:"Đang làm", Done:"Hoàn thành" };
-      const entry: ActivityEntry = {
-        id:        `act-${Date.now()}`,
+      activityEntry = {
+        id:        entryId,
         teamId:    task.teamId,
         message:   `${owner} chuyển "${task.title}" sang ${labels[status]}`,
         timestamp: now,
       };
-      dbUpdateTask(taskId, { status, done: status === "Done" });
-      dbAddActivity(entry);
-      return { ...prev, tasks, activity: [entry, ...prev.activity].slice(0, 200), lastUpdated: now };
+      return { ...prev, tasks, activity: [activityEntry!, ...prev.activity].slice(0, 200), lastUpdated: now };
     });
+    if (activityEntry) dbAddActivity(activityEntry);
   }, []);
 
   const editTask = useCallback((taskId: string, updates: Partial<Omit<Task, "id" | "teamId">>) => {
-    setState((prev) => {
-      dbUpdateTask(taskId, updates);
-      return {
-        ...prev,
-        tasks: prev.tasks.map((t) =>
-          t.id !== taskId ? t : { ...t, ...updates, done: (updates.status ?? t.status) === "Done" }
-        ),
-        lastUpdated: new Date().toISOString(),
-      };
-    });
+    dbUpdateTask(taskId, updates);
+    setState((prev) => ({
+      ...prev,
+      tasks: prev.tasks.map((t) =>
+        t.id !== taskId ? t : { ...t, ...updates, done: (updates.status ?? t.status) === "Done" }
+      ),
+      lastUpdated: new Date().toISOString(),
+    }));
   }, []);
 
   const deleteTask = useCallback((taskId: string) => {
-    setState((prev) => {
-      dbDeleteTask(taskId);
-      return {
-        ...prev,
-        tasks: prev.tasks.filter((t) => t.id !== taskId),
-        lastUpdated: new Date().toISOString(),
-      };
-    });
+    dbDeleteTask(taskId);
+    setState((prev) => ({
+      ...prev,
+      tasks: prev.tasks.filter((t) => t.id !== taskId),
+      lastUpdated: new Date().toISOString(),
+    }));
   }, []);
 
   const addObjective = useCallback((obj: Omit<Objective, "id">) => {
-    setState((prev) => {
-      const newObj: Objective = { ...obj, id: `obj-custom-${Date.now()}` };
-      dbAddObjective(newObj);
-      return { ...prev, objectives: [...prev.objectives, newObj] };
-    });
+    const newObj: Objective = { ...obj, id: `obj-custom-${Date.now()}` };
+    dbAddObjective(newObj);
+    setState((prev) => ({ ...prev, objectives: [...prev.objectives, newObj] }));
   }, []);
 
   const updateObjective = useCallback((objId: string, updates: Partial<Omit<Objective, "id">>) => {
-    setState((prev) => {
-      dbUpdateObjective(objId, updates);
-      return { ...prev, objectives: prev.objectives.map((o) => (o.id !== objId ? o : { ...o, ...updates })) };
-    });
+    dbUpdateObjective(objId, updates);
+    setState((prev) => ({ ...prev, objectives: prev.objectives.map((o) => (o.id !== objId ? o : { ...o, ...updates })) }));
   }, []);
 
   const deleteObjective = useCallback((objId: string) => {
-    setState((prev) => {
-      dbDeleteObjective(objId);
-      return { ...prev, objectives: prev.objectives.filter((o) => o.id !== objId) };
-    });
+    dbDeleteObjective(objId);
+    setState((prev) => ({ ...prev, objectives: prev.objectives.filter((o) => o.id !== objId) }));
   }, []);
 
   const addKeyResult = useCallback((objId: string, krData: Omit<KeyResult, "id">) => {
-    setState((prev) => {
-      const kr: KeyResult = { ...krData, id: `kr-custom-${Date.now()}` };
-      dbAddKeyResult(objId, kr);
-      return {
-        ...prev,
-        objectives: prev.objectives.map((o) =>
-          o.id !== objId ? o : { ...o, keyResults: [...o.keyResults, kr] }
-        ),
-      };
-    });
+    const kr: KeyResult = { ...krData, id: `kr-custom-${Date.now()}` };
+    dbAddKeyResult(objId, kr);
+    setState((prev) => ({
+      ...prev,
+      objectives: prev.objectives.map((o) =>
+        o.id !== objId ? o : { ...o, keyResults: [...o.keyResults, kr] }
+      ),
+    }));
   }, []);
 
   const deleteKeyResult = useCallback((objId: string, krId: string) => {
-    setState((prev) => {
-      dbDeleteKeyResult(krId);
-      return {
-        ...prev,
-        objectives: prev.objectives.map((o) =>
-          o.id !== objId ? o : { ...o, keyResults: o.keyResults.filter((kr) => kr.id !== krId) }
-        ),
-      };
-    });
+    dbDeleteKeyResult(krId);
+    setState((prev) => ({
+      ...prev,
+      objectives: prev.objectives.map((o) =>
+        o.id !== objId ? o : { ...o, keyResults: o.keyResults.filter((kr) => kr.id !== krId) }
+      ),
+    }));
   }, []);
 
   const updateKeyResult = useCallback((objId: string, krId: string, current: number) => {
-    setState((prev) => {
-      dbUpdateKeyResult(krId, current);
-      return {
-        ...prev,
-        objectives: prev.objectives.map((o) =>
-          o.id !== objId
-            ? o
-            : { ...o, keyResults: o.keyResults.map((kr) => (kr.id !== krId ? kr : { ...kr, current })) }
-        ),
-      };
-    });
+    dbUpdateKeyResult(krId, current);
+    setState((prev) => ({
+      ...prev,
+      objectives: prev.objectives.map((o) =>
+        o.id !== objId
+          ? o
+          : { ...o, keyResults: o.keyResults.map((kr) => (kr.id !== krId ? kr : { ...kr, current })) }
+      ),
+    }));
   }, []);
 
   const getTeamObjectives = useCallback(
