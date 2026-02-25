@@ -17,7 +17,7 @@ const TEAM_META: Record<string, { name: string; color: string; icon: string }> =
 };
 
 /* Clockwise: Toàn công ty → Marketing → Hợp tác → Công nghệ → Nhân sự → Hành chính */
-const SEGMENT_ORDER = ["company", "marketing", "partnerships", "tech", "hr", "assistant"];
+const SEGMENT_ORDER = ["company", "marketing", "partnerships", "assistant", "hr", "tech"];
 
 /* ── Add Objective Modal ─────────────────────────────────── */
 
@@ -357,10 +357,10 @@ export default function OKRPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 uppercase tracking-tight"
-            style={{ fontFamily: "'Georgia', 'Times New Roman', serif", letterSpacing: "0.12em" }}>
-            Mục tiêu &amp; Kết quả then chốt (OKR)
-          </h1>
+          <h1 className="text-2xl font-bold text-slate-800 uppercase tracking-wide"
+            style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
+            Mục tiêu & Kết quả then chốt (OKR)
+</h1>
           <p className="text-slate-500 mt-1 text-sm">Ấn vào phòng ban trên biểu đồ để xem chi tiết mục tiêu</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -387,7 +387,7 @@ export default function OKRPage() {
       {/* Summary stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Tổng mục tiêu", value: totalObjs, color: "#6366f1" },
+          { label: "Tổng mục tiêu", value: totalObjs - 1, color: "#6366f1" },
           { label: "Hoàn thành", value: completedObjs, color: "#10b981" },
           { label: "Kết quả then chốt", value: totalKRs, color: "#f59e0b" },
           { label: "Tiến độ TB", value: `${avgOverall}%`, color: "#3b82f6" },

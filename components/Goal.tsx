@@ -218,7 +218,7 @@ export default function Goal({ obj, color }: { obj: Objective; color: string }) 
                 {obj.quarter}
               </span>
             </div>
-            <p className="font-semibold text-slate-800 text-sm leading-snug line-clamp-2">{obj.title}</p>
+            <p className="font-semibold text-slate-800 text-sm leading-snug line-clamp-2 text-center">{obj.title}</p>
             <p className="text-[11px] text-slate-400 mt-0.5">{obj.keyResults.length} kết quả then chốt</p>
           </div>
           <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition">
