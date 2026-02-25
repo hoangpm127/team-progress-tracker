@@ -214,6 +214,15 @@ function DeptWheel({
 
   const [hovered, setHovered] = useState<string | null>(null);
 
+  // Arc helper: donut arc path using component-scope cx/cy
+  function arc(ro: number, ri: number, a1: number, a2: number, la: number) {
+    const xs1 = cx + ro * Math.cos(a1), ys1 = cy + ro * Math.sin(a1);
+    const xs2 = cx + ro * Math.cos(a2), ys2 = cy + ro * Math.sin(a2);
+    const xs3 = cx + ri * Math.cos(a2), ys3 = cy + ri * Math.sin(a2);
+    const xs4 = cx + ri * Math.cos(a1), ys4 = cy + ri * Math.sin(a1);
+    return `M ${xs1} ${ys1} A ${ro} ${ro} 0 ${la} 1 ${xs2} ${ys2} L ${xs3} ${ys3} A ${ri} ${ri} 0 ${la} 0 ${xs4} ${ys4} Z`;
+  }
+
   const segments = SEGMENT_ORDER.map((id, i) => {
     const meta = TEAM_META[id];
     const startDeg = (i * 360) / segCount - 90 + gapDeg / 2;
@@ -248,7 +257,16 @@ function DeptWheel({
     const stats = teamStats[id] ?? { count: 0, avg: 0 };
     const isOpen = openSet.has(id);
 
-    return { id, meta, path, lx, ly, stats, isOpen };
+    // Progress arc ring (thin band between innerR+5 and innerR+14)
+    const arcRI = innerR + 5, arcRO = innerR + 14;
+    const trackPath = arc(arcRO, arcRI, startRad, endRad, largeArc);
+    const progFrac = Math.min(1, stats.avg / 100);
+    const progEndDeg = startDeg + progFrac * (endDeg - startDeg);
+    const progEndRad = (progEndDeg * Math.PI) / 180;
+    const progLargeArc = progEndDeg - startDeg > 180 ? 1 : 0;
+    const fillPath = stats.avg > 0 ? arc(arcRO, arcRI, startRad, progEndRad, progLargeArc) : null;
+
+    return { id, meta, path, lx, ly, stats, isOpen, trackPath, fillPath };
   });
 
   const allCounts = Object.values(teamStats);
@@ -260,12 +278,31 @@ function DeptWheel({
   return (
     <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full max-w-[420px] max-h-[420px] select-none">
       <defs>
+        {/* Per-segment gradient fills */}
         {segments.map(seg => (
-          <filter key={`shadow-${seg.id}`} id={`shadow-${seg.id}`}>
-            <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor={seg.meta.color} floodOpacity="0.3" />
+          <linearGradient key={`grad-${seg.id}`} id={`grad-${seg.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={seg.meta.color} stopOpacity="0.72" />
+            <stop offset="100%" stopColor={seg.meta.color} stopOpacity="1" />
+          </linearGradient>
+        ))}
+        {/* Per-segment glow filters */}
+        {segments.map(seg => (
+          <filter key={`glow-${seg.id}`} id={`glow-${seg.id}`} x="-25%" y="-25%" width="150%" height="150%">
+            <feDropShadow dx="0" dy="0" stdDeviation="7" floodColor={seg.meta.color} floodOpacity="0.55" />
           </filter>
         ))}
+        {/* Center gradient + shadow */}
+        <radialGradient id="ctrG" cx="40%" cy="35%" r="65%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="100%" stopColor="#eef2ff" />
+        </radialGradient>
+        <filter id="ctrShd" x="-25%" y="-25%" width="150%" height="150%">
+          <feDropShadow dx="0" dy="3" stdDeviation="10" floodColor="#6366f1" floodOpacity="0.20" />
+        </filter>
       </defs>
+
+      {/* Outer decorative halo */}
+      <circle cx={cx} cy={cy} r={outerR + 6} fill="none" stroke="rgba(148,163,184,0.10)" strokeWidth="3" />
 
       {segments.map(seg => {
         const isHover = hovered === seg.id;
@@ -275,25 +312,41 @@ function DeptWheel({
             onClick={() => onToggle(seg.id)}
             onMouseEnter={() => setHovered(seg.id)}
             onMouseLeave={() => setHovered(null)}>
+            {/* Main donut segment */}
             <path d={seg.path}
-              fill={isActive ? seg.meta.color : isHover ? seg.meta.color + "18" : "#f8fafc"}
-              stroke={seg.meta.color}
-              strokeWidth={isActive ? 2.5 : isHover ? 2 : 1}
-              filter={isActive || isHover ? `url(#shadow-${seg.id})` : undefined}
+              fill={isActive ? `url(#grad-${seg.id})` : isHover ? seg.meta.color + "28" : seg.meta.color + "12"}
+              stroke={isActive || isHover ? seg.meta.color : seg.meta.color + "55"}
+              strokeWidth={isActive ? 2.5 : isHover ? 2 : 1.2}
+              filter={isActive ? `url(#glow-${seg.id})` : undefined}
               className="transition-all duration-200"
             />
-            <text x={seg.lx} y={seg.ly - 18} textAnchor="middle" fontSize={18} className="pointer-events-none">
+            {/* Progress arc track (background) */}
+            <path d={seg.trackPath} fill={isActive ? "rgba(255,255,255,0.18)" : seg.meta.color + "18"} className="pointer-events-none" />
+            {/* Progress arc fill */}
+            {seg.fillPath && (
+              <path d={seg.fillPath} fill={isActive ? "rgba(255,255,255,0.65)" : seg.meta.color} opacity={isActive ? 1 : 0.65} className="pointer-events-none" />
+            )}
+            {/* Icon background circle */}
+            <circle cx={seg.lx} cy={seg.ly - 22} r={15}
+              fill={isActive ? "rgba(255,255,255,0.22)" : seg.meta.color + "1a"}
+              stroke={isActive ? "rgba(255,255,255,0.55)" : seg.meta.color + "66"}
+              strokeWidth="1.5" className="pointer-events-none" />
+            {/* Emoji icon */}
+            <text x={seg.lx} y={seg.ly - 16} textAnchor="middle" fontSize={17} className="pointer-events-none">
               {seg.meta.icon}
             </text>
-            <text x={seg.lx} y={seg.ly + 2} textAnchor="middle" fontSize={11} fontWeight={700}
+            {/* Department name */}
+            <text x={seg.lx} y={seg.ly + 3} textAnchor="middle" fontSize={10.5} fontWeight={700}
               fill={isActive ? "#fff" : "#334155"} className="pointer-events-none">
               {seg.meta.name}
             </text>
-            <text x={seg.lx} y={seg.ly + 16} textAnchor="middle" fontSize={9.5}
-              fill={isActive ? "#ffffffcc" : "#64748b"} className="pointer-events-none">
-              {seg.stats.count} mục tiêu
+            {/* Obj count */}
+            <text x={seg.lx} y={seg.ly + 16} textAnchor="middle" fontSize={9}
+              fill={isActive ? "#ffffffbb" : "#64748b"} className="pointer-events-none">
+              {seg.stats.count} MT
             </text>
-            <text x={seg.lx} y={seg.ly + 29} textAnchor="middle" fontSize={12} fontWeight={800}
+            {/* Avg % */}
+            <text x={seg.lx} y={seg.ly + 30} textAnchor="middle" fontSize={13} fontWeight={800}
               fill={isActive ? "#fff" : seg.meta.color} className="pointer-events-none">
               {seg.stats.avg}%
             </text>
@@ -301,11 +354,13 @@ function DeptWheel({
         );
       })}
 
-      {/* Center */}
-      <circle cx={cx} cy={cy} r={innerR - 3} fill="white" stroke="#e2e8f0" strokeWidth={1.5} />
-      <text x={cx} y={cy - 16} textAnchor="middle" fontSize={10} fill="#94a3b8" fontWeight={600} letterSpacing="0.05em">TỔNG QUAN</text>
-      <text x={cx} y={cy + 10} textAnchor="middle" fontSize={28} fontWeight={800} fill="#1e293b">{overallAvg}%</text>
-      <text x={cx} y={cy + 28} textAnchor="middle" fontSize={10} fill="#94a3b8">{totalObjs} mục tiêu</text>
+      {/* Premium center circle */}
+      <circle cx={cx} cy={cy} r={innerR - 2} fill="url(#ctrG)" filter="url(#ctrShd)" />
+      <circle cx={cx} cy={cy} r={innerR - 2} fill="none" stroke="rgba(99,102,241,0.22)" strokeWidth="1.5" />
+      <circle cx={cx} cy={cy} r={innerR - 18} fill="none" stroke="rgba(99,102,241,0.07)" strokeWidth="1" strokeDasharray="3 6" />
+      <text x={cx} y={cy - 20} textAnchor="middle" fontSize={8.5} fill="#94a3b8" fontWeight={700} letterSpacing="0.12em">TỔNG QUAN</text>
+      <text x={cx} y={cy + 12} textAnchor="middle" fontSize={30} fontWeight={800} fill="#1e293b">{overallAvg}%</text>
+      <text x={cx} y={cy + 28} textAnchor="middle" fontSize={9.5} fill="#94a3b8">{totalObjs} mục tiêu</text>
     </svg>
   );
 }

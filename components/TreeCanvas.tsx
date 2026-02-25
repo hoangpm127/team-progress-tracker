@@ -237,22 +237,37 @@ function CanopyLabel({cx,cy,r,icon,title,prog,color,teamId,onClick,hovered,onEnt
   hovered:boolean;onEnter():void;onLeave():void;done:number;total:number;
 }){
   const h=healthOf(prog);
-  const W=hovered?176:148, H=hovered?54:34;
-  const bx=cx-W/2, by=cy+r+8;
+  const W=hovered?192:164, H=hovered?58:44;
+  const bx=cx-W/2, by=cy+r+10;
+  const iconX=bx+22, iconY=by+H/2;
   return(
     <g onMouseEnter={onEnter} onMouseLeave={onLeave} onClick={onClick} style={{cursor:"pointer"}}>
-      {/* large invisible hit zone */}
+      {/* hit zone */}
       <ellipse cx={cx} cy={cy} rx={r+36} ry={r+28} fill="transparent"/>
-      {/* label badge */}
-      <rect x={bx} y={by} width={W} height={H} rx="9"
-        fill={hovered?color:"rgba(12,16,30,0.84)"} stroke={color} strokeWidth="2"
-        style={{filter:hovered?"drop-shadow(0 4px 10px rgba(0,0,0,.4))":""}}/>
-      <text x={cx} y={by+15} textAnchor="middle" fill="white" fontSize="12" fontWeight="800">{icon} {title}</text>
+      {/* soft shadow */}
+      <rect x={bx+1} y={by+4} width={W} height={H} rx="14"
+        fill="rgba(0,0,0,0.28)" style={{filter:"blur(5px)",pointerEvents:"none"}}/>
+      {/* badge */}
+      <rect x={bx} y={by} width={W} height={H} rx="14"
+        fill={hovered?color:"rgba(8,12,26,0.92)"}
+        stroke={hovered?"rgba(255,255,255,0.35)":color}
+        strokeWidth={hovered?1.5:2.2}
+        style={{filter:hovered?`drop-shadow(0 0 20px ${color}66)`:"none",pointerEvents:"none"}}/>
+      {/* icon circle */}
+      <circle cx={iconX} cy={iconY} r={15}
+        fill={hovered?"rgba(255,255,255,0.22)":color+"22"}
+        stroke={hovered?"rgba(255,255,255,0.45)":color}
+        strokeWidth="2" style={{pointerEvents:"none"}}/>
+      <text x={iconX} y={iconY+5} textAnchor="middle" fontSize="14" style={{pointerEvents:"none"}}>{icon}</text>
+      {/* title */}
+      <text x={bx+44} y={by+(hovered?18:H/2)} textAnchor="start" fill="white" fontSize="11" fontWeight="800" style={{pointerEvents:"none"}}>{title}</text>
       {teamId&&(
-        <text x={cx} y={by+29} textAnchor="middle" fill={hovered?"rgba(255,255,255,.95)":color} fontSize="10" fontWeight="700">{prog}% · {h.dot} {h.label}</text>
+        <text x={bx+44} y={by+(hovered?32:H/2+13)} textAnchor="start"
+          fill={hovered?"rgba(255,255,255,.92)":color}
+          fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>{prog}% · {h.dot} {h.label}</text>
       )}
       {hovered&&teamId&&(
-        <text x={cx} y={by+45} textAnchor="middle" fill="rgba(255,255,255,.85)" fontSize="9">✅ {done}/{total} việc hoàn thành</text>
+        <text x={bx+44} y={by+47} textAnchor="start" fill="rgba(255,255,255,.78)" fontSize="9" style={{pointerEvents:"none"}}>✅ {done}/{total} hoàn thành</text>
       )}
     </g>
   );
@@ -558,11 +573,16 @@ export default function TreeCanvas(){
           <circle cx="192" cy="118" r="18" fill="rgba(255,255,255,.87)"/>
           <circle cx="178" cy="78"  r="12" fill="rgba(255,255,255,.82)"/>
           {mktP>20&&<ellipse cx="146" cy="102" rx="64" ry="34" fill={`rgba(236,72,153,${(mktP-20)/330})`}/>}
-          <rect x="68" y="150" width="156" height={hovered==="mkt"?52:34} rx="8"
-            fill={hovered==="mkt"?"#ec4899":"rgba(12,16,28,.86)"} stroke="#f472b6" strokeWidth="1.6"/>
-          <text x="146" y="164" textAnchor="middle" fill="white" fontSize="12" fontWeight="800" style={{pointerEvents:"none"}}>📣 Marketing</text>
-          <text x="146" y="177" textAnchor="middle" fill={hovered==="mkt"?"white":"#f472b6"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>{mktP}% · {healthOf(mktP).dot} {healthOf(mktP).label}</text>
-          {hovered==="mkt"&&<text x="146" y="192" textAnchor="middle" fill="rgba(255,255,255,.85)" fontSize="9" style={{pointerEvents:"none"}}>✅ {mktS.done}/{mktS.total} việc</text>}
+          <rect x="64" y="148" width="164" height={hovered==="mkt"?56:38} rx="14"
+            fill={hovered==="mkt"?"#ec4899":"rgba(8,12,26,0.92)"} stroke="#f472b6" strokeWidth={hovered==="mkt"?1.5:2}
+            style={{filter:hovered==="mkt"?"drop-shadow(0 0 18px #ec489966)":"drop-shadow(0 4px 8px rgba(0,0,0,.4))"}}/>
+          <circle cx="88" cy={hovered==="mkt"?176:167} r="14"
+            fill={hovered==="mkt"?"rgba(255,255,255,0.22)":"#ec489922"}
+            stroke={hovered==="mkt"?"rgba(255,255,255,0.45)":"#f472b6"} strokeWidth="1.5" style={{pointerEvents:"none"}}/>
+          <text x="88" y={hovered==="mkt"?181:172} textAnchor="middle" fontSize="14" style={{pointerEvents:"none"}}>📣</text>
+          <text x="109" y="163" textAnchor="start" fill="white" fontSize="11" fontWeight="800" style={{pointerEvents:"none"}}>Marketing</text>
+          <text x="109" y="177" textAnchor="start" fill={hovered==="mkt"?"white":"#f472b6"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>{mktP}% · {healthOf(mktP).dot} {healthOf(mktP).label}</text>
+          {hovered==="mkt"&&<text x="109" y="192" textAnchor="start" fill="rgba(255,255,255,.85)" fontSize="9" style={{pointerEvents:"none"}}>✅ {mktS.done}/{mktS.total} việc</text>}
           <rect x="22" y="42" width="248" height="158" rx="12" fill="transparent"
             onMouseEnter={()=>setHovered("mkt")} onMouseLeave={()=>setHovered(null)}/>
         </g>
@@ -579,11 +599,16 @@ export default function TreeCanvas(){
           <circle cx="900" cy="122" r="12" fill="rgba(255,255,255,.82)"/>
           {hvIdx>28&&<ellipse cx="852" cy="102" rx="68" ry="36" fill={`rgba(14,165,233,${(hvIdx-28)/350})`}/>}
           {rainOn&&<g opacity=".68">{Array.from({length:6},(_,i)=>(<line key={i} x1={826+i*11} y1={143} x2={823+i*11} y2={157} stroke="#93c5fd" strokeWidth="1.3" strokeLinecap="round"/>))}</g>}
-          <rect x="750" y="150" width="204" height={hovered==="heaven"?52:34} rx="8"
-            fill={hovered==="heaven"?"#0ea5e9":"rgba(12,16,28,.86)"} stroke="#38bdf8" strokeWidth="1.6"/>
-          <text x="852" y="164" textAnchor="middle" fill="white" fontSize="12" fontWeight="800" style={{pointerEvents:"none"}}>🌦 Thiên Thời</text>
-          <text x="852" y="177" textAnchor="middle" fill={hovered==="heaven"?"white":"#38bdf8"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>Index: {hvIdx} · {rainOn?"🌧 Đang mưa":"☀️ Quang đãng"}</text>
-          {hovered==="heaven"&&<text x="852" y="192" textAnchor="middle" fill="rgba(255,255,255,.85)" fontSize="9" style={{pointerEvents:"none"}}>Bấm để xem chi tiết thiên thời</text>}
+          <rect x="746" y="148" width="212" height={hovered==="heaven"?56:38} rx="14"
+            fill={hovered==="heaven"?"#0ea5e9":"rgba(8,12,26,0.92)"} stroke="#38bdf8" strokeWidth={hovered==="heaven"?1.5:2}
+            style={{filter:hovered==="heaven"?"drop-shadow(0 0 18px #0ea5e966)":"drop-shadow(0 4px 8px rgba(0,0,0,.4))"}}/>
+          <circle cx="770" cy={hovered==="heaven"?176:167} r="14"
+            fill={hovered==="heaven"?"rgba(255,255,255,0.22)":"#0ea5e922"}
+            stroke={hovered==="heaven"?"rgba(255,255,255,0.45)":"#38bdf8"} strokeWidth="1.5" style={{pointerEvents:"none"}}/>
+          <text x="770" y={hovered==="heaven"?181:172} textAnchor="middle" fontSize="14" style={{pointerEvents:"none"}}>🌦</text>
+          <text x="791" y="163" textAnchor="start" fill="white" fontSize="11" fontWeight="800" style={{pointerEvents:"none"}}>Thiên Thời</text>
+          <text x="791" y="177" textAnchor="start" fill={hovered==="heaven"?"white":"#38bdf8"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>Index: {hvIdx} · {rainOn?"🌧 Mưa":"☀️ Nắng"}</text>
+          {hovered==="heaven"&&<text x="791" y="192" textAnchor="start" fill="rgba(255,255,255,.85)" fontSize="9" style={{pointerEvents:"none"}}>Bấm để xem chi tiết thiên thời</text>}
           <rect x="734" y="38" width="236" height="158" rx="12" fill="transparent"
             onMouseEnter={()=>setHovered("heaven")} onMouseLeave={()=>setHovered(null)}/>
         </g>
@@ -670,11 +695,16 @@ export default function TreeCanvas(){
           <path d={`M ${TX+298},${GY+12} C ${TX+338},${GY+26} ${TX+376},${GY+50} ${TX+404},${GY+76} L ${TX+392},${GY+84} C ${TX+362},${GY+58} ${TX+324},${GY+34} ${TX+284},${GY+20} Z`}
             fill="url(#hrRootG)" opacity=".68"/>
           {/* HR label  */}
-          <rect x={TX-90} y={GY+52} width={180} height={hovered==="hr"?54:36} rx="9"
-            fill={hovered==="hr"?"#f59e0b":"rgba(12,16,28,.86)"} stroke="#fbbf24" strokeWidth="1.8"/>
-          <text x={TX} y={GY+66} textAnchor="middle" fill="white" fontSize="12" fontWeight="800">👥 Nhân Sự (Rễ)</text>
-          <text x={TX} y={GY+80} textAnchor="middle" fill={hovered==="hr"?"white":"#fbbf24"} fontSize="10" fontWeight="700">{hrP}% · {healthOf(hrP).dot} {healthOf(hrP).label}</text>
-          {hovered==="hr"&&<text x={TX} y={GY+97} textAnchor="middle" fill="rgba(255,255,255,.85)" fontSize="9">✅ {hrS.done}/{hrS.total} việc hoàn thành</text>}
+          <rect x={TX-94} y={GY+50} width={188} height={hovered==="hr"?56:38} rx="14"
+            fill={hovered==="hr"?"#f59e0b":"rgba(8,12,26,0.92)"} stroke="#fbbf24" strokeWidth={hovered==="hr"?1.5:2}
+            style={{filter:hovered==="hr"?"drop-shadow(0 0 18px #f59e0b66)":"drop-shadow(0 4px 8px rgba(0,0,0,.4))"}}/>
+          <circle cx={TX-70} cy={GY+50+(hovered==="hr"?28:19)} r="14"
+            fill={hovered==="hr"?"rgba(255,255,255,0.22)":"#f59e0b22"}
+            stroke={hovered==="hr"?"rgba(255,255,255,0.45)":"#fbbf24"} strokeWidth="1.5"/>
+          <text x={TX-70} y={GY+50+(hovered==="hr"?33:24)} textAnchor="middle" fontSize="14">👥</text>
+          <text x={TX-49} y={GY+65} textAnchor="start" fill="white" fontSize="11" fontWeight="800">Nhân Sự (Rễ)</text>
+          <text x={TX-49} y={GY+79} textAnchor="start" fill={hovered==="hr"?"white":"#fbbf24"} fontSize="10" fontWeight="700">{hrP}% · {healthOf(hrP).dot} {healthOf(hrP).label}</text>
+          {hovered==="hr"&&<text x={TX-49} y={GY+96} textAnchor="start" fill="rgba(255,255,255,.85)" fontSize="9">✅ {hrS.done}/{hrS.total} hoàn thành</text>}
           {/* transparent hit band */}
           <rect x="0" y={GY} width={VW} height="94" fill="transparent"/>
         </g>
