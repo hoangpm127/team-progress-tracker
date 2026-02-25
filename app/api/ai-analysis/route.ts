@@ -91,7 +91,7 @@ Hãy phân tích và trả về JSON.`;
       model: "gemini-2.5-flash",
       generationConfig: {
         temperature: 0.4,
-        maxOutputTokens: 600,
+        maxOutputTokens: 2048,
       },
       systemInstruction: systemPrompt,
     });
@@ -99,10 +99,12 @@ Hãy phân tích và trả về JSON.`;
     const result = await model.generateContent(userMessage);
     let text = result.response.text().trim();
 
-    // Strip markdown code fences if Gemini wraps response in ```json ... ```
-    text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
-
-    const parsed = JSON.parse(text) as { bullets?: string[] };
+    // Extract JSON object — handles ```json fences, leading/trailing text
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return NextResponse.json({ error: "AI không trả về JSON hợp lệ. Raw: " + text.slice(0, 200) }, { status: 502 });
+    }
+    const parsed = JSON.parse(jsonMatch[0]) as { bullets?: string[] };
 
     if (!Array.isArray(parsed.bullets) || parsed.bullets.length === 0) {
       return NextResponse.json({ error: "AI không trả về kết quả hợp lệ" }, { status: 502 });
