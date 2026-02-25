@@ -88,7 +88,7 @@ Hãy phân tích và trả về JSON.`;
 
   try {
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash-preview-04-17",
+      model: "gemini-2.0-flash",
       generationConfig: {
         temperature: 0.4,
         maxOutputTokens: 600,
