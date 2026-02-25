@@ -145,7 +145,6 @@ export default function EcosystemTree() {
   const [mounted,     setMounted]     = useState(false);
   const [dark,        setDark]        = useState(false);
   const [hoveredId,   setHoveredId]   = useState<string | null>(null);
-  const [showLayers,  setShowLayers]  = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -191,14 +190,6 @@ export default function EcosystemTree() {
         }}>🌳 Corporate Growth Tree Dashboard</span>
 
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <button onClick={() => setShowLayers(!showLayers)} style={{
-            padding: "4px 12px", borderRadius: 8, cursor: "pointer", fontSize: 11, fontWeight: 600,
-            border: `1px solid ${showLayers ? "#6366f1" : (dark ? "#1a3660" : "#d1d5db")}`,
-            background: showLayers ? (dark ? "#312e81" : "#eef2ff") : (dark ? "#0e1c34" : "#f9fafb"),
-            color: showLayers ? "#6366f1" : textSub,
-          }}>
-            🔬 {showLayers ? "Ẩn layers" : "Xem layers"}
-          </button>
           <button onClick={() => setDark(!dark)} style={{
             padding: "4px 12px", borderRadius: 8, border: "none", cursor: "pointer",
             fontSize: 11, fontWeight: 500,
@@ -236,7 +227,7 @@ export default function EcosystemTree() {
 
           {/* Background image */}
           <image
-            href={showLayers ? "/layer_visualization.png" : "/tree-crm.png"}
+            href="/tree-crm.png"
             x="0" y="0" width="900" height="530"
             preserveAspectRatio="xMidYMid meet"
             style={{ filter: dark ? "brightness(0.75)" : "none" }}
