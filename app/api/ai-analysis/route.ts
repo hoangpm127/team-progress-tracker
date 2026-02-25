@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 interface TeamSummary {
@@ -27,10 +27,10 @@ interface SystemSnapshot {
 
 // ─── POST /api/ai-analysis ─────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
-      { error: "OPENAI_API_KEY chưa được cấu hình trong .env.local" },
+      { error: "GEMINI_API_KEY chưa được cấu hình trong .env.local" },
       { status: 500 }
     );
   }
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const client = new OpenAI({ apiKey });
+  const genAI = new GoogleGenerativeAI(apiKey);
 
   // ── Build the system prompt ──────────────────────────────────────────────
   const systemPrompt = `Bạn là một AI cố vấn chiến lược cho một công ty công nghệ Việt Nam đang vận hành hệ sinh thái kỹ thuật số.
@@ -87,19 +87,19 @@ ${teamLines}
 Hãy phân tích và trả về JSON.`;
 
   try {
-    const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0.4,
-      max_tokens: 600,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user",   content: userMessage },
-      ],
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      generationConfig: {
+        temperature: 0.4,
+        maxOutputTokens: 600,
+        responseMimeType: "application/json",
+      },
+      systemInstruction: systemPrompt,
     });
 
-    const content = completion.choices[0]?.message?.content ?? "{}";
-    const parsed = JSON.parse(content) as { bullets?: string[] };
+    const result = await model.generateContent(userMessage);
+    const text   = result.response.text();
+    const parsed = JSON.parse(text) as { bullets?: string[] };
 
     if (!Array.isArray(parsed.bullets) || parsed.bullets.length === 0) {
       return NextResponse.json({ error: "AI không trả về kết quả hợp lệ" }, { status: 502 });
@@ -108,6 +108,6 @@ Hãy phân tích và trả về JSON.`;
     return NextResponse.json({ bullets: parsed.bullets.slice(0, 5) });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: `OpenAI error: ${msg}` }, { status: 502 });
+    return NextResponse.json({ error: `Gemini error: ${msg}` }, { status: 502 });
   }
 }
