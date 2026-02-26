@@ -31,11 +31,11 @@ function ProgressRing({ pct, color, size = 52 }: { pct: number; color: string; s
   const dash = (pct / 100) * circ;
   return (
     <svg width={size} height={size} className="shrink-0">
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#e2e8f0" strokeWidth={5} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(10,29,60,0.8)" strokeWidth={5} />
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={5}
         strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
         transform={`rotate(-90 ${size / 2} ${size / 2})`} />
-      <text x={size / 2} y={size / 2 + 4} textAnchor="middle" fontSize={11} fontWeight={700} fill="#1e293b">
+      <text x={size / 2} y={size / 2 + 4} textAnchor="middle" fontSize={11} fontWeight={700} fill="#EEF6FF">
         {pct}%
       </text>
     </svg>
@@ -74,7 +74,8 @@ function KrRow({ kr, onUpdateCurrent, onUpdateKr, onDelete }: {
   }
 
   return (
-    <div className={`py-2.5 border-b border-slate-100 last:border-0 ${editing ? "bg-slate-50 -mx-3 px-3 rounded-lg" : ""}`}>
+    <div className={`py-2.5 last:border-0 ${editing ? "-mx-3 px-3 rounded-lg" : ""}`}
+      style={{ borderBottom: "1px solid rgba(56,225,255,0.08)", background: editing ? "rgba(10,29,60,0.6)" : "" }}>
       {showDocs && <KrDocuments krId={kr.id} krTitle={kr.title} onClose={() => setShowDocs(false)} />}
       {editing ? (
         <div className="flex flex-col gap-2">
@@ -102,7 +103,7 @@ function KrRow({ kr, onUpdateCurrent, onUpdateKr, onDelete }: {
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-slate-700 truncate">{kr.title}</p>
             <div className="mt-1 flex items-center gap-2">
-              <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(10,29,60,0.8)" }}>
                 <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: barColor }} />
               </div>
               <span className="text-xs text-slate-500 w-8 text-right">{pct}%</span>
@@ -120,7 +121,8 @@ function KrRow({ kr, onUpdateCurrent, onUpdateKr, onDelete }: {
               </>
             ) : (
               <button onClick={() => { setCurrentVal(String(kr.current)); setEditCurrent(true); }}
-                className="text-xs font-mono bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded transition">
+                className="text-xs font-mono px-2 py-1 rounded transition"
+                style={{ background: "rgba(56,225,255,0.08)", color: "#B8D7F2", border: "1px solid rgba(56,225,255,0.15)" }}>
                 {kr.current} / {kr.target} {kr.unit}
               </button>
             )}
@@ -156,7 +158,7 @@ function AddKrForm({ onAdd, onCancel }: { onAdd: (kr: Omit<KeyResult, "id">) => 
   const [target, setTarget] = useState("100");
   const [unit, setUnit] = useState("%");
   return (
-    <div className="flex flex-col gap-2 py-3 border-t border-indigo-100 bg-indigo-50 -mx-3 px-3 rounded-b-xl">
+    <div className="flex flex-col gap-2 py-3 -mx-3 px-3 rounded-b-xl" style={{ borderTop: "1px solid rgba(56,225,255,0.15)", background: "rgba(14,111,174,0.10)" }}>
       <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Tiêu đề kết quả then chốt"
         className="w-full text-sm border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
       <div className="flex gap-2 flex-wrap items-center">
@@ -199,17 +201,20 @@ export default function Goal({ obj, color }: { obj: Objective; color: string }) 
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 min-w-[340px] max-w-[400px] w-[370px] shrink-0 flex flex-col overflow-hidden">
+    <div className="rounded-xl min-w-[340px] max-w-[400px] w-[370px] shrink-0 flex flex-col overflow-hidden"
+      style={{ background: "linear-gradient(135deg, #0D2548 0%, #081D3D 100%)", border: "1px solid rgba(56,225,255,0.14)", boxShadow: "0 4px 24px -4px rgba(56,225,255,0.08), 0 2px 8px rgba(0,0,0,0.5)" }}>
       {/* Header */}
       {editingHeader ? (
-        <div className="p-3 bg-slate-50 flex flex-col gap-2">
+        <div className="p-3 flex flex-col gap-2" style={{ background: "rgba(10,29,60,0.5)" }}>
           <input value={headerDraft.title} onChange={e => setHeaderDraft(d => ({ ...d, title: e.target.value }))}
             className="w-full text-sm font-semibold border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
           <div className="flex gap-2 items-center">
             <input value={headerDraft.quarter} onChange={e => setHeaderDraft(d => ({ ...d, quarter: e.target.value }))}
               placeholder="Q1 2026" className="w-24 text-sm border border-slate-200 rounded px-2 py-1.5 focus:outline-none" />
-            <button onClick={saveHeader} className="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700 font-semibold">Lưu</button>
-            <button onClick={() => setEditingHeader(false)} className="text-xs bg-slate-200 text-slate-600 px-3 py-1.5 rounded hover:bg-slate-300">Hủy</button>
+            <button onClick={saveHeader} className="text-xs text-white px-3 py-1.5 rounded font-semibold"
+            style={{ background: "linear-gradient(135deg, #0E6FAE, #12B8E8)" }}>Lưu</button>
+            <button onClick={() => setEditingHeader(false)} className="text-xs px-3 py-1.5 rounded transition"
+              style={{ background: "rgba(56,225,255,0.08)", color: "#B8D7F2", border: "1px solid rgba(56,225,255,0.15)" }}>Hủy</button>
           </div>
         </div>
       ) : (
@@ -221,8 +226,8 @@ export default function Goal({ obj, color }: { obj: Objective; color: string }) 
                 {obj.quarter}
               </span>
             </div>
-            <p className="font-semibold text-slate-800 text-sm leading-snug line-clamp-2 text-center">{obj.title}</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">{obj.keyResults.length} kết quả then chốt</p>
+            <p className="font-semibold text-sm leading-snug line-clamp-2 text-center" style={{ color: "#EEF6FF" }}>{obj.title}</p>
+            <p className="text-[11px] mt-0.5" style={{ color: "#6B9AC4" }}>{obj.keyResults.length} kết quả then chốt</p>
           </div>
           <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition">
             <button onClick={() => { setHeaderDraft({ title: obj.title, quarter: obj.quarter }); setEditingHeader(true); }}
@@ -243,7 +248,7 @@ export default function Goal({ obj, color }: { obj: Objective; color: string }) 
         </div>
       )}
       {/* KR list */}
-      <div className="px-3 pb-2 border-t border-slate-100 flex-1 overflow-y-auto max-h-[300px]">
+      <div className="px-3 pb-2 flex-1 overflow-y-auto max-h-[300px]" style={{ borderTop: "1px solid rgba(56,225,255,0.08)" }}>
         {obj.keyResults.map(kr => (
           <KrRow key={kr.id} kr={kr}
             onUpdateCurrent={(krId, val) => updateKeyResult(obj.id, krId, val)}
@@ -258,7 +263,8 @@ export default function Goal({ obj, color }: { obj: Objective; color: string }) 
           />
         ) : (
           <button onClick={() => setAddingKr(true)}
-            className="mt-2 mb-1 w-full text-xs text-indigo-500 hover:text-indigo-700 border border-dashed border-indigo-200 hover:border-indigo-400 rounded-lg py-1.5 transition flex items-center justify-center gap-1">
+            className="mt-2 mb-1 w-full text-xs border border-dashed rounded-lg py-1.5 transition flex items-center justify-center gap-1"
+            style={{ color: "#38E1FF", borderColor: "rgba(56,225,255,0.25)" }}>
             <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
             Thêm kết quả then chốt
           </button>

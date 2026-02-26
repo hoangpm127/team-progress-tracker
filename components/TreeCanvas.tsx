@@ -28,9 +28,9 @@ const Q1_START=+new Date("2026-01-01"), Q1_END=+new Date("2026-03-31"), TODAY_TS
 const ELAPSED=Math.round(Math.min(1,(TODAY_TS-Q1_START)/(Q1_END-Q1_START))*100);
 function healthOf(prog:number){
   const r=ELAPSED>0?prog/ELAPSED:1;
-  if(r>=0.80)return{label:"Đúng tiến độ",color:"#10b981",dot:"🟢"};
-  if(r>=0.50)return{label:"Hơi chậm",color:"#f59e0b",dot:"🟡"};
-  return{label:"Nguy hiểm",color:"#ef4444",dot:"🔴"};
+  if(r>=0.80)return{label:"Đúng tiến độ",color:"#10b981",dot:"●"};
+  if(r>=0.50)return{label:"Hơi chậm",color:"#f59e0b",dot:"●"};
+  return{label:"Nguy hiểm",color:"#ef4444",dot:"●"};
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -73,7 +73,7 @@ function MiniPopup({popup,onClose,onDetail,prog,done,total,overdue,extra}:
       <div className="px-4 py-3 border-t border-white/5">
         <button onClick={onDetail} className="w-full py-2.5 rounded-xl text-sm font-bold text-white active:scale-95 hover:brightness-110"
           style={{background:`linear-gradient(135deg,${meta.color}dd,${meta.color})`}}>
-          📋 Xem chi tiết →
+          Xem chi tiết →
         </button>
       </div>
     </div>
@@ -137,14 +137,14 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide">30 Dự Án Công Nghệ</h3>
                 <div className="flex gap-2 text-xs">
-                  <span className="text-emerald-600">🟢 {app.projects.filter(p=>p.status==="live").length}</span>
+                  <span className="text-emerald-600">● {app.projects.filter(p=>p.status==="live").length}</span>
                   <span className="text-amber-600">🔨 {app.projects.filter(p=>p.status==="building").length}</span>
                   <span className="text-slate-400">💡 {app.projects.filter(p=>p.status==="idea").length}</span>
                 </div>
               </div>
               <div className="space-y-1.5">
                 {app.projects.map(p=>{
-                  const m:{[k:string]:{dot:string;bg:string;tc:string}}={live:{dot:"🟢",bg:"#f0fdf4",tc:"#166534"},building:{dot:"🔨",bg:"#fffbeb",tc:"#92400e"},idea:{dot:"💡",bg:"#f8fafc",tc:"#475569"}};
+                  const m:{[k:string]:{dot:string;bg:string;tc:string}}={live:{dot:"●",bg:"#f0fdf4",tc:"#166534"},building:{dot:"◐",bg:"#fffbeb",tc:"#92400e"},idea:{dot:"○",bg:"#f8fafc",tc:"#475569"}};
                   const{dot,bg,tc}=m[p.status];
                   return(<div key={p.id} className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{background:bg}}><span className="text-sm shrink-0">{dot}</span><div className="flex-1 min-w-0"><div className="text-xs font-medium truncate" style={{color:tc}}>{p.name}</div><div className="text-xs text-slate-400">{p.owner}</div></div></div>);
                 })}
@@ -732,7 +732,7 @@ export default function TreeCanvas(){
         </g>
         {/* grass label */}
         <text x={VW/2} y={GY-7} textAnchor="middle" fill="rgba(18,80,18,.75)" fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>
-          🌿 Hợp Tác · {partP}% · {partS.done}/{partS.total} việc · {healthOf(partP).dot} {healthOf(partP).label}
+          Hợp Tác · {partP}% · {partS.done}/{partS.total} việc · {healthOf(partP).dot} {healthOf(partP).label}
         </text>
 
         {/* ── CANOPY LABELS (on top of everything) ────────────── */}
