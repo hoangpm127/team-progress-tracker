@@ -233,23 +233,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const updateTaskStatus = useCallback((taskId: string, status: TaskStatus, owner: string) => {
     const now = new Date().toISOString();
     const entryId = `act-${Date.now()}`;
+    const labels: Record<TaskStatus, string> = { Todo:"Chờ làm", Doing:"Đang làm", Done:"Hoàn thành" };
     dbUpdateTask(taskId, { status, done: status === "Done" });
-    let activityEntry: ActivityEntry | null = null;
     setState((prev) => {
+      const task = prev.tasks.find((t) => t.id === taskId);
+      if (!task) return prev;
       const tasks = prev.tasks.map((t) =>
         t.id !== taskId ? t : { ...t, status, done: status === "Done" }
       );
-      const task = tasks.find((t) => t.id === taskId)!;
-      const labels: Record<TaskStatus, string> = { Todo:"Chờ làm", Doing:"Đang làm", Done:"Hoàn thành" };
-      activityEntry = {
+      const entry: ActivityEntry = {
         id:        entryId,
         teamId:    task.teamId,
         message:   `${owner} chuyển "${task.title}" sang ${labels[status]}`,
         timestamp: now,
       };
-      return { ...prev, tasks, activity: [activityEntry!, ...prev.activity].slice(0, 200), lastUpdated: now };
+      // entryId is stable — idempotent insert (PK conflict on retry is safe)
+      dbAddActivity(entry);
+      return { ...prev, tasks, activity: [entry, ...prev.activity].slice(0, 200), lastUpdated: now };
     });
-    if (activityEntry) dbAddActivity(activityEntry);
   }, []);
 
   const editTask = useCallback((taskId: string, updates: Partial<Omit<Task, "id" | "teamId">>) => {

@@ -7,9 +7,12 @@ import KrDocuments from "./KrDocuments";
 
 /* ── helpers ─────────────────────────────────────────────── */
 
+// Units where lower value = better outcome (inverted progress calculation)
+const LOWER_IS_BETTER_UNITS = new Set(["ms", "phút", "giờ", "ngày", "giây", "ngày/tháng"]);
+
 export function krProgress(kr: KeyResult): number {
   if (kr.target === 0) return 100;
-  if ((kr.unit === "ms" || kr.unit === "%") && kr.current > kr.target) {
+  if ((LOWER_IS_BETTER_UNITS.has(kr.unit) || kr.unit === "%") && kr.current > kr.target) {
     return Math.max(0, Math.min(100, Math.round((1 - (kr.current - kr.target) / kr.target) * 100)));
   }
   return Math.max(0, Math.min(100, Math.round((kr.current / kr.target) * 100)));

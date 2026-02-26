@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useApp } from "@/lib/AppContext";
+import { ANNUAL_KPIS } from "@/lib/kpiData";
 
 // ─── Q1 2026 time reference ────────────────────────────────────────────────
 const Q1_START = new Date("2026-01-01");
@@ -13,15 +14,6 @@ const Q1_REMAINING = Q1_TOTAL - Q1_ELAPSED;
 const YEAR_START  = new Date(TODAY.getFullYear(), 0, 1);
 const YEAR_TOTAL  = ((TODAY.getFullYear() % 4 === 0) ? 366 : 365);
 const YEAR_ELAPSED = Math.round((TODAY.getTime() - YEAR_START.getTime()) / 86400000);
-
-// ─── Annual company KPIs ───────────────────────────────────────────────────
-const ANNUAL_KPIS = [
-  { id: "k1", label: "Dự án triển khai", current: 8,     target: 30,     unit: "dự án",      color: "#6366f1", clickable: true },
-  { id: "k2", label: "Thành viên nền tảng", current: 12400, target: 100000, unit: "thành viên", color: "#ec4899", clickable: false },
-  { id: "k3", label: "Đối tác ký kết",   current: 41,    target: 136,    unit: "đối tác",    color: "#10b981", clickable: false },
-  { id: "k5", label: "GMV năm",          current: 8.2,   target: 50,     unit: "tỷ VND",     color: "#8b5cf6", clickable: false },
-  { id: "k4", label: "Doanh thu năm",    current: 1.4,   target: 10,     unit: "tỷ VND",     color: "#f59e0b", clickable: false },
-];
 
 // ─── 30 Projects ─────────────────────────────────────────────────────────────
 type ProjectDoc = { icon: string; name: string; type: string; url?: string; desc: string };
@@ -238,7 +230,7 @@ export default function DashboardPage() {
       {/* ── Row 1: Summary stat cards ──────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         {[
-          { label: "Xgroup",         value: `${overallPct}%`,              sub: "theo trọng số",             accent: "#6366f1" },
+          { label: "Xgroup",         value: `${overallPct}%`,              sub: "theo trọng số",             accent: "#6366f1", noBar: true },
           { label: "CV hoàn thành",  value: `${totalDone}/${tasks.length}`, sub: "weighted progress",         accent: "#10b981" },
           { label: "OKR trung bình", value: `${avgOKRPct}%`,               sub: "kết quả then chốt",         accent: "#8b5cf6" },
           { label: "Team nguy hiểm", value: `${atRiskCount}`,              sub: `${onTrackCount} đúng hạn`,  accent: atRiskCount > 0 ? "#ef4444" : "#10b981" },
@@ -247,7 +239,9 @@ export default function DashboardPage() {
         ].map((s) => (
           <div key={s.label} className="stat-card bg-white rounded-2xl px-4 py-4 text-center relative overflow-hidden border border-slate-100/60"
             style={{ boxShadow: `0 2px 16px -4px ${s.accent}26, 0 1px 3px rgba(0,0,0,0.04)` }}>
-            <div className="absolute top-0 inset-x-0 h-[3px] rounded-t-2xl" style={{ background: `linear-gradient(90deg, transparent, ${s.accent}cc, transparent)` }} />
+            {'noBar' in s && s.noBar ? null : (
+              <div className="absolute top-0 inset-x-0 h-[3px] rounded-t-2xl" style={{ background: `linear-gradient(90deg, transparent, ${s.accent}cc, transparent)` }} />
+            )}
             <p className="text-[10px] font-bold text-slate-400 mb-1.5 leading-tight uppercase tracking-wider">{s.label}</p>
             <p className="text-[1.6rem] font-black leading-none mb-1 tabular-nums" style={{ color: s.accent }}>{s.value}</p>
             <p className="text-[10px] text-slate-400 leading-tight">{s.sub}</p>

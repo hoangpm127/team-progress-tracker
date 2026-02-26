@@ -350,7 +350,13 @@ export async function dbAddPartner(p: Partner): Promise<void> {
 }
 
 export async function dbUpdatePartner(id: string, updates: Partial<Omit<Partner,"id">>): Promise<void> {
-  const { error } = await supabase.from("partners").update(updates).eq("id", id);
+  // Convert camelCase → snake_case for Supabase columns
+  const row: Record<string, unknown> = {};
+  if (updates.category  !== undefined) row.category   = updates.category;
+  if (updates.name      !== undefined) row.name       = updates.name;
+  if (updates.status    !== undefined) row.status     = updates.status;
+  if (updates.createdAt !== undefined) row.created_at = updates.createdAt;
+  const { error } = await supabase.from("partners").update(row).eq("id", id);
   if (error) console.error("[db] dbUpdatePartner", error);
 }
 

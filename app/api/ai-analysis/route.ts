@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { fetchTeams, fetchTasks, fetchObjectives, fetchAiCache, saveAiCache } from "@/lib/db";
+import { ANNUAL_KPIS } from "@/lib/kpiData";
 
 // ─── Constants ─────────────────────────────────────────────────────────────
 const CACHE_TTL_MS = 2 * 60 * 60 * 1000; // 2 hours
@@ -8,14 +9,7 @@ const CACHE_TTL_MS = 2 * 60 * 60 * 1000; // 2 hours
 const Q1_START = new Date("2026-01-01");
 const Q1_END   = new Date("2026-03-31");
 const Q1_TOTAL = Math.round((Q1_END.getTime() - Q1_START.getTime()) / 86400000);
-
-const ANNUAL_KPIS = [
-  { label: "Dự án triển khai",    current: 8,     target: 30     },
-  { label: "Thành viên nền tảng", current: 12400, target: 100000 },
-  { label: "Đối tác ký kết",      current: 41,    target: 136    },
-  { label: "GMV năm",             current: 8.2,   target: 50     },
-  { label: "Doanh thu năm",       current: 1.4,   target: 10     },
-];
+// ANNUAL_KPIS imported at top of file from lib/kpiData.ts (single source of truth)
 
 // ─── Snapshot builder (mirrors page.tsx logic, reads from DB) ──────────────
 async function buildSnapshot() {

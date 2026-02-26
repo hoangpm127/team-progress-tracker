@@ -35,9 +35,9 @@ export default function SettingsPage() {
 
       <div className="mt-8 rounded-2xl px-6 py-5"
         style={{ background: "linear-gradient(135deg, rgba(238,242,255,0.9), rgba(245,243,255,0.9))", backdropFilter: "blur(12px)", border: "1px solid rgba(199,210,254,0.5)", boxShadow: "0 4px 20px -4px rgba(99,102,241,0.12)" }}>
-        <p className="text-sm font-semibold text-indigo-700 mb-1">Chế độ Demo</p>
+        <p className="text-sm font-semibold text-indigo-700 mb-1">Kết nối Supabase</p>
         <p className="text-sm text-indigo-500">
-          Ứng dụng chạy hoàn toàn trên trình duyệt, dữ liệu được lưu qua localStorage. Không có dữ liệu nào gửi lên máy chủ.
+          Dữ liệu được lưu trữ và đồng bộ qua Supabase (PostgreSQL). Mọi thay đổi được cập nhật realtime lên cloud.
         </p>
       </div>
     </div>

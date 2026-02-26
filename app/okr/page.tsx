@@ -9,7 +9,7 @@ import Goal, { objProgress } from "@/components/Goal";
 
 const TEAM_META: Record<string, { name: string; color: string; icon: string }> = {
   company:      { name: "Toàn công ty", color: "#64748b", icon: "🏢" },
-  marketing:    { name: "Marketing",    color: "#ec4899", icon: "📢" },
+  mkt:          { name: "Marketing",    color: "#ec4899", icon: "📢" },
   partnerships: { name: "Hợp tác",      color: "#10b981", icon: "🤝" },
   tech:         { name: "Công nghệ",    color: "#6366f1", icon: "💻" },
   hr:           { name: "Nhân sự",      color: "#f59e0b", icon: "👥" },
@@ -17,7 +17,7 @@ const TEAM_META: Record<string, { name: string; color: string; icon: string }> =
 };
 
 /* Clockwise: Toàn công ty → Marketing → Hợp tác → Công nghệ → Nhân sự → Hành chính */
-const SEGMENT_ORDER = ["company", "marketing", "partnerships", "assistant", "hr", "tech"];
+const SEGMENT_ORDER = ["company", "mkt", "partnerships", "assistant", "hr", "tech"];
 
 /* ── Add Objective Modal ─────────────────────────────────── */
 
@@ -447,7 +447,7 @@ export default function OKRPage() {
       {/* Summary stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Tổng mục tiêu", value: totalObjs - 1, accent: "#6366f1" },
+          { label: "Tổng mục tiêu", value: totalObjs,     accent: "#6366f1" },
           { label: "Hoàn thành",       value: completedObjs,   accent: "#10b981" },
           { label: "Kết quả then chốt", value: totalKRs,      accent: "#f59e0b" },
           { label: "Tiến độ TB",       value: `${avgOverall}%`, accent: "#3b82f6" },

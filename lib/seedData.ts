@@ -1,6 +1,6 @@
 ﻿import { Team, Task, Objective } from "./types";
 
-const today = new Date("2026-02-24");
+const today = new Date();
 function daysFromNow(days: number): string {
   const d = new Date(today);
   d.setDate(d.getDate() + days);
@@ -18,6 +18,7 @@ export const TEAMS: Team[] = [
   { id: "hr", name: "Nhân sự", color: "#f59e0b" },
   { id: "partnerships", name: "Hợp tác", color: "#10b981" },
   { id: "assistant", name: "Hành chính", color: "#3b82f6" },
+  { id: "piano", name: "Piano", color: "#8b5cf6" },
 ];
 
 export const SEED_TASKS: Task[] = [
