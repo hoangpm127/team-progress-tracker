@@ -1,15 +1,15 @@
 /**
- * lib/db.ts  — Supabase data-access layer
+ * lib/db.ts  â€” Supabase data-access layer
  *
  * All raw Supabase queries live here so AppContext stays clean.
- * Tables: teams · tasks · objectives · key_results · activity
- *         projects · partners · market · heaven_timing
+ * Tables: teams Â· tasks Â· objectives Â· key_results Â· activity
+ *         projects Â· partners Â· market Â· heaven_timing
  */
 import { supabase } from "./supabase";
 import { Team, Task, TaskStatus, ActivityEntry, Objective, KeyResult, KrDocument,
          Project, Partner, Market, HeavenTiming } from "./types";
 
-// ── helpers ──────────────────────────────────────────────────
+// â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function taskFromRow(row: Record<string, unknown>): Task {
   return {
@@ -47,7 +47,7 @@ function objFromRows(
   };
 }
 
-// ── READ ─────────────────────────────────────────────────────
+// â”€â”€ READ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function fetchTeams(): Promise<Team[]> {
   const { data, error } = await supabase.from("teams").select("*");
@@ -91,7 +91,7 @@ export async function fetchActivity(): Promise<ActivityEntry[]> {
   }));
 }
 
-// ── TASKS ────────────────────────────────────────────────────
+// â”€â”€ TASKS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function dbAddTask(task: Task): Promise<void> {
   const { error } = await supabase.from("tasks").insert({
@@ -106,7 +106,7 @@ export async function dbAddTask(task: Task): Promise<void> {
     status:      task.status,
     done:        task.done,
   });
-  if (error) console.error("[db] addTask", error);
+  if (error) console.error("[db] addTask", error?.message ?? error);
 }
 
 export async function dbUpdateTask(
@@ -124,15 +124,15 @@ export async function dbUpdateTask(
   if (updates.done        !== undefined) payload.done        = updates.done;
 
   const { error } = await supabase.from("tasks").update(payload).eq("id", taskId);
-  if (error) console.error("[db] updateTask", error);
+  if (error) console.error("[db] updateTask", error?.message ?? error);
 }
 
 export async function dbDeleteTask(taskId: string): Promise<void> {
   const { error } = await supabase.from("tasks").delete().eq("id", taskId);
-  if (error) console.error("[db] deleteTask", error);
+  if (error) console.error("[db] deleteTask", error?.message ?? error);
 }
 
-// ── ACTIVITY ──────────────────────────────────────────────────
+// â”€â”€ ACTIVITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function dbAddActivity(entry: ActivityEntry): Promise<void> {
   const { error } = await supabase.from("activity").insert({
@@ -141,10 +141,10 @@ export async function dbAddActivity(entry: ActivityEntry): Promise<void> {
     message:   entry.message,
     timestamp: entry.timestamp,
   });
-  if (error) console.error("[db] addActivity", error);
+  if (error) console.error("[db] addActivity", error.message ?? error);
 }
 
-// ── OBJECTIVES ────────────────────────────────────────────────
+// â”€â”€ OBJECTIVES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function dbAddObjective(obj: Objective): Promise<void> {
   const { error: objErr } = await supabase.from("objectives").insert({
@@ -153,7 +153,7 @@ export async function dbAddObjective(obj: Objective): Promise<void> {
     quarter: obj.quarter,
     title:   obj.title,
   });
-  if (objErr) { console.error("[db] addObjective", objErr); return; }
+  if (objErr) { console.error("[db] addObjective", objErr?.message ?? objErr); return; }
 
   if (obj.keyResults.length > 0) {
     const { error: krErr } = await supabase.from("key_results").insert(
@@ -166,7 +166,7 @@ export async function dbAddObjective(obj: Objective): Promise<void> {
         unit:         kr.unit,
       }))
     );
-    if (krErr) console.error("[db] addObjective KRs", krErr);
+    if (krErr) console.error("[db] addObjective KRs", krErr?.message ?? krErr);
   }
 }
 
@@ -181,17 +181,17 @@ export async function dbUpdateObjective(
 
   if (Object.keys(payload).length > 0) {
     const { error } = await supabase.from("objectives").update(payload).eq("id", objId);
-    if (error) console.error("[db] updateObjective", error);
+    if (error) console.error("[db] updateObjective", error?.message ?? error);
   }
 }
 
 export async function dbDeleteObjective(objId: string): Promise<void> {
   // key_results cascade-delete automatically (FK ON DELETE CASCADE)
   const { error } = await supabase.from("objectives").delete().eq("id", objId);
-  if (error) console.error("[db] deleteObjective", error);
+  if (error) console.error("[db] deleteObjective", error?.message ?? error);
 }
 
-// ── KEY RESULTS ───────────────────────────────────────────────
+// â”€â”€ KEY RESULTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function dbAddKeyResult(objId: string, kr: KeyResult): Promise<void> {
   const { error } = await supabase.from("key_results").insert({
@@ -202,7 +202,7 @@ export async function dbAddKeyResult(objId: string, kr: KeyResult): Promise<void
     target:       kr.target,
     unit:         kr.unit,
   });
-  if (error) console.error("[db] addKeyResult", error);
+  if (error) console.error("[db] addKeyResult", error?.message ?? error);
 }
 
 export async function dbUpdateKeyResult(krId: string, current: number): Promise<void> {
@@ -210,15 +210,15 @@ export async function dbUpdateKeyResult(krId: string, current: number): Promise<
     .from("key_results")
     .update({ current })
     .eq("id", krId);
-  if (error) console.error("[db] updateKeyResult", error);
+  if (error) console.error("[db] updateKeyResult", error?.message ?? error);
 }
 
 export async function dbDeleteKeyResult(krId: string): Promise<void> {
   const { error } = await supabase.from("key_results").delete().eq("id", krId);
-  if (error) console.error("[db] deleteKeyResult", error);
+  if (error) console.error("[db] deleteKeyResult", error?.message ?? error);
 }
 
-// ── KR DOCUMENTS ──────────────────────────────────────────────
+// â”€â”€ KR DOCUMENTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function fetchKrDocuments(krId: string): Promise<KrDocument[]> {
   const { data, error } = await supabase
@@ -226,7 +226,7 @@ export async function fetchKrDocuments(krId: string): Promise<KrDocument[]> {
     .select("*")
     .eq("kr_id", krId)
     .order("uploaded_at", { ascending: false });
-  if (error) { console.error("[db] fetchKrDocuments", error); return []; }
+  if (error) { console.error("[db] fetchKrDocuments", error?.message ?? error); return []; }
   return (data ?? []).map((r) => ({
     id:         r.id          as string,
     krId:       r.kr_id       as string,
@@ -254,7 +254,7 @@ export async function dbUploadKrDocument(
   const { error: uploadErr } = await supabase.storage
     .from("kr-documents")
     .upload(filePath, file, { contentType: file.type, upsert: false });
-  if (uploadErr) { console.error("[db] uploadKrDocument storage", uploadErr); return null; }
+  if (uploadErr) { console.error("[db] uploadKrDocument storage", uploadErr?.message ?? uploadErr); return null; }
 
   // 2. Insert metadata row
   const doc: KrDocument = {
@@ -273,7 +273,7 @@ export async function dbUploadKrDocument(
     file_size:   doc.fileSize,
     uploaded_at: doc.uploadedAt,
   });
-  if (metaErr) { console.error("[db] uploadKrDocument meta", metaErr); return null; }
+  if (metaErr) { console.error("[db] uploadKrDocument meta", metaErr?.message ?? metaErr); return null; }
   return doc;
 }
 
@@ -282,14 +282,14 @@ export async function dbDeleteKrDocument(doc: KrDocument): Promise<void> {
   const { error: storageErr } = await supabase.storage
     .from("kr-documents")
     .remove([doc.filePath]);
-  if (storageErr) console.error("[db] deleteKrDocument storage", storageErr);
+  if (storageErr) console.error("[db] deleteKrDocument storage", storageErr?.message ?? storageErr);
 
   // 2. Delete metadata row
   const { error: metaErr } = await supabase
     .from("kr_documents")
     .delete()
     .eq("id", doc.id);
-  if (metaErr) console.error("[db] deleteKrDocument meta", metaErr);
+  if (metaErr) console.error("[db] deleteKrDocument meta", metaErr?.message ?? metaErr);
 }
 
 export function getKrDocumentUrl(filePath: string): string {
@@ -299,13 +299,13 @@ export function getKrDocumentUrl(filePath: string): string {
   return data.publicUrl;
 }
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  Projects (Technology / Trunk)
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export async function fetchProjects(): Promise<Project[]> {
   const { data, error } = await supabase.from("projects").select("*").order("id");
-  if (error) { console.error("[db] fetchProjects", error); return []; }
+  if (error) { console.error("[db] fetchProjects", error?.message ?? error); return []; }
   return (data ?? []).map((r) => ({
     id:           r.id           as string,
     name:         r.name         as string,
@@ -322,16 +322,16 @@ export async function dbUpdateProject(id: string, updates: Partial<Omit<Project,
   if (updates.owner         !== undefined) row.owner          = updates.owner;
   if (updates.lastUpdateAt  !== undefined) row.last_update_at = updates.lastUpdateAt;
   const { error } = await supabase.from("projects").update(row).eq("id", id);
-  if (error) console.error("[db] dbUpdateProject", error);
+  if (error) console.error("[db] dbUpdateProject", error?.message ?? error);
 }
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  Partners (Grass / Partnerships)
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export async function fetchPartners(): Promise<Partner[]> {
   const { data, error } = await supabase.from("partners").select("*").order("category");
-  if (error) { console.error("[db] fetchPartners", error); return []; }
+  if (error) { console.error("[db] fetchPartners", error?.message ?? error); return []; }
   return (data ?? []).map((r) => ({
     id:        r.id        as string,
     category:  r.category  as Partner["category"],
@@ -346,27 +346,27 @@ export async function dbAddPartner(p: Partner): Promise<void> {
     id: p.id, category: p.category, name: p.name,
     status: p.status, created_at: p.createdAt,
   });
-  if (error) console.error("[db] dbAddPartner", error);
+  if (error) console.error("[db] dbAddPartner", error?.message ?? error);
 }
 
 export async function dbUpdatePartner(id: string, updates: Partial<Omit<Partner,"id">>): Promise<void> {
-  // Convert camelCase → snake_case for Supabase columns
+  // Convert camelCase â†’ snake_case for Supabase columns
   const row: Record<string, unknown> = {};
   if (updates.category  !== undefined) row.category   = updates.category;
   if (updates.name      !== undefined) row.name       = updates.name;
   if (updates.status    !== undefined) row.status     = updates.status;
   if (updates.createdAt !== undefined) row.created_at = updates.createdAt;
   const { error } = await supabase.from("partners").update(row).eq("id", id);
-  if (error) console.error("[db] dbUpdatePartner", error);
+  if (error) console.error("[db] dbUpdatePartner", error?.message ?? error);
 }
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  Market (Soil singleton)
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export async function fetchMarket(): Promise<Market | null> {
   const { data, error } = await supabase.from("market").select("*").eq("id","singleton").single();
-  if (error) { console.error("[db] fetchMarket", error); return null; }
+  if (error) { console.error("[db] fetchMarket", error?.message ?? error); return null; }
   return {
     marketIndex: data.market_index as number,
     notes:       data.notes as string,
@@ -379,16 +379,16 @@ export async function dbUpdateMarket(updates: Partial<Market>): Promise<void> {
   if (updates.marketIndex !== undefined) row.market_index = updates.marketIndex;
   if (updates.notes       !== undefined) row.notes        = updates.notes;
   const { error } = await supabase.from("market").upsert(row);
-  if (error) console.error("[db] dbUpdateMarket", error);
+  if (error) console.error("[db] dbUpdateMarket", error?.message ?? error);
 }
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  Heaven Timing (Rain singleton)
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export async function fetchHeavenTiming(): Promise<HeavenTiming | null> {
   const { data, error } = await supabase.from("heaven_timing").select("*").eq("id","singleton").single();
-  if (error) { console.error("[db] fetchHeavenTiming", error); return null; }
+  if (error) { console.error("[db] fetchHeavenTiming", error?.message ?? error); return null; }
   return {
     heavenTimingIndex: data.heaven_timing_index as number,
     rainEnabled:       data.rain_enabled        as boolean,
@@ -401,12 +401,12 @@ export async function dbUpdateHeavenTiming(updates: Partial<HeavenTiming>): Prom
   if (updates.heavenTimingIndex !== undefined) row.heaven_timing_index = updates.heavenTimingIndex;
   if (updates.rainEnabled       !== undefined) row.rain_enabled        = updates.rainEnabled;
   const { error } = await supabase.from("heaven_timing").upsert(row);
-  if (error) console.error("[db] dbUpdateHeavenTiming", error);
+  if (error) console.error("[db] dbUpdateHeavenTiming", error?.message ?? error);
 }
 
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  AI Analysis Cache (singleton row, key = 'main')
-// ══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export async function fetchAiCache(): Promise<{ bullets: string[]; updatedAt: string } | null> {
   const { data, error } = await supabase
@@ -428,5 +428,5 @@ export async function saveAiCache(bullets: string[]): Promise<void> {
     bullets,
     updated_at: new Date().toISOString(),
   });
-  if (error) console.error("[db] saveAiCache", error);
+  if (error) console.error("[db] saveAiCache", error?.message ?? error);
 }

@@ -199,7 +199,7 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
                   const over=!t.done&&t.deadline<today;
                   return(
                     <div key={t.id} className={`flex gap-2.5 p-2.5 rounded-lg border ${t.done?"bg-green-50 border-green-100":over?"bg-red-50 border-red-100":"bg-slate-50 border-slate-100"}`}>
-                      <button onClick={()=>app.toggleTask(t.id,"Tree")} className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 ${t.done?"bg-green-500 border-green-500 text-white":"border-slate-300"}`}>
+                      <button onClick={()=>{if(app.canEdit(teamId??"")){app.toggleTask(t.id,"Tree");}}} title={app.canEdit(teamId??"") ? undefined : "Cần đăng nhập để thay đổi"} className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 ${t.done?"bg-green-500 border-green-500 text-white":"border-slate-300"} ${!app.canEdit(teamId??"") ? "opacity-50 cursor-not-allowed" : ""}`}>
                         {t.done&&<svg className="w-2.5 h-2.5" viewBox="0 0 10 10" fill="none" strokeWidth="1.8" stroke="currentColor"><path d="M1.5 5.5L4 8 8.5 2"/></svg>}
                       </button>
                       <div className="flex-1 min-w-0">

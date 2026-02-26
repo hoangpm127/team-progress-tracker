@@ -22,10 +22,12 @@ const FILTER_LABELS: Record<Filter, string> = {
 export default function TeamDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const { teams, loading, getTeamTasks, getTeamProgress, getTeamActivity, toggleTask, editTask, deleteTask, lastUpdated } =
+  const { teams, loading, getTeamTasks, getTeamProgress, getTeamActivity, toggleTask, editTask, deleteTask, lastUpdated,
+          canEdit } =
     useApp();
 
   const team = teams.find((t) => t.id === params.id);
+  const editable = canEdit(params.id ?? ""); // true for admin, true for leader of this division
 
   const [filter, setFilter] = useState<Filter>("All");
   const [search, setSearch] = useState("");
@@ -223,7 +225,8 @@ export default function TeamDetailPage() {
                 />
               </div>
 
-              {/* Add task */}
+              {/* Add task — chỉ hiện nếu có quyền chỉnh sửa */}
+              {editable && (
               <button
                 onClick={() => setShowModal(true)}
                 className="flex items-center gap-2 px-4 py-2 text-white text-sm font-bold rounded-xl transition shrink-0"
@@ -235,6 +238,7 @@ export default function TeamDetailPage() {
                 </svg>
                 Thêm công việc
               </button>
+              )}
             </div>
           </div>
 
@@ -328,10 +332,12 @@ export default function TeamDetailPage() {
                           </td>
                           <td className="px-4 py-4">
                             <div className="flex items-center gap-1">
+                              {editable && (
                               <button onClick={() => startEdit(task)} className="p-1.5 rounded hover:bg-indigo-100 text-slate-400 hover:text-indigo-600 transition" title="Sửa">
                                 <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
                               </button>
-                              {confirmDeleteId === task.id ? (
+                              )}
+                              {editable && (confirmDeleteId === task.id ? (
                                 <>
                                   <button onClick={() => { deleteTask(task.id); setConfirmDeleteId(null); }} className="text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded hover:bg-red-600 font-semibold">Xóa</button>
                                   <button onClick={() => setConfirmDeleteId(null)} className="text-[10px] text-slate-400 hover:text-slate-600 px-1">✕</button>
@@ -340,7 +346,7 @@ export default function TeamDetailPage() {
                                 <button onClick={() => setConfirmDeleteId(task.id)} className="p-1.5 rounded hover:bg-red-100 text-slate-400 hover:text-red-500 transition" title="Xóa">
                                   <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
                                 </button>
-                              )}
+                              ))}
                             </div>
                           </td>
                         </tr>
@@ -379,8 +385,10 @@ export default function TeamDetailPage() {
                           <input
                             type="checkbox"
                             checked={task.done}
-                            onChange={() => toggleTask(task.id, task.owner)}
-                            className="mt-0.5 w-4 h-4 rounded border-slate-300 accent-indigo-500 cursor-pointer shrink-0"
+                            onChange={() => editable && toggleTask(task.id, task.owner)}
+                            disabled={!editable}
+                            title={!editable ? "Cần đăng nhập để thay đổi trạng thái" : undefined}
+                            className={`mt-0.5 w-4 h-4 rounded border-slate-300 accent-indigo-500 shrink-0 ${editable ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
@@ -401,10 +409,12 @@ export default function TeamDetailPage() {
                             </div>
                           </div>
                           <div className="flex gap-1 shrink-0">
+                            {editable && (
                             <button onClick={() => startEdit(task)} className="p-1.5 rounded hover:bg-indigo-100 text-slate-400 hover:text-indigo-600 transition">
                               <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
                             </button>
-                            {confirmDeleteId === task.id ? (
+                            )}
+                            {editable && (confirmDeleteId === task.id ? (
                               <>
                                 <button onClick={() => { deleteTask(task.id); setConfirmDeleteId(null); }} className="text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded font-semibold">Xóa</button>
                                 <button onClick={() => setConfirmDeleteId(null)} className="text-[10px] text-slate-400 px-1">✕</button>
@@ -413,7 +423,7 @@ export default function TeamDetailPage() {
                               <button onClick={() => setConfirmDeleteId(task.id)} className="p-1.5 rounded hover:bg-red-100 text-slate-400 hover:text-red-500 transition">
                                 <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
                               </button>
-                            )}
+                            ))}
                           </div>
                         </div>
                       )}
@@ -447,7 +457,7 @@ export default function TeamDetailPage() {
         </div>
       )}
 
-      {showModal && (
+      {editable && showModal && (
         <AddTaskModal teamId={team.id} onClose={() => setShowModal(false)} />
       )}
     </div>

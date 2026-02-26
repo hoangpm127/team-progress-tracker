@@ -9,6 +9,7 @@ import React, {
 import { Team, Task, ActivityEntry, TaskStatus, Objective, KeyResult,
          Project, Partner, Market, HeavenTiming } from "./types";
 import { TEAMS, SEED_TASKS, SEED_OBJECTIVES } from "./seedData";
+import { Role } from "./authConfig";
 import {
   fetchTeams, fetchTasks, fetchObjectives, fetchActivity,
   dbAddTask, dbUpdateTask, dbDeleteTask, dbAddActivity,
@@ -56,6 +57,13 @@ interface AppContextValue extends AppState {
   getTeamActivity: (teamId: string) => ActivityEntry[];
   getTeamObjectives: (teamId: string) => Objective[];
   getCompanyObjectives: () => Objective[];
+  // ── Auth ──────────────────────────────────────────────────
+  role:          Role;
+  roleName:      string;
+  leaderTeamId:  string;   // team.id mà leader được quyền sửa; "" nếu không phải leader
+  setAuth:       (role: Role, name: string, teamId: string) => void;
+  logoutAuth:    () => void;
+  canEdit:       (teamId: string) => boolean; // admin=true; leader=teamId match; guest=false
 }
 
 const DEFAULT_MARKET: Market = { marketIndex: 55, notes: "", updatedAt: "" };
@@ -79,7 +87,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state,   setState]   = useState<AppState>(INITIAL_STATE);
   const [loading, setLoading] = useState(true);
 
-  // ── Bootstrap: fetch all data from Supabase ───────────────
+  // ── Auth state ──────────────────────────────────────────────
+  const [role,         setRole]         = useState<Role>("guest");
+  const [roleName,     setRoleName]     = useState("");
+  const [leaderTeamId, setLeaderTeamId] = useState("");
+
+  const setAuth = useCallback((r: Role, name: string, teamId: string) => {
+    setRole(r); setRoleName(name); setLeaderTeamId(teamId);
+  }, []);
+
+  const logoutAuth = useCallback(() => {
+    setRole("guest"); setRoleName(""); setLeaderTeamId("");
+  }, []);
+
+  const canEdit = useCallback((teamId: string): boolean => {
+    if (role === "admin") return true;
+    if (role === "leader") return leaderTeamId === teamId;
+    return false;
+  }, [role, leaderTeamId]);
+  // ────────────────────────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -378,6 +404,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         updateProject, addPartner, updatePartner, setMarket, setHeavenTiming,
         getTeamTasks, getTeamProgress, getTeamStats,
         getTeamActivity, getTeamObjectives, getCompanyObjectives,
+        // auth
+        role, roleName, leaderTeamId, setAuth, logoutAuth, canEdit,
       }}
     >
       {children}
