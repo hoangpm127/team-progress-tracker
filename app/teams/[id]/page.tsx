@@ -50,8 +50,8 @@ export default function TeamDetailPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="flex flex-col items-center gap-3 text-slate-400">
-        <div className="w-8 h-8 border-2 border-slate-200 border-t-indigo-500 rounded-full animate-spin"/>
+      <div className="flex flex-col items-center gap-3 text-white/40">
+        <div className="w-8 h-8 border-2 border-white/10 border-t-white/50 rounded-full animate-spin"/>
         <span className="text-sm">Đang tải dữ liệu...</span>
       </div>
     </div>
@@ -81,7 +81,7 @@ export default function TeamDetailPage() {
         <p className="text-slate-500 mb-4">Không tìm thấy phòng ban.</p>
         <button
           onClick={() => router.push("/")}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm"
+          className="px-4 py-2 bg-white/20 text-white rounded-xl text-sm"
         >
           Về Tổng quan
         </button>
@@ -95,17 +95,7 @@ export default function TeamDetailPage() {
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => router.push("/teams")}
-          className="flex items-center gap-2 text-sm text-slate-400 hover:text-slate-700 transition-colors"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          🌳 Về cây
-        </button>
-        <span className="text-slate-200 select-none">|</span>
-        <button
-          onClick={() => router.push("/")}
-          className="flex items-center gap-2 text-sm text-slate-400 hover:text-slate-700 transition-colors"
+          className="flex items-center gap-2 text-sm text-white/40 hover:text-white/70 transition-colors"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -145,8 +135,8 @@ export default function TeamDetailPage() {
 
       {/* Weight warning */}
       {weightWarning && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-5 flex items-center gap-3 text-sm text-amber-800">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 shrink-0 text-amber-500">
+        <div className="bg-white/5 border border-white/15 rounded-xl px-4 py-3 mb-5 flex items-center gap-3 text-sm text-white/60">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 shrink-0 text-white/40">
             <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
             <line x1="12" y1="9" x2="12" y2="13" />
             <line x1="12" y1="17" x2="12.01" y2="17" />
@@ -156,7 +146,7 @@ export default function TeamDetailPage() {
       )}
 
       {/* Tab bar */}
-      <div className="flex items-center gap-1 mb-6 rounded-xl p-1 w-fit flex-wrap" style={{ background: "rgba(10,29,60,0.8)" }}>
+      <div className="flex items-center gap-1 mb-6 rounded-xl p-1 w-fit flex-wrap" style={{ background: "rgba(42,42,42,0.8)" }}>
         {([
           { key: "tasks",    label: "Công việc" },
           { key: "kanban",   label: "Kanban" },
@@ -170,10 +160,10 @@ export default function TeamDetailPage() {
               activeTab === tab.key ? "shadow-sm" : ""
             }`}
             style={activeTab === tab.key ? {
-              background: "linear-gradient(135deg, #0E6FAE, #12B8E8)",
+              background: "#3a3a3a",
               color: "#ffffff",
-              boxShadow: "0 2px 8px rgba(56,225,255,0.30)"
-            } : { color: "#6B9AC4" }}
+              boxShadow: "0 2px 8px rgba(0,0,0,0.40)"
+            } : { color: "#aaaaaa" }}
           >
             {tab.label}
           </button>
@@ -192,8 +182,8 @@ export default function TeamDetailPage() {
                   onClick={() => setFilter(f)}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
                     filter === f
-                      ? "bg-indigo-600 text-white shadow-sm"
-                      : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                      ? "bg-white/20 text-white shadow-sm"
+                      : "bg-white/5 text-white/50 hover:bg-white/10"
                   }`}
                 >
                   {FILTER_LABELS[f]}
@@ -214,7 +204,7 @@ export default function TeamDetailPage() {
                   fill="none"
                   stroke="currentColor"
                   strokeWidth={2}
-                  className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40"
                 >
                   <circle cx="11" cy="11" r="8" />
                   <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -224,7 +214,7 @@ export default function TeamDetailPage() {
                   placeholder="Tìm công việc…"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-3.5 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition"
+                  className="w-full pl-9 pr-3.5 py-2 text-sm rounded-xl border border-white/15 bg-white/5 text-white/80 placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/30 transition"
                 />
               </div>
 
@@ -233,7 +223,7 @@ export default function TeamDetailPage() {
               <button
                 onClick={() => setShowModal(true)}
                 className="flex items-center gap-2 px-4 py-2 text-white text-sm font-bold rounded-xl transition shrink-0"
-                style={{ background: "linear-gradient(135deg, #0E6FAE, #12B8E8)", boxShadow: "0 4px 14px -2px rgba(56,225,255,0.40)" }}
+                style={{ background: "linear-gradient(135deg, #333333, #444444)", boxShadow: "0 4px 14px -2px rgba(0,0,0,0.40)" }}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-4 h-4">
                   <line x1="12" y1="5" x2="12" y2="19" />
@@ -247,41 +237,41 @@ export default function TeamDetailPage() {
 
           {/* Task table */}
           {filteredTasks.length === 0 ? (
-            <div className="text-center py-16 rounded-2xl" style={{ background: "rgba(13,37,72,0.85)", border: "1px solid rgba(56,225,255,0.10)", color: "#6B9AC4" }}>
+            <div className="text-center py-16 rounded-2xl" style={{ background: "rgba(42,42,42,0.85)", border: "1px solid rgba(255,255,255,0.08)", color: "#aaaaaa" }}>
               Không có công việc nào.
             </div>
           ) : (
-            <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(10,25,54,0.90)", border: "1px solid rgba(56,225,255,0.12)", boxShadow: "0 4px 24px -4px rgba(56,225,255,0.06), 0 1px 3px rgba(0,0,0,0.4)" }}>
+            <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(36,36,36,0.90)", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px -4px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.4)" }}>
               {/* Desktop table */}
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr style={{ borderBottom: "1px solid rgba(56,225,255,0.10)" }}>
+                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                       <th className="w-10 px-4 py-3 text-left" />
-                      <th className="px-4 py-3 text-left font-semibold" style={{ color: "#6B9AC4" }}>Công việc</th>
-                      <th className="px-4 py-3 text-left font-semibold w-20" style={{ color: "#6B9AC4" }}>Trọng số</th>
-                      <th className="px-4 py-3 text-left font-semibold w-32" style={{ color: "#6B9AC4" }}>Phụ trách</th>
-                      <th className="px-4 py-3 text-left font-semibold w-28" style={{ color: "#6B9AC4" }}>Hạn chờ</th>
-                      <th className="px-4 py-3 text-left font-semibold w-24" style={{ color: "#6B9AC4" }}>Trạng thái</th>
+                      <th className="px-4 py-3 text-left font-semibold" style={{ color: "#aaaaaa" }}>Công việc</th>
+                      <th className="px-4 py-3 text-left font-semibold w-20" style={{ color: "#aaaaaa" }}>Trọng số</th>
+                      <th className="px-4 py-3 text-left font-semibold w-32" style={{ color: "#aaaaaa" }}>Phụ trách</th>
+                      <th className="px-4 py-3 text-left font-semibold w-28" style={{ color: "#aaaaaa" }}>Hạn chờ</th>
+                      <th className="px-4 py-3 text-left font-semibold w-24" style={{ color: "#aaaaaa" }}>Trạng thái</th>
                       <th className="px-4 py-3 w-20" />
                     </tr>
                   </thead>
-                  <tbody className="divide-y" style={{ borderColor: "rgba(56,225,255,0.06)" }}>
+                  <tbody className="divide-y" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
                     {filteredTasks.map((task) => {
                       const isOverdue = !task.done && task.deadline < today;
                       if (editingId === task.id) return (
-                        <tr key={task.id} style={{ background: "rgba(14,111,174,0.10)", borderLeft: "2px solid rgba(56,225,255,0.40)" }}>
+                        <tr key={task.id} style={{ background: "rgba(255,255,255,0.04)", borderLeft: "2px solid rgba(255,255,255,0.25)" }}>
                           <td className="px-4 py-3" />
                           <td className="px-4 py-3" colSpan={4}>
                             <div className="flex flex-col gap-2">
-                              <input value={draft.title ?? ""} onChange={e => setDraft(d => ({...d, title: e.target.value}))} placeholder="Tiêu đề" className="w-full text-sm border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-                              <input value={draft.description ?? ""} onChange={e => setDraft(d => ({...d, description: e.target.value}))} placeholder="Mô tả (tuỳ chọn)" className="w-full text-sm border border-slate-200 rounded px-2 py-1.5 focus:outline-none" />
+                              <input value={draft.title ?? ""} onChange={e => setDraft(d => ({...d, title: e.target.value}))} placeholder="Tiêu đề" className="w-full text-sm border border-white/20 bg-white/5 text-white/80 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-white/30" />
+                              <input value={draft.description ?? ""} onChange={e => setDraft(d => ({...d, description: e.target.value}))} placeholder="Mô tả (tuỳ chọn)" className="w-full text-sm border border-white/15 bg-white/5 text-white/70 rounded px-2 py-1.5 focus:outline-none" />
                               <div className="flex gap-2 flex-wrap items-center">
-                                <input value={draft.owner ?? ""} onChange={e => setDraft(d => ({...d, owner: e.target.value}))} placeholder="Phụ trách" className="flex-1 min-w-[120px] text-sm border border-slate-200 rounded px-2 py-1.5 focus:outline-none" />
-                                <label className="text-xs text-slate-500">Bắt đầu<input type="date" value={draft.startDate ?? ""} onChange={e => setDraft(d => ({...d, startDate: e.target.value}))} className="ml-1 text-sm border border-slate-200 rounded px-2 py-1 focus:outline-none" /></label>
-                                <label className="text-xs text-slate-500">Hạn<input type="date" value={draft.deadline ?? ""} onChange={e => setDraft(d => ({...d, deadline: e.target.value}))} className="ml-1 text-sm border border-slate-200 rounded px-2 py-1 focus:outline-none" /></label>
-                                <label className="text-xs text-slate-500">W<input type="number" value={draft.weight ?? 10} onChange={e => setDraft(d => ({...d, weight: Number(e.target.value)}))} min={1} max={100} className="ml-1 w-14 text-sm border border-slate-200 rounded px-2 py-1 focus:outline-none" /></label>
-                                <select value={draft.status ?? "Todo"} onChange={e => setDraft(d => ({...d, status: e.target.value as TaskStatus}))} className="text-sm border border-slate-200 rounded px-2 py-1.5 focus:outline-none bg-white">
+                                <input value={draft.owner ?? ""} onChange={e => setDraft(d => ({...d, owner: e.target.value}))} placeholder="Phụ trách" className="flex-1 min-w-[120px] text-sm border border-white/15 bg-white/5 text-white/70 rounded px-2 py-1.5 focus:outline-none" />
+                                <label className="text-xs text-white/50">Bắt đầu<input type="date" value={draft.startDate ?? ""} onChange={e => setDraft(d => ({...d, startDate: e.target.value}))} className="ml-1 text-sm border border-white/15 bg-white/5 text-white/70 rounded px-2 py-1 focus:outline-none" /></label>
+                                <label className="text-xs text-white/50">Hạn<input type="date" value={draft.deadline ?? ""} onChange={e => setDraft(d => ({...d, deadline: e.target.value}))} className="ml-1 text-sm border border-white/15 bg-white/5 text-white/70 rounded px-2 py-1 focus:outline-none" /></label>
+                                <label className="text-xs text-white/50">W<input type="number" value={draft.weight ?? 10} onChange={e => setDraft(d => ({...d, weight: Number(e.target.value)}))} min={1} max={100} className="ml-1 w-14 text-sm border border-white/15 bg-white/5 text-white/70 rounded px-2 py-1 focus:outline-none" /></label>
+                                <select value={draft.status ?? "Todo"} onChange={e => setDraft(d => ({...d, status: e.target.value as TaskStatus}))} className="text-sm border border-white/15 bg-[#2a2a2a] text-white/80 rounded px-2 py-1.5 focus:outline-none">
                                   <option value="Todo">Chờ làm</option>
                                   <option value="Doing">Đang làm</option>
                                   <option value="Done">Hoàn thành</option>
@@ -291,8 +281,8 @@ export default function TeamDetailPage() {
                           </td>
                           <td className="px-4 py-3" colSpan={2}>
                             <div className="flex flex-col gap-1.5">
-                              <button onClick={saveEdit} className="text-xs text-white px-3 py-1.5 rounded font-semibold" style={{ background: "linear-gradient(135deg, #0E6FAE, #12B8E8)" }}>Lưu</button>
-                              <button onClick={cancelEdit} className="text-xs px-3 py-1.5 rounded" style={{ background: "rgba(56,225,255,0.08)", color: "#B8D7F2", border: "1px solid rgba(56,225,255,0.15)" }}>Hủy</button>
+                              <button onClick={saveEdit} className="text-xs text-white px-3 py-1.5 rounded font-semibold" style={{ background: "#3a3a3a" }}>Lưu</button>
+                              <button onClick={cancelEdit} className="text-xs px-3 py-1.5 rounded" style={{ background: "rgba(255,255,255,0.06)", color: "#cccccc", border: "1px solid rgba(255,255,255,0.12)" }}>Hủy</button>
                             </div>
                           </td>
                         </tr>
@@ -300,34 +290,34 @@ export default function TeamDetailPage() {
                       return (
                         <tr
                           key={task.id}
-                          className={`hover:bg-slate-50 transition-colors ${task.done ? "opacity-60" : ""}`}
+                          className={`hover:bg-white/3 transition-colors ${task.done ? "opacity-60" : ""}`}
                         >
                           <td className="px-4 py-4 text-center">
                             <input
                               type="checkbox"
                               checked={task.done}
                               onChange={() => toggleTask(task.id, task.owner)}
-                              className="w-4 h-4 rounded border-slate-300 text-indigo-500 cursor-pointer accent-indigo-500"
+                              className="w-4 h-4 rounded border-white/30 accent-white cursor-pointer"
                             />
                           </td>
                           <td className="px-4 py-4">
                             <p className={`font-medium text-sm ${
                             task.done ? "line-through" : ""
-                          }`} style={{ color: task.done ? "#3B6899" : "#EEF6FF" }}>
+                          }`} style={{ color: task.done ? "#555555" : "#ffffff" }}>
                               {task.title}
                             </p>
                             {task.description && (
-                              <p className="text-slate-400 text-xs mt-0.5 line-clamp-1">{task.description}</p>
+                              <p className="text-white/40 text-xs mt-0.5 line-clamp-1">{task.description}</p>
                             )}
                           </td>
                           <td className="px-4 py-4">
-                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-xs" style={{ background: "rgba(56,225,255,0.10)", color: "#38E1FF" }}>
+                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-xs" style={{ background: "rgba(255,255,255,0.08)", color: "#cccccc" }}>
                               {task.weight}
                             </span>
                           </td>
-                          <td className="px-4 py-4" style={{ color: "#B8D7F2" }}>{task.owner}</td>
+                          <td className="px-4 py-4" style={{ color: "#cccccc" }}>{task.owner}</td>
                           <td className="px-4 py-4">
-                            <span className={`text-xs font-medium ${isOverdue ? "text-red-500 font-semibold" : "text-slate-500"}`}>
+                            <span className={`text-xs font-medium ${isOverdue ? "text-white/40 font-semibold" : "text-white/50"}`}>
                               {isOverdue && "⚠ "}
                               {task.deadline}
                             </span>
@@ -338,17 +328,17 @@ export default function TeamDetailPage() {
                           <td className="px-4 py-4">
                             <div className="flex items-center gap-1">
                               {editable && (
-                              <button onClick={() => startEdit(task)} className="p-1.5 rounded hover:bg-indigo-100 text-slate-400 hover:text-indigo-600 transition" title="Sửa">
+                              <button onClick={() => startEdit(task)} className="p-1.5 rounded hover:bg-white/10 text-white/40 hover:text-white/70 transition" title="Sửa">
                                 <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
                               </button>
                               )}
                               {editable && (confirmDeleteId === task.id ? (
                                 <>
-                                  <button onClick={() => { deleteTask(task.id); setConfirmDeleteId(null); }} className="text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded hover:bg-red-600 font-semibold">Xóa</button>
-                                  <button onClick={() => setConfirmDeleteId(null)} className="text-[10px] text-slate-400 hover:text-slate-600 px-1">✕</button>
+                                  <button onClick={() => { deleteTask(task.id); setConfirmDeleteId(null); }} className="text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded hover:bg-white/30 font-semibold">Xóa</button>
+                                  <button onClick={() => setConfirmDeleteId(null)} className="text-[10px] text-white/40 hover:text-white/60 px-1">✕</button>
                                 </>
                               ) : (
-                                <button onClick={() => setConfirmDeleteId(task.id)} className="p-1.5 rounded hover:bg-red-100 text-slate-400 hover:text-red-500 transition" title="Xóa">
+                                <button onClick={() => setConfirmDeleteId(task.id)} className="p-1.5 rounded hover:bg-white/10 text-white/40 hover:text-white/50 transition" title="Xóa">
                                   <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
                                 </button>
                               ))}
@@ -361,28 +351,28 @@ export default function TeamDetailPage() {
                 </table>
               </div>
 
-              <div className="md:hidden" style={{ borderTop: "1px solid rgba(56,225,255,0.06)" }}>
+              <div className="md:hidden" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
                 {filteredTasks.map((task) => {
                   const isOverdue = !task.done && task.deadline < today;
                   return (
                     <div key={task.id} className={`p-4 ${task.done ? "opacity-60" : ""} ${editingId === task.id ? "border-l-2" : ""}`}
-                      style={{ borderBottom: "1px solid rgba(56,225,255,0.06)", ...(editingId === task.id ? { background: "rgba(14,111,174,0.10)", borderLeftColor: "rgba(56,225,255,0.40)" } : {}) }}>
+                      style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", ...(editingId === task.id ? { background: "rgba(255,255,255,0.04)", borderLeftColor: "rgba(255,255,255,0.25)" } : {}) }}>
                       {editingId === task.id ? (
                         <div className="flex flex-col gap-2">
-                          <input value={draft.title ?? ""} onChange={e => setDraft(d => ({...d, title: e.target.value}))} placeholder="Tiêu đề" className="w-full text-sm border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-                          <input value={draft.description ?? ""} onChange={e => setDraft(d => ({...d, description: e.target.value}))} placeholder="Mô tả" className="w-full text-sm border border-slate-200 rounded px-2 py-1.5 focus:outline-none" />
-                          <input value={draft.owner ?? ""} onChange={e => setDraft(d => ({...d, owner: e.target.value}))} placeholder="Phụ trách" className="w-full text-sm border border-slate-200 rounded px-2 py-1.5 focus:outline-none" />
+                          <input value={draft.title ?? ""} onChange={e => setDraft(d => ({...d, title: e.target.value}))} placeholder="Tiêu đề" className="w-full text-sm border border-white/20 bg-white/5 text-white/80 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-white/30" />
+                          <input value={draft.description ?? ""} onChange={e => setDraft(d => ({...d, description: e.target.value}))} placeholder="Mô tả" className="w-full text-sm border border-white/15 bg-white/5 text-white/70 rounded px-2 py-1.5 focus:outline-none" />
+                          <input value={draft.owner ?? ""} onChange={e => setDraft(d => ({...d, owner: e.target.value}))} placeholder="Phụ trách" className="w-full text-sm border border-white/15 bg-white/5 text-white/70 rounded px-2 py-1.5 focus:outline-none" />
                           <div className="flex gap-2 flex-wrap">
-                            <input type="date" value={draft.deadline ?? ""} onChange={e => setDraft(d => ({...d, deadline: e.target.value}))} className="flex-1 text-sm border border-slate-200 rounded px-2 py-1.5" />
-                            <select value={draft.status ?? "Todo"} onChange={e => setDraft(d => ({...d, status: e.target.value as TaskStatus}))} className="text-sm border border-slate-200 rounded px-2 py-1.5 bg-white">
+                            <input type="date" value={draft.deadline ?? ""} onChange={e => setDraft(d => ({...d, deadline: e.target.value}))} className="flex-1 text-sm border border-white/15 bg-white/5 text-white/70 rounded px-2 py-1.5" />
+                            <select value={draft.status ?? "Todo"} onChange={e => setDraft(d => ({...d, status: e.target.value as TaskStatus}))} className="text-sm border border-white/15 bg-[#2a2a2a] text-white/80 rounded px-2 py-1.5">
                               <option value="Todo">Chờ làm</option>
                               <option value="Doing">Đang làm</option>
                               <option value="Done">Hoàn thành</option>
                             </select>
                           </div>
                           <div className="flex gap-2">
-                            <button onClick={saveEdit} className="flex-1 text-sm text-white py-1.5 rounded font-semibold" style={{ background: "linear-gradient(135deg, #0E6FAE, #12B8E8)" }}>Lưu</button>
-                            <button onClick={cancelEdit} className="flex-1 text-sm py-1.5 rounded" style={{ background: "rgba(56,225,255,0.08)", color: "#B8D7F2" }}>Hủy</button>
+                            <button onClick={saveEdit} className="flex-1 text-sm text-white py-1.5 rounded font-semibold" style={{ background: "#3a3a3a" }}>Lưu</button>
+                            <button onClick={cancelEdit} className="flex-1 text-sm py-1.5 rounded" style={{ background: "rgba(255,255,255,0.06)", color: "#cccccc" }}>Hủy</button>
                           </div>
                         </div>
                       ) : (
@@ -393,39 +383,39 @@ export default function TeamDetailPage() {
                             onChange={() => editable && toggleTask(task.id, task.owner)}
                             disabled={!editable}
                             title={!editable ? "Cần đăng nhập để thay đổi trạng thái" : undefined}
-                            className={`mt-0.5 w-4 h-4 rounded border-slate-300 accent-indigo-500 shrink-0 ${editable ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}
+                            className={`mt-0.5 w-4 h-4 rounded border-white/30 accent-white shrink-0 ${editable ? "cursor-pointer" : "cursor-not-allowed opacity-60"}`}
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <p className={`font-semibold text-slate-800 text-sm ${task.done ? "line-through text-slate-400" : ""}`}>
+                              <p className={`font-semibold text-white/80 text-sm ${task.done ? "line-through text-white/30" : ""}`}>
                                 {task.title}
                               </p>
                               <StatusBadge status={task.status} />
                             </div>
                             {task.description && (
-                              <p className="text-slate-400 text-xs mt-0.5 line-clamp-2">{task.description}</p>
+                              <p className="text-white/40 text-xs mt-0.5 line-clamp-2">{task.description}</p>
                             )}
-                            <div className="flex items-center gap-3 mt-2 text-xs text-slate-400 flex-wrap">
+                            <div className="flex items-center gap-3 mt-2 text-xs text-white/40 flex-wrap">
                               <span>w:{task.weight}</span>
                               <span>{task.owner}</span>
-                              <span className={isOverdue ? "text-red-500 font-semibold" : ""}>
+                              <span className={isOverdue ? "text-white/40 font-semibold" : ""}>
                                 {isOverdue && "⚠ "}{task.deadline}
                               </span>
                             </div>
                           </div>
                           <div className="flex gap-1 shrink-0">
                             {editable && (
-                            <button onClick={() => startEdit(task)} className="p-1.5 rounded hover:bg-indigo-100 text-slate-400 hover:text-indigo-600 transition">
+                            <button onClick={() => startEdit(task)} className="p-1.5 rounded hover:bg-white/10 text-white/40 hover:text-white/70 transition">
                               <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
                             </button>
                             )}
                             {editable && (confirmDeleteId === task.id ? (
                               <>
-                                <button onClick={() => { deleteTask(task.id); setConfirmDeleteId(null); }} className="text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded font-semibold">Xóa</button>
-                                <button onClick={() => setConfirmDeleteId(null)} className="text-[10px] text-slate-400 px-1">✕</button>
+                                <button onClick={() => { deleteTask(task.id); setConfirmDeleteId(null); }} className="text-[10px] bg-white/20 text-white px-1.5 py-0.5 rounded font-semibold">Xóa</button>
+                                <button onClick={() => setConfirmDeleteId(null)} className="text-[10px] text-white/40 px-1">✕</button>
                               </>
                             ) : (
-                              <button onClick={() => setConfirmDeleteId(task.id)} className="p-1.5 rounded hover:bg-red-100 text-slate-400 hover:text-red-500 transition">
+                              <button onClick={() => setConfirmDeleteId(task.id)} className="p-1.5 rounded hover:bg-white/10 text-white/40 hover:text-white/50 transition">
                                 <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
                               </button>
                             ))}
@@ -442,22 +432,22 @@ export default function TeamDetailPage() {
       )}
 
       {activeTab === "kanban" && (
-        <div className="rounded-2xl p-4" style={{ background: "rgba(10,25,54,0.90)", backdropFilter: "blur(16px)", border: "1px solid rgba(56,225,255,0.12)", boxShadow: "0 4px 24px -4px rgba(56,225,255,0.06), 0 1px 3px rgba(0,0,0,0.4)" }}>
-          <h3 className="font-semibold mb-4 text-sm text-center" style={{ color: "#B8D7F2" }}>Bảng Kanban</h3>
+        <div className="rounded-2xl p-4" style={{ background: "rgba(36,36,36,0.90)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px -4px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.4)" }}>
+          <h3 className="font-semibold mb-4 text-sm text-center" style={{ color: "#cccccc" }}>Bảng Kanban</h3>
           <KanbanBoard tasks={allTasks} teamColor={team.color} />
         </div>
       )}
 
       {activeTab === "gantt" && (
-        <div className="rounded-2xl p-4" style={{ background: "rgba(10,25,54,0.90)", backdropFilter: "blur(16px)", border: "1px solid rgba(56,225,255,0.12)", boxShadow: "0 4px 24px -4px rgba(56,225,255,0.06), 0 1px 3px rgba(0,0,0,0.4)" }}>
-          <h3 className="font-semibold mb-4 text-sm text-center" style={{ color: "#B8D7F2" }}>Biểu đồ Gantt</h3>
+        <div className="rounded-2xl p-4" style={{ background: "rgba(36,36,36,0.90)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px -4px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.4)" }}>
+          <h3 className="font-semibold mb-4 text-sm text-center" style={{ color: "#cccccc" }}>Biểu đồ Gantt</h3>
           <GanttChart tasks={allTasks} teamColor={team.color} />
         </div>
       )}
 
       {activeTab === "activity" && (
-        <div className="rounded-2xl px-6 py-4" style={{ background: "rgba(10,25,54,0.90)", backdropFilter: "blur(16px)", border: "1px solid rgba(56,225,255,0.12)", boxShadow: "0 4px 24px -4px rgba(56,225,255,0.06), 0 1px 3px rgba(0,0,0,0.4)" }}>
-          <h3 className="font-semibold mb-4 text-sm text-center" style={{ color: "#B8D7F2" }}>Nhật ký hoạt động</h3>
+        <div className="rounded-2xl px-6 py-4" style={{ background: "rgba(36,36,36,0.90)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px -4px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.4)" }}>
+          <h3 className="font-semibold mb-4 text-sm text-center" style={{ color: "#cccccc" }}>Nhật ký hoạt động</h3>
           <ActivityLog entries={activity} />
         </div>
       )}      

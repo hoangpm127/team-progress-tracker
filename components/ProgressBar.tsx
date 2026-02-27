@@ -14,7 +14,7 @@ const sizeMap = {
 
 export default function ProgressBar({
   value,
-  color = "#6366f1",
+  color = "#888888",
   size = "md",
   showLabel = false,
   animated = true,
@@ -35,7 +35,7 @@ export default function ProgressBar({
         />
       </div>
       {showLabel && (
-        <span className="text-sm font-semibold w-10 text-right shrink-0" style={{ color: "#B8D7F2" }}>
+        <span className="text-sm font-semibold w-10 text-right shrink-0" style={{ color: "#cccccc" }}>
           {clamped}%
         </span>
       )}

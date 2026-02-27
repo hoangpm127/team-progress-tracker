@@ -10,9 +10,9 @@ import Goal, { objProgress } from "@/components/Goal";
 const TEAM_META: Record<string, { name: string; color: string; icon: string }> = {
   company:      { name: "Toàn công ty", color: "#64748b", icon: "CO" },
   mkt:          { name: "Marketing",    color: "#ec4899", icon: "MK" },
-  partnerships: { name: "Hợp tác",      color: "#10b981", icon: "HT" },
-  tech:         { name: "Công nghệ",    color: "#6366f1", icon: "CN" },
-  hr:           { name: "Nhân sự",      color: "#f59e0b", icon: "NS" },
+  partnerships: { name: "Hợp tác",      color: "#aaaaaa", icon: "HT" },
+  tech:         { name: "Công nghệ",    color: "#888888", icon: "CN" },
+  hr:           { name: "Nhân sự",      color: "#cccccc", icon: "NS" },
   assistant:    { name: "Hành chính",   color: "#3b82f6", icon: "HC" },
 };
 
@@ -35,39 +35,39 @@ function AddObjModal({ onClose, defaultTeam }: { onClose: () => void; defaultTea
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" style={{ background: "#081D3D", border: "1px solid rgba(56,225,255,0.20)", boxShadow: "0 20px 60px -8px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.4)" }} onClick={e => e.stopPropagation()}>
-        <h2 className="text-lg font-bold mb-4 text-center" style={{ color: "#EEF6FF" }}>Thêm mục tiêu mới</h2>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 20px 60px -8px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.4)" }} onClick={e => e.stopPropagation()}>
+        <h2 className="text-lg font-bold mb-4 text-center" style={{ color: "#ffffff" }}>Thêm mục tiêu mới</h2>
         <div className="flex flex-col gap-3">
           <div>
-            <label className="text-xs font-semibold mb-1 block" style={{ color: "#6B9AC4" }}>Tiêu đề mục tiêu *</label>
+            <label className="text-xs font-semibold mb-1 block" style={{ color: "#aaaaaa" }}>Tiêu đề mục tiêu *</label>
             <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Ví dụ: Tăng trưởng doanh thu 40%"
-              className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" autoFocus />
+              className="w-full text-sm border border-white/15 bg-white/5 text-white/80 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white/20" autoFocus />
           </div>
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="text-xs font-semibold mb-1 block" style={{ color: "#6B9AC4" }}>Phòng ban</label>
+              <label className="text-xs font-semibold mb-1 block" style={{ color: "#aaaaaa" }}>Phòng ban</label>
               <select value={teamId} onChange={e => setTeamId(e.target.value)}
-                className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                className="w-full text-sm border border-white/15 bg-[#2a2a2a] text-white/80 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white/20">
                 {SEGMENT_ORDER.map(id => (
                   <option key={id} value={id}>{TEAM_META[id]?.name ?? id}</option>
                 ))}
               </select>
             </div>
             <div className="w-28">
-              <label className="text-xs font-semibold mb-1 block" style={{ color: "#6B9AC4" }}>Quý</label>
+              <label className="text-xs font-semibold mb-1 block" style={{ color: "#aaaaaa" }}>Quý</label>
               <input value={quarter} onChange={e => setQuarter(e.target.value)} placeholder="Q2 2026"
-                className="w-full text-sm border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                className="w-full text-sm border border-white/15 bg-white/5 text-white/80 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white/20" />
             </div>
           </div>
         </div>
         <div className="flex gap-3 mt-5">
           <button onClick={submit} disabled={!title.trim()}
             className="flex-1 disabled:opacity-40 text-white py-2.5 rounded-xl font-bold text-sm"
-            style={{ background: "linear-gradient(135deg, #0E6FAE, #12B8E8)", boxShadow: "0 4px 14px -2px rgba(56,225,255,0.40)" }}>
+            style={{ background: "#3a3a3a", boxShadow: "0 4px 14px -2px rgba(0,0,0,0.40)" }}>
             Tạo mục tiêu
           </button>
           <button onClick={onClose} className="flex-1 py-2.5 rounded-xl font-semibold text-sm hover:opacity-80 transition"
-            style={{ background: "rgba(56,225,255,0.08)", color: "#B8D7F2", border: "1px solid rgba(56,225,255,0.15)" }}>
+            style={{ background: "rgba(255,255,255,0.06)", color: "#cccccc", border: "1px solid rgba(255,255,255,0.12)" }}>
             Hủy
           </button>
         </div>
@@ -118,20 +118,20 @@ function GoalStrip({ objectives, color }: { objectives: Objective[]; color: stri
       {canScrollLeft && (
         <button onClick={() => scroll(-1)}
           className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full flex items-center justify-center hover:shadow-xl transition"
-          style={{ background: "#081D3D", border: "1px solid rgba(56,225,255,0.25)", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
-          <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4" style={{ color: "#38E1FF" }}><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+          style={{ background: "#2a2a2a", border: "1px solid rgba(255,255,255,0.15)", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+          <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4" style={{ color: "#cccccc" }}><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
         </button>
       )}
       {canScrollRight && (
         <button onClick={() => scroll(1)}
           className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full flex items-center justify-center hover:shadow-xl transition"
-          style={{ background: "#081D3D", border: "1px solid rgba(56,225,255,0.25)", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
-          <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4" style={{ color: "#38E1FF" }}><path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg>
+          style={{ background: "#2a2a2a", border: "1px solid rgba(255,255,255,0.15)", boxShadow: "0 4px 16px rgba(0,0,0,0.5)" }}>
+          <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4" style={{ color: "#cccccc" }}><path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg>
         </button>
       )}
       <div ref={scrollRef}
         className="flex gap-4 overflow-x-auto pb-2 px-1 snap-x"
-        style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(56,225,255,0.25) transparent" }}>
+        style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
         {objectives.map(obj => (
           <div key={obj.id} className="snap-start">
             <Goal obj={obj} color={color} />
@@ -172,8 +172,8 @@ function DeptPanel({ teamId, objectives, color, name, isOpen, onToggle, onAddObj
           style={{ borderColor: color + "50", background: `linear-gradient(135deg, ${color}12, ${color}06)`, backdropFilter: "blur(8px)" }}>
       <div className="flex items-center gap-3 px-5 py-3" style={{ borderBottom: `1px solid ${color}20` }}>
         <div className="w-1.5 h-6 rounded-full" style={{ background: color }} />
-        <span className="text-sm font-bold" style={{ color: "#EEF6FF" }}>{name}</span>
-        <span className="text-xs" style={{ color: "#6B9AC4" }}>
+        <span className="text-sm font-bold" style={{ color: "#ffffff" }}>{name}</span>
+        <span className="text-xs" style={{ color: "#aaaaaa" }}>
           {objectives.length} mục tiêu · TB: <strong style={{ color }}>{teamAvg}%</strong>
         </span>
         <div className="ml-auto flex items-center gap-2">
@@ -185,7 +185,7 @@ function DeptPanel({ teamId, objectives, color, name, isOpen, onToggle, onAddObj
           </button>
           <button onClick={onToggle}
             className="p-1.5 rounded-lg transition" title="Đóng"
-            style={{ color: "#6B9AC4" }}>
+            style={{ color: "#aaaaaa" }}>
             <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
           </button>
         </div>
@@ -297,16 +297,16 @@ function DeptWheel({
         ))}
         {/* Center gradient + shadow */}
         <radialGradient id="ctrG" cx="40%" cy="35%" r="65%">
-          <stop offset="0%" stopColor="#0A2D5E" />
-          <stop offset="100%" stopColor="#061A3A" />
+          <stop offset="0%" stopColor="#2a2a2a" />
+          <stop offset="100%" stopColor="#181818" />
         </radialGradient>
         <filter id="ctrShd" x="-25%" y="-25%" width="150%" height="150%">
-          <feDropShadow dx="0" dy="3" stdDeviation="10" floodColor="#38E1FF" floodOpacity="0.20" />
+          <feDropShadow dx="0" dy="3" stdDeviation="10" floodColor="#aaaaaa" floodOpacity="0.12" />
         </filter>
       </defs>
 
       {/* Outer decorative halo */}
-      <circle cx={cx} cy={cy} r={outerR + 6} fill="none" stroke="rgba(56,225,255,0.12)" strokeWidth="2" />
+      <circle cx={cx} cy={cy} r={outerR + 6} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="2" />
 
       {segments.map(seg => {
         const isHover = hovered === seg.id;
@@ -330,24 +330,14 @@ function DeptWheel({
             {seg.fillPath && (
               <path d={seg.fillPath} fill={isActive ? "rgba(255,255,255,0.65)" : seg.meta.color} opacity={isActive ? 1 : 0.65} className="pointer-events-none" />
             )}
-            {/* Icon background circle */}
-            <circle cx={seg.lx} cy={seg.ly - 22} r={15}
-              fill={isActive ? "rgba(255,255,255,0.22)" : seg.meta.color + "1a"}
-              stroke={isActive ? "rgba(255,255,255,0.55)" : seg.meta.color + "66"}
-              strokeWidth="1.5" className="pointer-events-none" />
-            {/* Abbrev icon */}
-            <text x={seg.lx} y={seg.ly - 16} textAnchor="middle" fontSize={11} fontWeight={700} className="pointer-events-none"
-              fill={isActive ? "#fff" : seg.meta.color}>
-              {seg.meta.icon}
-            </text>
             {/* Department name */}
             <text x={seg.lx} y={seg.ly + 3} textAnchor="middle" fontSize={10.5} fontWeight={700}
-              fill={isActive ? "#fff" : "#B8D7F2"} className="pointer-events-none">
+              fill={isActive ? "#fff" : "#cccccc"} className="pointer-events-none">
               {seg.meta.name}
             </text>
             {/* Obj count */}
             <text x={seg.lx} y={seg.ly + 16} textAnchor="middle" fontSize={9}
-              fill={isActive ? "#ffffffbb" : "#6B9AC4"} className="pointer-events-none">
+              fill={isActive ? "#ffffffbb" : "#aaaaaa"} className="pointer-events-none">
               {seg.stats.count} MT
             </text>
             {/* Avg % */}
@@ -361,11 +351,11 @@ function DeptWheel({
 
       {/* Premium center circle */}
       <circle cx={cx} cy={cy} r={innerR - 2} fill="url(#ctrG)" filter="url(#ctrShd)" />
-      <circle cx={cx} cy={cy} r={innerR - 2} fill="none" stroke="rgba(56,225,255,0.22)" strokeWidth="1.5" />
-      <circle cx={cx} cy={cy} r={innerR - 18} fill="none" stroke="rgba(56,225,255,0.08)" strokeWidth="1" strokeDasharray="3 6" />
-      <text x={cx} y={cy - 20} textAnchor="middle" fontSize={8.5} fill="#6B9AC4" fontWeight={700} letterSpacing="0.12em">TỔNG QUAN</text>
-      <text x={cx} y={cy + 12} textAnchor="middle" fontSize={30} fontWeight={800} fill="#38E1FF">{overallAvg}%</text>
-      <text x={cx} y={cy + 28} textAnchor="middle" fontSize={9.5} fill="#6B9AC4">{totalObjs} mục tiêu</text>
+      <circle cx={cx} cy={cy} r={innerR - 2} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" />
+      <circle cx={cx} cy={cy} r={innerR - 18} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="3 6" />
+      <text x={cx} y={cy - 20} textAnchor="middle" fontSize={8.5} fill="#aaaaaa" fontWeight={700} letterSpacing="0.12em">TỔNG QUAN</text>
+      <text x={cx} y={cy + 12} textAnchor="middle" fontSize={30} fontWeight={800} fill="#ffffff">{overallAvg}%</text>
+      <text x={cx} y={cy + 28} textAnchor="middle" fontSize={9.5} fill="#aaaaaa">{totalObjs} mục tiêu</text>
     </svg>
   );
 }
@@ -389,8 +379,8 @@ export default function OKRPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="flex flex-col items-center gap-3 text-slate-400">
-        <div className="w-8 h-8 border-2 border-slate-200 border-t-indigo-500 rounded-full animate-spin" />
+      <div className="flex flex-col items-center gap-3 text-white/40">
+        <div className="w-8 h-8 border-2 border-white/10 border-t-white/50 rounded-full animate-spin" />
         <span className="text-sm">Đang tải dữ liệu...</span>
       </div>
     </div>
@@ -414,58 +404,75 @@ export default function OKRPage() {
   const totalKRs = objectives.reduce((s, o) => s + o.keyResults.length, 0);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="relative min-h-screen"
+      style={{ backgroundImage: 'url("/bg-okr.png")', backgroundSize: "cover", backgroundPosition: "center", backgroundAttachment: "fixed" }}>
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(18,18,18,0.50)", zIndex: 0 }} />
+    <div className="relative p-6 max-w-7xl mx-auto" style={{ zIndex: 1 }}>
       {/* Header */}
       <div className="mb-6">
         <div className="text-center mb-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3" style={{ background: "rgba(56,225,255,0.08)", border: "1px solid rgba(56,225,255,0.20)" }}>
-            <span className="text-xs font-bold tracking-wide" style={{ color: "#38E1FF" }}>OKR Dashboard</span>
-          </div>
           <h1 className="text-3xl font-extrabold tracking-tight leading-tight"
-            style={{ background: "linear-gradient(135deg, #38E1FF 0%, #51F3FF 50%, #20CFED 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", filter: "drop-shadow(0 0 12px rgba(56,225,255,0.40))" }}>
-            Mục Tiêu &amp; Kết Quả Then Chốt
+            style={{ color: "#ffffff" }}>
+            KẾT QUẢ THEN CHỐT
           </h1>
-        </div>
-        <div className="flex items-center justify-end gap-2">
-          {openDepts.size < 6 && (
-            <button onClick={() => setOpenDepts(new Set(SEGMENT_ORDER))}
-              className="text-xs px-3 py-2 rounded-xl transition font-semibold"
-              style={{ border: "1px solid rgba(56,225,255,0.20)", color: "#B8D7F2", background: "rgba(56,225,255,0.06)" }}>
-              Mở tất cả
-            </button>
-          )}
-          {openDepts.size > 0 && (
-            <button onClick={() => setOpenDepts(new Set())}
-              className="text-xs px-3 py-2 rounded-xl transition font-semibold"
-              style={{ border: "1px solid rgba(56,225,255,0.20)", color: "#B8D7F2", background: "rgba(56,225,255,0.06)" }}>
-              Đóng tất cả
-            </button>
-          )}
-          <button onClick={() => { setAddObjTeam(undefined); setShowAddObj(true); }}
-            className="flex items-center gap-2 px-4 py-2 text-white text-sm font-bold rounded-xl transition"
-            style={{ background: "linear-gradient(135deg, #0E6FAE, #12B8E8)", boxShadow: "0 4px 14px -2px rgba(56,225,255,0.40)" }}>
-            <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
-            Thêm mục tiêu
-          </button>
+          <p className="text-xs mt-1.5" style={{ color: "#888888" }}>Cập nhật lúc 19:56 - 27/02/2026</p>
         </div>
       </div>
 
-      {/* Summary stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      {/* Uptime mini-cards */}
+      <div className="grid grid-cols-3 gap-3 mb-3">
         {[
-          { label: "Tổng mục tiêu", value: totalObjs,     accent: "#6366f1" },
-          { label: "Hoàn thành",       value: completedObjs,   accent: "#10b981" },
-          { label: "Kết quả then chốt", value: totalKRs,      accent: "#f59e0b" },
-          { label: "Tiến độ TB",       value: `${avgOverall}%`, accent: "#3b82f6" },
-        ].map(s => (
-          <div key={s.label} className="stat-card rounded-2xl p-4 flex flex-col gap-1 relative overflow-hidden"
-            style={{ background: "linear-gradient(135deg, #0D2548 0%, #0A1E38 100%)", border: "1px solid rgba(56,225,255,0.12)", boxShadow: `0 4px 20px -4px rgba(56,225,255,0.10), 0 1px 3px rgba(0,0,0,0.4)` }}>
-            <div className="absolute top-0 inset-x-0 h-[3px] rounded-t-2xl"
-              style={{ background: `linear-gradient(90deg, transparent, ${s.accent}cc, transparent)` }} />
-            <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "#6B9AC4" }}>{s.label}</span>
-            <span className="text-2xl font-black tabular-nums" style={{ color: s.accent }}>{s.value}</span>
+          { label: "Tháng", value: "98%" },
+          { label: "Quý",   value: "24,5%" },
+          { label: "Năm",   value: "8,3%" },
+        ].map((u) => (
+          <div key={u.label} className="rounded-lg px-2 py-1.5 text-center backdrop-blur-md"
+            style={{ background: "rgba(30,30,30,0.22)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 1px 4px rgba(0,0,0,0.30)" }}>
+            <p className="text-[8px] font-semibold uppercase tracking-widest mb-0.5" style={{ color: "#777777" }}>{u.label}</p>
+            <p className="text-[0.8rem] font-extrabold leading-none tabular-nums" style={{ color: "#ffffff" }}>{u.value}</p>
           </div>
         ))}
+      </div>
+
+      {/* Summary stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        {[
+          { label: "Tổng Mục Tiêu",     value: totalObjs,         sub: "toàn công ty" },
+          { label: "Hoàn Thành",        value: completedObjs,     sub: "đã đạt 100%" },
+          { label: "Kết Quả Then Chốt", value: totalKRs,          sub: "key results" },
+          { label: "Tiến Độ TB",        value: `${avgOverall}%`,  sub: "trung bình OKR" },
+        ].map(s => (
+          <div key={s.label} className="rounded-2xl px-4 py-4 text-center backdrop-blur-md"
+            style={{ background: "rgba(55,55,62,0.52)", border: "1px solid rgba(155,155,165,0.32)", boxShadow: "0 4px 18px rgba(0,0,0,0.45)" }}>
+            <p className="text-[10px] font-bold mb-1.5 leading-tight uppercase tracking-wider" style={{ color: "#b0b0b8" }}>{s.label}</p>
+            <p className="text-[1.6rem] font-black leading-none mb-1 tabular-nums" style={{ color: "#ffffff" }}>{s.value}</p>
+            <p className="text-[10px] leading-tight" style={{ color: "#888890" }}>{s.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex items-center justify-center gap-3 mb-6">
+        {openDepts.size < 6 && (
+          <button onClick={() => setOpenDepts(new Set(SEGMENT_ORDER))}
+            className="text-xs px-3 py-2 rounded-xl transition font-semibold"
+            style={{ border: "1px solid rgba(255,255,255,0.12)", color: "#cccccc", background: "rgba(255,255,255,0.06)" }}>
+            Mở tất cả
+          </button>
+        )}
+        {openDepts.size > 0 && (
+          <button onClick={() => setOpenDepts(new Set())}
+            className="text-xs px-3 py-2 rounded-xl transition font-semibold"
+            style={{ border: "1px solid rgba(255,255,255,0.12)", color: "#cccccc", background: "rgba(255,255,255,0.06)" }}>
+            Đóng tất cả
+          </button>
+        )}
+        <button onClick={() => { setAddObjTeam(undefined); setShowAddObj(true); }}
+          className="flex items-center gap-2 px-4 py-2 text-white text-sm font-bold rounded-xl transition"
+          style={{ background: "#3a3a3a", boxShadow: "0 4px 14px -2px rgba(0,0,0,0.40)" }}>
+          <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
+          Thêm mục tiêu
+        </button>
       </div>
 
       {/* Wheel */}
@@ -496,6 +503,7 @@ export default function OKRPage() {
       </div>
 
       {showAddObj && <AddObjModal onClose={() => setShowAddObj(false)} defaultTeam={addObjTeam} />}
+    </div>
     </div>
   );
 }

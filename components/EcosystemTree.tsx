@@ -27,7 +27,7 @@ const LAYERS: LayerDef[] = [
     label: "Clouds",
     labelVi: "Mây",
     pct: "~16%",
-    color: "#22d3ee",
+    color: "#aaaaaa",
     shape: {
       type: "path",
       // Mây trái (cx≈185, cy≈108) + Mây phải (cx≈695, cy≈95) — 2 sub-paths
@@ -42,7 +42,7 @@ const LAYERS: LayerDef[] = [
     label: "Wind",
     labelVi: "Gió",
     pct: "0.1%",
-    color: "#06b6d4",
+    color: "#999999",
     shape: { type: "rect", x: 58, y: 98, w: 268, h: 188, rx: 30 },
     tooltip: "Gió — Marketing, luồng lực đẩy thương hiệu ra thị trường",
   },
@@ -53,7 +53,7 @@ const LAYERS: LayerDef[] = [
     label: "Rain",
     labelVi: "Mưa",
     pct: "0.4%",
-    color: "#60a5fa",
+    color: "#aaaaaa",
     shape: { type: "rect", x: 524, y: 72, w: 202, h: 158, rx: 24 },
     tooltip: "Mưa — Thiên thời, nguồn lực & cơ hội từ môi trường bên ngoài",
   },
@@ -64,7 +64,7 @@ const LAYERS: LayerDef[] = [
     label: "Trunk",
     labelVi: "Thân cây",
     pct: "3.2%",
-    color: "#a78bfa",
+    color: "#999999",
     shape: { type: "rect", x: 400, y: 296, w: 100, h: 178, rx: 10 },
     tooltip: "Thân cây — Technology Core, nền tảng kỹ thuật dẫn đến 30 Projects",
   },
@@ -75,7 +75,7 @@ const LAYERS: LayerDef[] = [
     label: "Roots",
     labelVi: "Rễ cây",
     pct: "2.3%",
-    color: "#fb923c",
+    color: "#bbbbbb",
     shape: {
       type: "path",
       // Rễ trái + rễ phải + rễ trung tâm thẳng đứng
@@ -90,7 +90,7 @@ const LAYERS: LayerDef[] = [
     label: "Grass / Ground",
     labelVi: "Cỏ & Hoa lá đất",
     pct: "~12%",
-    color: "#34d399",
+    color: "#cccccc",
     shape: { type: "rect", x: 0, y: 472, w: 900, h: 58, rx: 0 },
     tooltip: "Mặt đất — tất cả cỏ, hoa, lá dưới mặt đất; Partner Block bên ngoài",
   },
@@ -122,9 +122,9 @@ export default function EcosystemTree() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  const border   = dark ? "#1a3660" : "#c7dff5";
-  const textSub  = dark ? "#94a3b8" : "#64748b";
-  const textMain = dark ? "#f1f5f9" : "#0f172a";
+  const border   = dark ? "rgba(255,255,255,0.10)" : "#c7dff5";
+  const textSub  = dark ? "#888888" : "#64748b";
+  const textMain = dark ? "#eeeeee" : "#0f172a";
 
   const handleEnter = (layer: LayerDef, e: React.MouseEvent<SVGElement>) => {
     setHoveredId(layer.id);

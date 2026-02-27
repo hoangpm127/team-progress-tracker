@@ -6,8 +6,8 @@ import { useState } from "react";
 
 const COLUMNS: { status: TaskStatus; label: string; bg: string; border: string }[] = [
   { status: "Todo",  label: "Chờ làm",    bg: "bg-slate-50",   border: "border-slate-200" },
-  { status: "Doing", label: "Đang làm",   bg: "bg-indigo-50",  border: "border-indigo-200" },
-  { status: "Done",  label: "Hoàn thành", bg: "bg-emerald-50", border: "border-emerald-200" },
+  { status: "Doing", label: "Đang làm",   bg: "bg-white/5",   border: "border-white/10" },
+  { status: "Done",  label: "Hoàn thành", bg: "bg-white/8",   border: "border-white/15" },
 ];
 
 function isOverdue(deadline: string): boolean {
@@ -30,10 +30,10 @@ function TaskCard({
       draggable
       onDragStart={(e) => e.dataTransfer.setData("taskId", task.id)}
       className={`bg-white rounded-lg border shadow-sm p-3 cursor-grab active:cursor-grabbing mb-2 group
-        ${overdue ? "border-red-300" : "border-slate-200"}`}
+        ${overdue ? "border-white/20" : "border-white/10"}`}
     >
       {overdue && (
-        <span className="text-xs text-red-500 font-semibold mb-1 block">⚠ Quá hạn</span>
+        <span className="text-xs text-white/40 font-semibold mb-1 block">⚠ Quá hạn</span>
       )}
       <p className="text-sm font-semibold text-slate-800 leading-snug mb-1">{task.title}</p>
       {task.description && (
@@ -95,14 +95,14 @@ export default function KanbanBoard({ tasks, teamColor }: KanbanBoardProps) {
           <div
             key={col.status}
             className={`rounded-xl border-2 p-3 min-h-[200px] transition-colors
-              ${col.bg} ${isOver ? "border-indigo-400 bg-indigo-50" : col.border}`}
+              ${col.bg} ${isOver ? "border-white/30 bg-white/5" : col.border}`}
             onDragOver={(e) => { e.preventDefault(); setDraggingOver(col.status); }}
             onDragLeave={() => setDraggingOver(null)}
             onDrop={(e) => handleDrop(e, col.status)}
           >
             {/* Column header */}
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-bold text-slate-700">{col.label}</span>
+              <span className="text-sm font-bold text-white/70">{col.label}</span>
               <span
                 className="text-xs font-semibold rounded-full px-2 py-0.5 text-white"
                 style={{ background: teamColor }}
