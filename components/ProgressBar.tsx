@@ -23,7 +23,8 @@ export default function ProgressBar({
 
   return (
     <div className="flex items-center gap-3 w-full">
-      <div className={`flex-1 rounded-full bg-slate-100/80 overflow-hidden ${sizeMap[size]}`}>
+      <div className={`flex-1 rounded-full overflow-hidden ${sizeMap[size]}`}
+        style={{ background: "rgba(10, 30, 56, 0.8)", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.3)" }}>
         <div
           className={`h-full rounded-full ${animated ? "transition-all duration-700 ease-out" : ""}`}
           style={{
@@ -34,7 +35,7 @@ export default function ProgressBar({
         />
       </div>
       {showLabel && (
-        <span className="text-sm font-semibold text-slate-700 w-10 text-right shrink-0">
+        <span className="text-sm font-semibold w-10 text-right shrink-0" style={{ color: "#B8D7F2" }}>
           {clamped}%
         </span>
       )}

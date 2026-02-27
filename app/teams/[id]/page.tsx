@@ -156,7 +156,7 @@ export default function TeamDetailPage() {
       )}
 
       {/* Tab bar */}
-      <div className="flex items-center gap-1 mb-6 bg-slate-100 rounded-xl p-1 w-fit flex-wrap">
+      <div className="flex items-center gap-1 mb-6 rounded-xl p-1 w-fit flex-wrap" style={{ background: "rgba(10,29,60,0.8)" }}>
         {([
           { key: "tasks",    label: "Công việc" },
           { key: "kanban",   label: "Kanban" },
@@ -167,10 +167,13 @@ export default function TeamDetailPage() {
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-              activeTab === tab.key
-                ? "bg-white text-slate-800 shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
+              activeTab === tab.key ? "shadow-sm" : ""
             }`}
+            style={activeTab === tab.key ? {
+              background: "linear-gradient(135deg, #0E6FAE, #12B8E8)",
+              color: "#ffffff",
+              boxShadow: "0 2px 8px rgba(56,225,255,0.30)"
+            } : { color: "#6B9AC4" }}
           >
             {tab.label}
           </button>
@@ -230,7 +233,7 @@ export default function TeamDetailPage() {
               <button
                 onClick={() => setShowModal(true)}
                 className="flex items-center gap-2 px-4 py-2 text-white text-sm font-bold rounded-xl transition shrink-0"
-                style={{ background: "linear-gradient(135deg, #6366f1, #7c3aed)", boxShadow: "0 4px 14px -2px rgba(99,102,241,0.4)" }}
+                style={{ background: "linear-gradient(135deg, #0E6FAE, #12B8E8)", boxShadow: "0 4px 14px -2px rgba(56,225,255,0.40)" }}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-4 h-4">
                   <line x1="12" y1="5" x2="12" y2="19" />
@@ -244,30 +247,30 @@ export default function TeamDetailPage() {
 
           {/* Task table */}
           {filteredTasks.length === 0 ? (
-            <div className="text-center py-16 text-slate-400 bg-white rounded-2xl border border-slate-100">
+            <div className="text-center py-16 rounded-2xl" style={{ background: "rgba(13,37,72,0.85)", border: "1px solid rgba(56,225,255,0.10)", color: "#6B9AC4" }}>
               Không có công việc nào.
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="rounded-2xl overflow-hidden" style={{ background: "rgba(10,25,54,0.90)", border: "1px solid rgba(56,225,255,0.12)", boxShadow: "0 4px 24px -4px rgba(56,225,255,0.06), 0 1px 3px rgba(0,0,0,0.4)" }}>
               {/* Desktop table */}
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-slate-100">
+                    <tr style={{ borderBottom: "1px solid rgba(56,225,255,0.10)" }}>
                       <th className="w-10 px-4 py-3 text-left" />
-                      <th className="px-4 py-3 text-left font-semibold text-slate-500">Công việc</th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-500 w-20">Trọng số</th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-500 w-32">Phụ trách</th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-500 w-28">Hạn chót</th>
-                      <th className="px-4 py-3 text-left font-semibold text-slate-500 w-24">Trạng thái</th>
+                      <th className="px-4 py-3 text-left font-semibold" style={{ color: "#6B9AC4" }}>Công việc</th>
+                      <th className="px-4 py-3 text-left font-semibold w-20" style={{ color: "#6B9AC4" }}>Trọng số</th>
+                      <th className="px-4 py-3 text-left font-semibold w-32" style={{ color: "#6B9AC4" }}>Phụ trách</th>
+                      <th className="px-4 py-3 text-left font-semibold w-28" style={{ color: "#6B9AC4" }}>Hạn chờ</th>
+                      <th className="px-4 py-3 text-left font-semibold w-24" style={{ color: "#6B9AC4" }}>Trạng thái</th>
                       <th className="px-4 py-3 w-20" />
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-50">
+                  <tbody className="divide-y" style={{ borderColor: "rgba(56,225,255,0.06)" }}>
                     {filteredTasks.map((task) => {
                       const isOverdue = !task.done && task.deadline < today;
                       if (editingId === task.id) return (
-                        <tr key={task.id} className="bg-indigo-50 border-l-2 border-indigo-400">
+                        <tr key={task.id} style={{ background: "rgba(14,111,174,0.10)", borderLeft: "2px solid rgba(56,225,255,0.40)" }}>
                           <td className="px-4 py-3" />
                           <td className="px-4 py-3" colSpan={4}>
                             <div className="flex flex-col gap-2">
@@ -288,8 +291,8 @@ export default function TeamDetailPage() {
                           </td>
                           <td className="px-4 py-3" colSpan={2}>
                             <div className="flex flex-col gap-1.5">
-                              <button onClick={saveEdit} className="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700 font-semibold">Lưu</button>
-                              <button onClick={cancelEdit} className="text-xs bg-slate-200 text-slate-600 px-3 py-1.5 rounded hover:bg-slate-300">Hủy</button>
+                              <button onClick={saveEdit} className="text-xs text-white px-3 py-1.5 rounded font-semibold" style={{ background: "linear-gradient(135deg, #0E6FAE, #12B8E8)" }}>Lưu</button>
+                              <button onClick={cancelEdit} className="text-xs px-3 py-1.5 rounded" style={{ background: "rgba(56,225,255,0.08)", color: "#B8D7F2", border: "1px solid rgba(56,225,255,0.15)" }}>Hủy</button>
                             </div>
                           </td>
                         </tr>
@@ -308,7 +311,9 @@ export default function TeamDetailPage() {
                             />
                           </td>
                           <td className="px-4 py-4">
-                            <p className={`font-medium text-slate-800 ${task.done ? "line-through text-slate-400" : ""}`}>
+                            <p className={`font-medium text-sm ${
+                            task.done ? "line-through" : ""
+                          }`} style={{ color: task.done ? "#3B6899" : "#EEF6FF" }}>
                               {task.title}
                             </p>
                             {task.description && (
@@ -316,11 +321,11 @@ export default function TeamDetailPage() {
                             )}
                           </td>
                           <td className="px-4 py-4">
-                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 text-slate-600 font-bold text-xs">
+                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-xs" style={{ background: "rgba(56,225,255,0.10)", color: "#38E1FF" }}>
                               {task.weight}
                             </span>
                           </td>
-                          <td className="px-4 py-4 text-slate-600">{task.owner}</td>
+                          <td className="px-4 py-4" style={{ color: "#B8D7F2" }}>{task.owner}</td>
                           <td className="px-4 py-4">
                             <span className={`text-xs font-medium ${isOverdue ? "text-red-500 font-semibold" : "text-slate-500"}`}>
                               {isOverdue && "⚠ "}
@@ -356,12 +361,12 @@ export default function TeamDetailPage() {
                 </table>
               </div>
 
-              {/* Mobile card list */}
-              <div className="md:hidden divide-y divide-slate-100">
+              <div className="md:hidden" style={{ borderTop: "1px solid rgba(56,225,255,0.06)" }}>
                 {filteredTasks.map((task) => {
                   const isOverdue = !task.done && task.deadline < today;
                   return (
-                    <div key={task.id} className={`p-4 ${task.done ? "opacity-60" : ""} ${editingId === task.id ? "bg-indigo-50 border-l-2 border-indigo-400" : ""}`}>
+                    <div key={task.id} className={`p-4 ${task.done ? "opacity-60" : ""} ${editingId === task.id ? "border-l-2" : ""}`}
+                      style={{ borderBottom: "1px solid rgba(56,225,255,0.06)", ...(editingId === task.id ? { background: "rgba(14,111,174,0.10)", borderLeftColor: "rgba(56,225,255,0.40)" } : {}) }}>
                       {editingId === task.id ? (
                         <div className="flex flex-col gap-2">
                           <input value={draft.title ?? ""} onChange={e => setDraft(d => ({...d, title: e.target.value}))} placeholder="Tiêu đề" className="w-full text-sm border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
@@ -376,8 +381,8 @@ export default function TeamDetailPage() {
                             </select>
                           </div>
                           <div className="flex gap-2">
-                            <button onClick={saveEdit} className="flex-1 text-sm bg-indigo-600 text-white py-1.5 rounded hover:bg-indigo-700 font-semibold">Lưu</button>
-                            <button onClick={cancelEdit} className="flex-1 text-sm bg-slate-200 text-slate-600 py-1.5 rounded hover:bg-slate-300">Hủy</button>
+                            <button onClick={saveEdit} className="flex-1 text-sm text-white py-1.5 rounded font-semibold" style={{ background: "linear-gradient(135deg, #0E6FAE, #12B8E8)" }}>Lưu</button>
+                            <button onClick={cancelEdit} className="flex-1 text-sm py-1.5 rounded" style={{ background: "rgba(56,225,255,0.08)", color: "#B8D7F2" }}>Hủy</button>
                           </div>
                         </div>
                       ) : (
@@ -437,25 +442,25 @@ export default function TeamDetailPage() {
       )}
 
       {activeTab === "kanban" && (
-        <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.7)", boxShadow: "0 4px 24px -4px rgba(15,23,42,0.08), 0 1px 3px rgba(0,0,0,0.04)" }}>
-          <h3 className="font-semibold text-slate-700 mb-4 text-sm text-center">Bảng Kanban</h3>
+        <div className="rounded-2xl p-4" style={{ background: "rgba(10,25,54,0.90)", backdropFilter: "blur(16px)", border: "1px solid rgba(56,225,255,0.12)", boxShadow: "0 4px 24px -4px rgba(56,225,255,0.06), 0 1px 3px rgba(0,0,0,0.4)" }}>
+          <h3 className="font-semibold mb-4 text-sm text-center" style={{ color: "#B8D7F2" }}>Bảng Kanban</h3>
           <KanbanBoard tasks={allTasks} teamColor={team.color} />
         </div>
       )}
 
       {activeTab === "gantt" && (
-        <div className="rounded-2xl p-4" style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.7)", boxShadow: "0 4px 24px -4px rgba(15,23,42,0.08), 0 1px 3px rgba(0,0,0,0.04)" }}>
-          <h3 className="font-semibold text-slate-700 mb-4 text-sm text-center">Biểu đồ Gantt</h3>
+        <div className="rounded-2xl p-4" style={{ background: "rgba(10,25,54,0.90)", backdropFilter: "blur(16px)", border: "1px solid rgba(56,225,255,0.12)", boxShadow: "0 4px 24px -4px rgba(56,225,255,0.06), 0 1px 3px rgba(0,0,0,0.4)" }}>
+          <h3 className="font-semibold mb-4 text-sm text-center" style={{ color: "#B8D7F2" }}>Biểu đồ Gantt</h3>
           <GanttChart tasks={allTasks} teamColor={team.color} />
         </div>
       )}
 
       {activeTab === "activity" && (
-        <div className="rounded-2xl px-6 py-4" style={{ background: "rgba(255,255,255,0.88)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.7)", boxShadow: "0 4px 24px -4px rgba(15,23,42,0.08), 0 1px 3px rgba(0,0,0,0.04)" }}>
-          <h3 className="font-semibold text-slate-700 mb-4 text-sm text-center">Nhật ký hoạt động</h3>
+        <div className="rounded-2xl px-6 py-4" style={{ background: "rgba(10,25,54,0.90)", backdropFilter: "blur(16px)", border: "1px solid rgba(56,225,255,0.12)", boxShadow: "0 4px 24px -4px rgba(56,225,255,0.06), 0 1px 3px rgba(0,0,0,0.4)" }}>
+          <h3 className="font-semibold mb-4 text-sm text-center" style={{ color: "#B8D7F2" }}>Nhật ký hoạt động</h3>
           <ActivityLog entries={activity} />
         </div>
-      )}
+      )}      
 
       {editable && showModal && (
         <AddTaskModal teamId={team.id} onClose={() => setShowModal(false)} />

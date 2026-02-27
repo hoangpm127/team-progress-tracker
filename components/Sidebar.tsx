@@ -62,20 +62,21 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-30 border-b border-slate-200/60 flex items-center px-4 h-14"
-        style={{ background: "rgba(245,247,255,0.92)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
+      <div className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center px-4 h-14"
+        style={{ background: "rgba(4,15,34,0.96)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(56,225,255,0.15)" }}>
         <button
           onClick={() => setMobileOpen((v) => !v)}
-          className="p-2 rounded-xl hover:bg-slate-100 transition-colors"
+          className="p-2 rounded-xl transition-colors"
+          style={{ background: "rgba(56,225,255,0.06)" }}
           aria-label="Toggle menu"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-slate-600">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5" style={{ color: "#38E1FF" }}>
             <line x1="3" y1="6" x2="21" y2="6" />
             <line x1="3" y1="12" x2="21" y2="12" />
             <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
         </button>
-        <span className="ml-3 font-extrabold text-slate-800 tracking-tight">Xgroup</span>
+        <span className="ml-3 font-extrabold tracking-tight" style={{ color: "#51F3FF" }}>Xgroup</span>
       </div>
 
       {/* Mobile overlay */}
@@ -90,24 +91,28 @@ export default function Sidebar() {
       <aside
         className={`
           fixed md:sticky top-0 left-0 z-20 h-screen w-60
-          border-r border-slate-200/60 flex flex-col
+          flex flex-col
           transform transition-transform duration-300
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0
         `}
-        style={{ background: "linear-gradient(180deg, #fafbff 0%, #f5f7ff 100%)", boxShadow: "1px 0 0 rgba(148,163,184,0.1), 4px 0 24px -4px rgba(15,23,42,0.04)" }}
+        style={{
+          background: "linear-gradient(180deg, #040F22 0%, #061A3A 100%)",
+          borderRight: "1px solid rgba(56,225,255,0.15)",
+          boxShadow: "4px 0 32px -4px rgba(56,225,255,0.08), 1px 0 0 rgba(56,225,255,0.10)"
+        }}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100/80">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm"
-            style={{ background: "linear-gradient(135deg, #6366f1 0%, #7c3aed 100%)", boxShadow: "0 4px 12px -2px rgba(99,102,241,0.4)" }}>
+        <div className="flex items-center gap-3 px-6 py-5" style={{ borderBottom: "1px solid rgba(56,225,255,0.12)" }}>
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg, #0E6FAE 0%, #12B8E8 100%)", boxShadow: "0 4px 16px -2px rgba(56,225,255,0.40), 0 0 0 1px rgba(56,225,255,0.25)" }}>
             <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="w-4 h-4">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
           </div>
           <div>
-            <div className="font-extrabold text-slate-800 text-sm leading-tight tracking-tight">Xgroup</div>
-            <div className="text-[11px] text-slate-400 font-medium">Operations Hub</div>
+            <div className="font-extrabold text-sm leading-tight tracking-tight" style={{ color: "#51F3FF" }}>Xgroup</div>
+            <div className="text-[11px] font-medium" style={{ color: "#6B9AC4" }}>Operations Hub</div>
           </div>
         </div>
 
@@ -126,14 +131,20 @@ export default function Sidebar() {
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   active
                     ? "text-white"
-                    : "text-slate-500 hover:bg-white/70 hover:text-slate-800 hover:shadow-sm"
+                    : "hover:shadow-sm"
                 }`}
                 style={active ? {
-                  background: "linear-gradient(135deg, #6366f1 0%, #7c3aed 100%)",
-                  boxShadow: "0 4px 12px -2px rgba(99,102,241,0.35)"
-                } : {}}
+                  background: "linear-gradient(135deg, #0E6FAE 0%, #12B8E8 100%)",
+                  boxShadow: "0 4px 16px -2px rgba(56,225,255,0.40), 0 0 0 1px rgba(56,225,255,0.25)",
+                  color: "#ffffff",
+                  textShadow: "0 0 12px rgba(56,225,255,0.5)"
+                } : {
+                  color: "#6B9AC4",
+                }}
+                onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLElement).style.background = "rgba(56,225,255,0.07)"; (e.currentTarget as HTMLElement).style.color = "#B8D7F2"; } }}
+                onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLElement).style.background = ""; (e.currentTarget as HTMLElement).style.color = "#6B9AC4"; } }}
               >
-                <span className={active ? "text-white" : "text-slate-400"}>
+                <span style={{ color: active ? "#ffffff" : "#6B9AC4" }}>
                   {item.icon}
                 </span>
                 {item.label}
@@ -143,8 +154,8 @@ export default function Sidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="px-5 py-4 border-t border-slate-100">
-          <p className="text-xs text-slate-400">© 2026 Xgroup</p>
+        <div className="px-5 py-4" style={{ borderTop: "1px solid rgba(56,225,255,0.10)" }}>
+          <p className="text-xs" style={{ color: "#4A7A9B" }}>© 2026 Xgroup</p>
         </div>
       </aside>
     </>
