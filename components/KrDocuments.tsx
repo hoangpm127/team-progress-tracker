@@ -94,8 +94,8 @@ function DocThumb({ doc }: { doc: KrDocument }) {
     );
   }
   return (
-    <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
-      <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-red-500">
+    <div className="w-9 h-9 rounded-lg bg-white/8 flex items-center justify-center shrink-0">
+      <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-white/50">
         <path d="M7 2h7l5 5v13a2 2 0 01-2 2H7a2 2 0 01-2-2V4a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.5" />
         <path d="M14 2v5h5" stroke="currentColor" strokeWidth="1.5" />
         <text x="7" y="17" fontSize="5.5" fontWeight="bold" fill="currentColor">PDF</text>
@@ -190,8 +190,8 @@ export default function KrDocuments({
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 flex flex-col max-h-[80vh] overflow-hidden">
           {/* Header */}
           <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100">
-            <div className="w-9 h-9 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0">
-              <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-indigo-600">
+            <div className="w-9 h-9 rounded-lg bg-white/8 flex items-center justify-center shrink-0">
+              <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-white/60">
                 <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
               </svg>
             </div>
@@ -220,8 +220,8 @@ export default function KrDocuments({
               className={`w-full border-2 border-dashed rounded-xl py-4 flex flex-col items-center gap-1.5 transition
                 disabled:opacity-50 disabled:cursor-not-allowed
                 ${dragOver
-                  ? "border-indigo-500 bg-indigo-50 text-indigo-700"
-                  : "border-indigo-200 hover:border-indigo-400 text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50/50"
+                  ? "border-white/40 bg-white/10 text-white/80"
+                  : "border-white/15 hover:border-white/30 text-white/50 hover:text-white/70 hover:bg-white/5"
                 }`}
             >
               {uploading ? (
@@ -242,7 +242,7 @@ export default function KrDocuments({
               )}
             </button>
             {error && (
-              <p className="mt-2 text-xs text-red-500 flex items-center gap-1">
+              <p className="mt-2 text-xs text-white/50 flex items-center gap-1">
                 <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 shrink-0">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
@@ -281,15 +281,15 @@ export default function KrDocuments({
                       <p className="text-[11px] text-slate-400">
                         {fmtSize(doc.fileSize)} &middot; {fmtDate(doc.uploadedAt)}
                         {isImage(doc.fileName)
-                          ? <span className="ml-1.5 text-emerald-500 font-medium">Ảnh</span>
-                          : <span className="ml-1.5 text-red-400 font-medium">PDF</span>}
+                          ? <span className="ml-1.5 text-white/60 font-medium">Ảnh</span>
+                          : <span className="ml-1.5 text-white/40 font-medium">PDF</span>}
                       </p>
                     </div>
                     {/* Actions */}
                     <div className="flex items-center gap-1 shrink-0">
                       {/* View / enlarge */}
                       <button onClick={() => setViewDoc(doc)}
-                        className="p-1.5 rounded-lg hover:bg-indigo-100 text-slate-400 hover:text-indigo-600 transition"
+                        className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white/70 transition"
                         title={isImage(doc.fileName) ? "Mở to ảnh" : "Xem PDF"}>
                         {isImage(doc.fileName) ? (
                           /* Expand icon for images */
@@ -308,13 +308,13 @@ export default function KrDocuments({
                       {confirmDeleteId === doc.id ? (
                         <>
                           <button onClick={() => handleDelete(doc)}
-                            className="text-[10px] bg-red-500 text-white px-2 py-1 rounded-lg hover:bg-red-600 font-semibold">Xóa</button>
+                            className="text-[10px] bg-white/20 text-white px-2 py-1 rounded-lg hover:bg-white/30 font-semibold">Xóa</button>
                           <button onClick={() => setConfirmDeleteId(null)}
                             className="text-[10px] text-slate-400 hover:text-slate-600 px-1">✕</button>
                         </>
                       ) : (
                         <button onClick={() => setConfirmDeleteId(doc.id)}
-                          className="p-1.5 rounded-lg hover:bg-red-100 text-slate-400 hover:text-red-500 transition opacity-0 group-hover:opacity-100"
+                          className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white/50 transition opacity-0 group-hover:opacity-100"
                           title="Xóa tài liệu">
                           <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                             <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />

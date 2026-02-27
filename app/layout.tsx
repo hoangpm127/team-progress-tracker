@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Barlow } from "next/font/google";
+import { IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import { AppProvider } from "@/lib/AppContext";
 
-const barlow = Barlow({
+const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-barlow",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-ibm-plex",
   display: "swap",
 });
 
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={barlow.variable}>
-      <body className={`${barlow.className} bg-[--color-background] text-[--color-foreground] antialiased`}>
+    <html lang="en" className={ibmPlexSans.variable}>
+      <body className={`${ibmPlexSans.className} bg-[--color-background] text-[--color-foreground] antialiased`}>
         <AppProvider>
           <div className="flex min-h-screen">
             <Sidebar />

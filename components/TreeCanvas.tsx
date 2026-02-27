@@ -7,14 +7,14 @@ import { useApp } from "@/lib/AppContext";
 // ─────────────────────────────────────────────────────────────
 type ZoneId = "tech"|"hr"|"mkt"|"heaven"|"partnerships"|"market"|"assistant"|"piano";
 const ZONE_META: Record<ZoneId,{icon:string;title:string;color:string;border:string;subtitle:string;teamId:string|null}> = {
-  tech:         {icon:"⚙️", title:"Công nghệ",  color:"#6366f1",border:"#818cf8",subtitle:"Thân cây — Technology Core",        teamId:"tech"},
-  hr:           {icon:"👥", title:"Nhân sự",    color:"#f59e0b",border:"#fbbf24",subtitle:"Rễ cây — Human Resources",          teamId:"hr"},
-  mkt:          {icon:"📣", title:"Marketing",  color:"#ec4899",border:"#f472b6",subtitle:"Mây trái — Quảng bá & Thương hiệu", teamId:"mkt"},
-  heaven:       {icon:"🌦", title:"Thiên thời", color:"#0ea5e9",border:"#38bdf8",subtitle:"Mây phải — Cơ hội & Thời điểm",    teamId:null},
-  partnerships: {icon:"🤝", title:"Hợp tác",    color:"#10b981",border:"#34d399",subtitle:"Cỏ xanh — 4 nhóm đối tác",         teamId:"partnerships"},
-  market:       {icon:"🌍", title:"Thị trường", color:"#a16207",border:"#d97706",subtitle:"Đất — Bối cảnh kinh doanh",         teamId:null},
-  assistant:    {icon:"📋", title:"Hành chính", color:"#3b82f6",border:"#60a5fa",subtitle:"Nhánh phải — BOD / Admin",          teamId:"assistant"},
-  piano:        {icon:"🎹", title:"Piano",      color:"#8b5cf6",border:"#a78bfa",subtitle:"Nhánh trái — Piano Division",       teamId:"piano"},
+  tech:         {icon:"⚙️", title:"Công nghệ",  color:"#888888",border:"#aaaaaa",subtitle:"Thân cây — Technology Core",        teamId:"tech"},
+  hr:           {icon:"👥", title:"Nhân sự",    color:"#cccccc",border:"#dddddd",subtitle:"Rễ cây — Human Resources",          teamId:"hr"},
+  mkt:          {icon:"📣", title:"Marketing",  color:"#999999",border:"#aaaaaa",subtitle:"Mây trái — Quảng bá & Thương hiệu", teamId:"mkt"},
+  heaven:       {icon:"🌦", title:"Thiên thời", color:"#888888",border:"#aaaaaa",subtitle:"Mây phải — Cơ hội & Thời điểm",    teamId:null},
+  partnerships: {icon:"🤝", title:"Hợp tác",    color:"#aaaaaa",border:"#bbbbbb",subtitle:"Cỏ xanh — 4 nhóm đối tác",         teamId:"partnerships"},
+  market:       {icon:"🌍", title:"Thị trường", color:"#888888",border:"#aaaaaa",subtitle:"Đất — Bối cảnh kinh doanh",         teamId:null},
+  assistant:    {icon:"📋", title:"Hành chính", color:"#aaaaaa",border:"#bbbbbb",subtitle:"Nhánh phải — BOD / Admin",          teamId:"assistant"},
+  piano:        {icon:"🎹", title:"Piano",      color:"#999999",border:"#aaaaaa",subtitle:"Nhánh trái — Piano Division",       teamId:"piano"},
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -28,9 +28,9 @@ const Q1_START=+new Date("2026-01-01"), Q1_END=+new Date("2026-03-31"), TODAY_TS
 const ELAPSED=Math.round(Math.min(1,(TODAY_TS-Q1_START)/(Q1_END-Q1_START))*100);
 function healthOf(prog:number){
   const r=ELAPSED>0?prog/ELAPSED:1;
-  if(r>=0.80)return{label:"Đúng tiến độ",color:"#10b981",dot:"●"};
-  if(r>=0.50)return{label:"Hơi chậm",color:"#f59e0b",dot:"●"};
-  return{label:"Nguy hiểm",color:"#ef4444",dot:"●"};
+  if(r>=0.80)return{label:"Đúng tiến độ",color:"#cccccc",dot:"●"};
+  if(r>=0.50)return{label:"Hơi chậm",color:"#aaaaaa",dot:"●"};
+  return{label:"Nguy hiểm",color:"#777777",dot:"●"};
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -64,7 +64,7 @@ function MiniPopup({popup,onClose,onDetail,prog,done,total,overdue,extra}:
           </div>
           <div className="flex gap-3 text-xs text-slate-400 mb-1">
             <span>✅ {done}/{total} tasks</span>
-            {overdue>0&&<span className="text-red-400">⚠ {overdue} quá hạn</span>}
+            {overdue>0&&<span className="text-white/40">⚠ {overdue} quá hạn</span>}
           </div>
           <div className="text-xs font-medium" style={{color:h.color}}>{h.dot} {h.label}</div>
         </div>
@@ -84,10 +84,10 @@ function MiniPopup({popup,onClose,onDetail,prog,done,total,overdue,extra}:
 //  FULL SIDE PANEL
 // ─────────────────────────────────────────────────────────────
 const PARTNER_CATS=[
-  {id:1,label:"Nhà cung cấp",icon:"📦",color:"#f59e0b"},
-  {id:2,label:"HR Partners", icon:"👥",color:"#a78bfa"},
-  {id:3,label:"Kiến thức",   icon:"🎓",color:"#34d399"},
-  {id:4,label:"Tài chính",   icon:"💰",color:"#60a5fa"},
+  {id:1,label:"Nhà cung cấp",icon:"📦",color:"#cccccc"},
+  {id:2,label:"HR Partners", icon:"👥",color:"#aaaaaa"},
+  {id:3,label:"Kiến thức",   icon:"🎓",color:"#bbbbbb"},
+  {id:4,label:"Tài chính",   icon:"💰",color:"#aaaaaa"},
 ];
 function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
   const app=useApp();const meta=ZONE_META[zone];const teamId=meta.teamId;
@@ -97,7 +97,7 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
   const acts=teamId?app.getTeamActivity(teamId).slice(0,6):[];
   const today=new Date().toISOString().split("T")[0];
   const h=healthOf(prog);
-  const SC:{[k:string]:string}={Todo:"#64748b",Doing:"#3b82f6",Done:"#10b981"};
+  const SC:{[k:string]:string}={Todo:"#555555",Doing:"#888888",Done:"#cccccc"};
   const SL:{[k:string]:string}={Todo:"Chờ làm",Doing:"Đang làm",Done:"Hoàn thành"};
   return(
     <div className="fixed inset-0 z-[60] flex justify-end">
@@ -124,7 +124,7 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
                 </div>
                 <div className="flex gap-4 mt-2 text-xs text-slate-500">
                   <span>✅ {stats.done}/{stats.total} tasks</span>
-                  {stats.overdue>0&&<span className="text-red-500">⚠ {stats.overdue} quá hạn</span>}
+                  {stats.overdue>0&&<span className="text-white/40">⚠ {stats.overdue} quá hạn</span>}
                 </div>
               </div>
             )}
@@ -137,8 +137,8 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide">30 Dự Án Công Nghệ</h3>
                 <div className="flex gap-2 text-xs">
-                  <span className="text-emerald-600">● {app.projects.filter(p=>p.status==="live").length}</span>
-                  <span className="text-amber-600">🔨 {app.projects.filter(p=>p.status==="building").length}</span>
+                  <span className="text-white/70">● {app.projects.filter(p=>p.status==="live").length}</span>
+                  <span className="text-white/50">🔨 {app.projects.filter(p=>p.status==="building").length}</span>
                   <span className="text-slate-400">💡 {app.projects.filter(p=>p.status==="idea").length}</span>
                 </div>
               </div>
@@ -160,7 +160,7 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
                   <div key={cat.id} className="mb-5">
                     <div className="flex items-center gap-2 mb-2"><span>{cat.icon}</span><span className="text-sm font-semibold" style={{color:cat.color}}>{cat.label}</span><span className="ml-auto text-xs text-slate-400">{list.filter(p=>p.status==="active").length}/{list.length} active</span></div>
                     {list.length===0?<p className="text-xs text-slate-400 italic pl-5">Chưa có dữ liệu</p>
-                    :<div className="space-y-1 pl-5">{list.map(p=>(<div key={p.id} className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:p.status==="active"?"#10b981":"#94a3b8"}}/><span className="text-xs text-slate-600 flex-1">{p.name}</span><span className="text-xs text-slate-400">{p.status==="active"?"Active":"Pipeline"}</span></div>))}</div>}
+                    :<div className="space-y-1 pl-5">{list.map(p=>(<div key={p.id} className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:p.status==="active"?"#cccccc":"#555555"}}/><span className="text-xs text-slate-600 flex-1">{p.name}</span><span className="text-xs text-slate-400">{p.status==="active"?"Active":"Pipeline"}</span></div>))}</div>}
                   </div>
                 );
               })}
@@ -170,10 +170,10 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
             <div>
               <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Chỉ Số Thị Trường</h3>
               <div className="rounded-xl p-4 mb-3" style={{background:"#fef3c7",border:"1px solid #fde68a"}}>
-                <div className="flex items-center justify-between mb-2"><span className="text-sm text-amber-800">Market Index</span><span className="text-3xl font-bold text-amber-900">{app.market.marketIndex}</span></div>
-                <div className="h-3 bg-amber-100 rounded-full overflow-hidden"><div className="h-3 rounded-full" style={{width:`${app.market.marketIndex}%`,background:"linear-gradient(90deg,#f59e0b,#d97706)"}}/></div>
+                <div className="flex items-center justify-between mb-2"><span className="text-sm text-white/60">Market Index</span><span className="text-3xl font-bold text-white/80">{app.market.marketIndex}</span></div>
+          <div className="h-3 bg-white/10 rounded-full overflow-hidden"><div className="h-3 rounded-full" style={{width:`${app.market.marketIndex}%`,background:"linear-gradient(90deg,#555555,#aaaaaa)"}}/></div>
               </div>
-              {app.market.notes&&<p className="text-xs text-slate-600 bg-amber-50 rounded-lg p-3 border border-amber-100 leading-relaxed">{app.market.notes}</p>}
+              {app.market.notes&&<p className="text-xs text-white/50 bg-white/5 rounded-lg p-3 border border-white/10 leading-relaxed">{app.market.notes}</p>}
             </div>
           )}
           {zone==="heaven"&&(
@@ -198,7 +198,7 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
                 {tasks.map(t=>{
                   const over=!t.done&&t.deadline<today;
                   return(
-                    <div key={t.id} className={`flex gap-2.5 p-2.5 rounded-lg border ${t.done?"bg-green-50 border-green-100":over?"bg-red-50 border-red-100":"bg-slate-50 border-slate-100"}`}>
+                    <div key={t.id} className={`flex gap-2.5 p-2.5 rounded-lg border ${t.done?"bg-white/8 border-white/10":over?"bg-white/5 border-white/8":"bg-slate-50 border-slate-100"}`}>
                       <button onClick={()=>{if(app.canEdit(teamId??"")){app.toggleTask(t.id,"Tree");}}} title={app.canEdit(teamId??"") ? undefined : "Cần đăng nhập để thay đổi"} className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 ${t.done?"bg-green-500 border-green-500 text-white":"border-slate-300"} ${!app.canEdit(teamId??"") ? "opacity-50 cursor-not-allowed" : ""}`}>
                         {t.done&&<svg className="w-2.5 h-2.5" viewBox="0 0 10 10" fill="none" strokeWidth="1.8" stroke="currentColor"><path d="M1.5 5.5L4 8 8.5 2"/></svg>}
                       </button>
@@ -207,7 +207,7 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
                         <div className="flex flex-wrap gap-x-2 mt-0.5">
                           <span className="text-xs" style={{color:SC[t.status]}}>{SL[t.status]}</span>
                           <span className="text-xs text-slate-400">· Hạn {t.deadline}</span>
-                          {over&&<span className="text-xs text-red-500 font-medium">⚠ Quá hạn</span>}
+                          {over&&<span className="text-xs text-white/40 font-medium">⚠ Quá hạn</span>}
                         </div>
                       </div>
                     </div>
@@ -425,10 +425,10 @@ function FlowerTip({cx,cy,prog}:{cx:number;cy:number;prog:number}){
         const px=cx+Math.cos(a)*PR*2;
         const py=cy+Math.sin(a)*PR*2;
         return(<ellipse key={i} cx={px} cy={py} rx={PR} ry={PR*.48}
-          fill="#fef9c3" stroke="#fbbf24" strokeWidth="1.2" opacity=".96"
+          fill="#f5f5f5" stroke="#cccccc" strokeWidth="1.2" opacity=".96"
           transform={`rotate(${i*60-90} ${px} ${py})`}/>);
       })}
-      <circle cx={cx} cy={cy} r={PR*.72} fill="#fbbf24" stroke="#f59e0b" strokeWidth="1"/>
+      <circle cx={cx} cy={cy} r={PR*.72} fill="#cccccc" stroke="#aaaaaa" strokeWidth="1"/>
       <circle cx={cx-1.5} cy={cy-1.5} r={PR*.28} fill="rgba(255,255,255,.5)"/>
     </g>
   );
@@ -476,9 +476,9 @@ export default function TreeCanvas(){
     <div className="relative w-full h-full" style={{background:"linear-gradient(180deg,#92c8e4 0%,#b8dff2 32%,#c2e4b8 68%,#b8dca8 100%)"}}>
       {/* controls */}
       <div className="absolute top-2 right-3 z-10 flex gap-2">
-        <button onClick={()=>app.setHeavenTiming({rainEnabled:!rainOn})} className="px-3 py-1.5 rounded-xl text-xs font-semibold border shadow transition-all active:scale-95" style={{background:rainOn?"#0ea5e9":"white",color:rainOn?"white":"#475569",borderColor:rainOn?"#38bdf8":"#e2e8f0"}}>{rainOn?"🌧 Tắt mưa":"☀️ Bật mưa"}</button>
-        <button onClick={()=>openFull("market")} className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-amber-200 text-amber-700 shadow hover:bg-amber-50 active:scale-95">🌍 Market {mkIdx}</button>
-        <button onClick={()=>openFull("heaven")} className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-sky-200 text-sky-700 shadow hover:bg-sky-50 active:scale-95">🌦 Heaven {hvIdx}</button>
+        <button onClick={()=>app.setHeavenTiming({rainEnabled:!rainOn})} className="px-3 py-1.5 rounded-xl text-xs font-semibold border shadow transition-all active:scale-95" style={{background:rainOn?"#555555":"white",color:rainOn?"white":"#475569",borderColor:rainOn?"#888888":"#e2e8f0"}}>{rainOn?"🌧 Tắt mưa":"☀️ Bật mưa"}</button>
+        <button onClick={()=>openFull("market")} className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-white/20 text-slate-600 shadow hover:bg-white/80 active:scale-95">🌍 Market {mkIdx}</button>
+        <button onClick={()=>openFull("heaven")} className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-white/20 text-slate-600 shadow hover:bg-white/80 active:scale-95">🌦 Heaven {hvIdx}</button>
       </div>
 
       <svg viewBox={`0 0 ${VW} ${VH}`} preserveAspectRatio="xMidYMid meet" className="w-full h-full" style={{display:"block"}}>
@@ -572,16 +572,16 @@ export default function TreeCanvas(){
           <circle cx="124" cy="80"  r="16" fill="rgba(255,255,255,.86)"/>
           <circle cx="192" cy="118" r="18" fill="rgba(255,255,255,.87)"/>
           <circle cx="178" cy="78"  r="12" fill="rgba(255,255,255,.82)"/>
-          {mktP>20&&<ellipse cx="146" cy="102" rx="64" ry="34" fill={`rgba(236,72,153,${(mktP-20)/330})`}/>}
+          {mktP>20&&<ellipse cx="146" cy="102" rx="64" ry="34" fill={`rgba(160,160,160,${(mktP-20)/330})`}/>}
           <rect x="64" y="148" width="164" height={hovered==="mkt"?56:38} rx="14"
-            fill={hovered==="mkt"?"#ec4899":"rgba(8,12,26,0.92)"} stroke="#f472b6" strokeWidth={hovered==="mkt"?1.5:2}
-            style={{filter:hovered==="mkt"?"drop-shadow(0 0 18px #ec489966)":"drop-shadow(0 4px 8px rgba(0,0,0,.4))"}}/>
+            fill={hovered==="mkt"?"#777777":"rgba(8,12,26,0.92)"} stroke="#aaaaaa" strokeWidth={hovered==="mkt"?1.5:2}
+            style={{filter:hovered==="mkt"?"drop-shadow(0 0 18px rgba(150,150,150,0.4))":"drop-shadow(0 4px 8px rgba(0,0,0,.4))"}}/>
           <circle cx="88" cy={hovered==="mkt"?176:167} r="14"
-            fill={hovered==="mkt"?"rgba(255,255,255,0.22)":"#ec489922"}
-            stroke={hovered==="mkt"?"rgba(255,255,255,0.45)":"#f472b6"} strokeWidth="1.5" style={{pointerEvents:"none"}}/>
-          <text x="88" y={hovered==="mkt"?181:172} textAnchor="middle" fontSize="14" style={{pointerEvents:"none"}}>📣</text>
+            fill={hovered==="mkt"?"rgba(255,255,255,0.22)":"rgba(160,160,160,0.13)"}
+            stroke={hovered==="mkt"?"rgba(255,255,255,0.45)":"#aaaaaa"} strokeWidth="1.5" style={{pointerEvents:"none"}}/>
+          <text x={88} y={hovered==="mkt"?181:172} textAnchor="middle" fontSize="14" style={{pointerEvents:"none"}}>📣</text>
           <text x="109" y="163" textAnchor="start" fill="white" fontSize="11" fontWeight="800" style={{pointerEvents:"none"}}>Marketing</text>
-          <text x="109" y="177" textAnchor="start" fill={hovered==="mkt"?"white":"#f472b6"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>{mktP}% · {healthOf(mktP).dot} {healthOf(mktP).label}</text>
+          <text x="109" y="177" textAnchor="start" fill={hovered==="mkt"?"white":"#aaaaaa"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>{mktP}% · {healthOf(mktP).dot} {healthOf(mktP).label}</text>
           {hovered==="mkt"&&<text x="109" y="192" textAnchor="start" fill="rgba(255,255,255,.85)" fontSize="9" style={{pointerEvents:"none"}}>✅ {mktS.done}/{mktS.total} việc</text>}
           <rect x="22" y="42" width="248" height="158" rx="12" fill="transparent"
             onMouseEnter={()=>setHovered("mkt")} onMouseLeave={()=>setHovered(null)}/>
@@ -597,17 +597,17 @@ export default function TreeCanvas(){
           <circle cx="872" cy="78"  r="16" fill="rgba(255,255,255,.86)"/>
           <circle cx="812" cy="124" r="14" fill="rgba(255,255,255,.84)"/>
           <circle cx="900" cy="122" r="12" fill="rgba(255,255,255,.82)"/>
-          {hvIdx>28&&<ellipse cx="852" cy="102" rx="68" ry="36" fill={`rgba(14,165,233,${(hvIdx-28)/350})`}/>}
-          {rainOn&&<g opacity=".68">{Array.from({length:6},(_,i)=>(<line key={i} x1={826+i*11} y1={143} x2={823+i*11} y2={157} stroke="#93c5fd" strokeWidth="1.3" strokeLinecap="round"/>))}</g>}
+          {hvIdx>28&&<ellipse cx="852" cy="102" rx="68" ry="36" fill={`rgba(150,150,150,${(hvIdx-28)/350})`}/>}
+          {rainOn&&<g opacity=".68">{Array.from({length:6},(_,i)=>(<line key={i} x1={826+i*11} y1={143} x2={823+i*11} y2={157} stroke="#cccccc" strokeWidth="1.3" strokeLinecap="round"/>))}</g>}
           <rect x="746" y="148" width="212" height={hovered==="heaven"?56:38} rx="14"
-            fill={hovered==="heaven"?"#0ea5e9":"rgba(8,12,26,0.92)"} stroke="#38bdf8" strokeWidth={hovered==="heaven"?1.5:2}
-            style={{filter:hovered==="heaven"?"drop-shadow(0 0 18px #0ea5e966)":"drop-shadow(0 4px 8px rgba(0,0,0,.4))"}}/>
+            fill={hovered==="heaven"?"#666666":"rgba(8,12,26,0.92)"} stroke="#aaaaaa" strokeWidth={hovered==="heaven"?1.5:2}
+            style={{filter:hovered==="heaven"?"drop-shadow(0 0 18px rgba(150,150,150,0.4))":"drop-shadow(0 4px 8px rgba(0,0,0,.4))"}}/>
           <circle cx="770" cy={hovered==="heaven"?176:167} r="14"
-            fill={hovered==="heaven"?"rgba(255,255,255,0.22)":"#0ea5e922"}
-            stroke={hovered==="heaven"?"rgba(255,255,255,0.45)":"#38bdf8"} strokeWidth="1.5" style={{pointerEvents:"none"}}/>
+            fill={hovered==="heaven"?"rgba(255,255,255,0.22)":"rgba(150,150,150,0.13)"}
+            stroke={hovered==="heaven"?"rgba(255,255,255,0.45)":"#aaaaaa"} strokeWidth="1.5" style={{pointerEvents:"none"}}/>
           <text x="770" y={hovered==="heaven"?181:172} textAnchor="middle" fontSize="14" style={{pointerEvents:"none"}}>🌦</text>
           <text x="791" y="163" textAnchor="start" fill="white" fontSize="11" fontWeight="800" style={{pointerEvents:"none"}}>Thiên Thời</text>
-          <text x="791" y="177" textAnchor="start" fill={hovered==="heaven"?"white":"#38bdf8"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>Index: {hvIdx} · {rainOn?"🌧 Mưa":"☀️ Nắng"}</text>
+          <text x="791" y="177" textAnchor="start" fill={hovered==="heaven"?"white":"#aaaaaa"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>Index: {hvIdx} · {rainOn?"🌧 Mưa":"☀️ Nắng"}</text>
           {hovered==="heaven"&&<text x="791" y="192" textAnchor="start" fill="rgba(255,255,255,.85)" fontSize="9" style={{pointerEvents:"none"}}>Bấm để xem chi tiết thiên thời</text>}
           <rect x="734" y="38" width="236" height="158" rx="12" fill="transparent"
             onMouseEnter={()=>setHovered("heaven")} onMouseLeave={()=>setHovered(null)}/>
@@ -651,17 +651,17 @@ export default function TreeCanvas(){
 
           {/* ── ORGANIC CANOPIES — branches + leaves, no circles ──── */}
           {/* Piano left */}
-          <OrganicCanopy cx={PIANO_CX} cy={PIANO_CY} prog={pianoP} color="#8b5cf6" done={pianoS.done} overdue={pianoS.overdue} seed={101}/>
+          <OrganicCanopy cx={PIANO_CX} cy={PIANO_CY} prog={pianoP} color="#999999" done={pianoS.done} overdue={pianoS.overdue} seed={101}/>
           <FlowerTip cx={PIANO_CX} cy={PIANO_CY-cR(pianoP)-8} prog={pianoP}/>
           {/* Assistant right */}
-          <OrganicCanopy cx={ASST_CX} cy={ASST_CY} prog={asstP} color="#3b82f6" done={asstS.done} overdue={asstS.overdue} seed={202}/>
+          <OrganicCanopy cx={ASST_CX} cy={ASST_CY} prog={asstP} color="#aaaaaa" done={asstS.done} overdue={asstS.overdue} seed={202}/>
           <FlowerTip cx={ASST_CX} cy={ASST_CY-cR(asstP)-8} prog={asstP}/>
           {/* Mid-left (tech sub) */}
-          <OrganicCanopy cx={ML_CX} cy={ML_CY} prog={Math.round(techP*0.65)} color="#22c55e" done={Math.round(techS.done*0.3)} overdue={0} seed={404}/>
+          <OrganicCanopy cx={ML_CX} cy={ML_CY} prog={Math.round(techP*0.65)} color="#888888" done={Math.round(techS.done*0.3)} overdue={0} seed={404}/>
           {/* Mid-right (tech sub) */}
-          <OrganicCanopy cx={MR_CX} cy={MR_CY} prog={Math.round(techP*0.65)} color="#22c55e" done={Math.round(techS.done*0.3)} overdue={0} seed={505}/>
+          <OrganicCanopy cx={MR_CX} cy={MR_CY} prog={Math.round(techP*0.65)} color="#888888" done={Math.round(techS.done*0.3)} overdue={0} seed={505}/>
           {/* Tech center crown — on top */}
-          <OrganicCanopy cx={TECH_CX} cy={TECH_CY} prog={techP} color="#6366f1" done={techS.done} overdue={techS.overdue} seed={303}/>
+          <OrganicCanopy cx={TECH_CX} cy={TECH_CY} prog={techP} color="#888888" done={techS.done} overdue={techS.overdue} seed={303}/>
           <FlowerTip cx={TECH_CX} cy={TECH_CY-cR(techP)-8} prog={techP}/>
 
         </g>{/* end .tree-grp */}
@@ -696,14 +696,14 @@ export default function TreeCanvas(){
             fill="url(#hrRootG)" opacity=".68"/>
           {/* HR label  */}
           <rect x={TX-94} y={GY+50} width={188} height={hovered==="hr"?56:38} rx="14"
-            fill={hovered==="hr"?"#f59e0b":"rgba(8,12,26,0.92)"} stroke="#fbbf24" strokeWidth={hovered==="hr"?1.5:2}
-            style={{filter:hovered==="hr"?"drop-shadow(0 0 18px #f59e0b66)":"drop-shadow(0 4px 8px rgba(0,0,0,.4))"}}/>
+            fill={hovered==="hr"?"#888888":"rgba(8,12,26,0.92)"} stroke="#aaaaaa" strokeWidth={hovered==="hr"?1.5:2}
+            style={{filter:hovered==="hr"?"drop-shadow(0 0 18px rgba(150,150,150,0.35))":"drop-shadow(0 4px 8px rgba(0,0,0,.4))"}}/>
           <circle cx={TX-70} cy={GY+50+(hovered==="hr"?28:19)} r="14"
-            fill={hovered==="hr"?"rgba(255,255,255,0.22)":"#f59e0b22"}
-            stroke={hovered==="hr"?"rgba(255,255,255,0.45)":"#fbbf24"} strokeWidth="1.5"/>
+            fill={hovered==="hr"?"rgba(255,255,255,0.22)":"rgba(150,150,150,0.13)"}
+            stroke={hovered==="hr"?"rgba(255,255,255,0.45)":"#aaaaaa"} strokeWidth="1.5"/>
           <text x={TX-70} y={GY+50+(hovered==="hr"?33:24)} textAnchor="middle" fontSize="14">👥</text>
           <text x={TX-49} y={GY+65} textAnchor="start" fill="white" fontSize="11" fontWeight="800">Nhân Sự (Rễ)</text>
-          <text x={TX-49} y={GY+79} textAnchor="start" fill={hovered==="hr"?"white":"#fbbf24"} fontSize="10" fontWeight="700">{hrP}% · {healthOf(hrP).dot} {healthOf(hrP).label}</text>
+          <text x={TX-49} y={GY+79} textAnchor="start" fill={hovered==="hr"?"white":"#aaaaaa"} fontSize="10" fontWeight="700">{hrP}% · {healthOf(hrP).dot} {healthOf(hrP).label}</text>
           {hovered==="hr"&&<text x={TX-49} y={GY+96} textAnchor="start" fill="rgba(255,255,255,.85)" fontSize="9">✅ {hrS.done}/{hrS.total} hoàn thành</text>}
           {/* transparent hit band */}
           <rect x="0" y={GY} width={VW} height="94" fill="transparent"/>
@@ -719,7 +719,7 @@ export default function TreeCanvas(){
           ))}
           <text x={VW/2} y={GY+128} textAnchor="middle" fill={hovered==="market"?"rgba(255,200,50,.55)":"rgba(255,255,255,.20)"} fontSize="10" letterSpacing="2.5">🌍 THỊ TRƯỜNG (ĐẤT) — Market Index: {mkIdx}</text>
           {/* partner category labels */}
-          {[{x:108,icon:"📦",label:"Nhà cung cấp",c:"#f59e0b"},{x:316,icon:"👥",label:"HR Partners",c:"#a78bfa"},{x:660,icon:"🎓",label:"Kiến thức",c:"#34d399"},{x:892,icon:"💰",label:"Tài chính",c:"#60a5fa"}].map((lb,i)=>(
+          {[{x:108,icon:"📦",label:"Nhà cung cấp",c:"#cccccc"},{x:316,icon:"👥",label:"HR Partners",c:"#aaaaaa"},{x:660,icon:"🎓",label:"Kiến thức",c:"#bbbbbb"},{x:892,icon:"💰",label:"Tài chính",c:"#aaaaaa"}].map((lb,i)=>(
             <text key={i} x={lb.x} y={GY+150} textAnchor="middle" fill={lb.c} fontSize="10" fontWeight="700">{lb.icon} {lb.label}</text>
           ))}
         </g>
@@ -737,17 +737,17 @@ export default function TreeCanvas(){
 
         {/* ── CANOPY LABELS (on top of everything) ────────────── */}
         <CanopyLabel cx={PIANO_CX} cy={PIANO_CY} r={pianoR} icon="🎹" title="Piano"
-          prog={pianoP} color="#8b5cf6" teamId="piano"
+          prog={pianoP} color="#999999" teamId="piano"
           hovered={hovered==="piano"} done={pianoS.done} total={pianoS.total}
           onClick={e=>openZone("piano",e)} onEnter={()=>setHovered("piano")} onLeave={()=>setHovered(null)}/>
 
         <CanopyLabel cx={ASST_CX} cy={ASST_CY} r={asstR} icon="📋" title="Hành Chính"
-          prog={asstP} color="#3b82f6" teamId="assistant"
+          prog={asstP} color="#aaaaaa" teamId="assistant"
           hovered={hovered==="assistant"} done={asstS.done} total={asstS.total}
           onClick={e=>openZone("assistant",e)} onEnter={()=>setHovered("assistant")} onLeave={()=>setHovered(null)}/>
 
         <CanopyLabel cx={TECH_CX} cy={TECH_CY} r={techR} icon="⚙️" title="Công Nghệ"
-          prog={techP} color="#6366f1" teamId="tech"
+          prog={techP} color="#888888" teamId="tech"
           hovered={hovered==="tech"} done={techS.done} total={techS.total}
           onClick={e=>openZone("tech",e)} onEnter={()=>setHovered("tech")} onLeave={()=>setHovered(null)}/>
 

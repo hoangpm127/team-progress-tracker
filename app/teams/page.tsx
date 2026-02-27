@@ -10,8 +10,8 @@ export default function TeamsPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="flex flex-col items-center gap-3 text-slate-400">
-        <div className="w-8 h-8 border-2 border-slate-200 border-t-indigo-500 rounded-full animate-spin"/>
+      <div className="flex flex-col items-center gap-3 text-white/40">
+        <div className="w-8 h-8 border-2 border-white/10 border-t-white/50 rounded-full animate-spin"/>
         <span className="text-sm">Đang tải dữ liệu...</span>
       </div>
     </div>
@@ -22,14 +22,14 @@ export default function TeamsPage() {
       <div className="flex flex-col" style={{ height: "calc(100vh - 56px)" }}>
         {/* slim header bar */}
         <div className="flex items-center justify-between px-5 py-2 shrink-0 backdrop-blur"
-          style={{ borderBottom: "1px solid rgba(56,225,255,0.12)", background: "rgba(4,15,34,0.90)" }}>
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", background: "rgba(17,17,17,0.90)" }}>
           <div className="flex items-center gap-2">
             <span className="text-base">🌳</span>
-            <span className="font-semibold text-sm" style={{ color: "#B8D7F2" }}>Thiên–Địa–Nhân Ecosystem Tree</span>
+            <span className="font-semibold text-sm" style={{ color: "#cccccc" }}>Thiên–Địa–Nhân Ecosystem Tree</span>
           </div>
-          <div className="flex items-center gap-1 rounded-xl p-1" style={{ background: "rgba(10,29,60,0.8)" }}>
-            <button className="px-3 py-1 rounded-lg text-xs font-medium shadow-sm" style={{ background: "linear-gradient(135deg, #0E6FAE, #12B8E8)", color: "#fff" }}>🌳 Tree</button>
-            <button onClick={() => setView("cards")} className="px-3 py-1 rounded-lg text-xs font-medium transition" style={{ color: "#6B9AC4" }}>☰ Cards</button>
+          <div className="flex items-center gap-1 rounded-xl p-1" style={{ background: "rgba(42,42,42,0.8)" }}>
+            <button className="px-3 py-1 rounded-lg text-xs font-medium shadow-sm" style={{ background: "#3a3a3a", color: "#fff" }}>🌳 Tree</button>
+            <button onClick={() => setView("cards")} className="px-3 py-1 rounded-lg text-xs font-medium transition" style={{ color: "#aaaaaa" }}>☰ Cards</button>
           </div>
         </div>
         <div className="flex-1 overflow-hidden">
@@ -44,14 +44,14 @@ export default function TeamsPage() {
       <div className="mb-6 flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight"
-            style={{ background: "linear-gradient(135deg, #38E1FF 0%, #51F3FF 50%, #20CFED 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", filter: "drop-shadow(0 0 10px rgba(56,225,255,0.35))" }}>Phòng ban</h1>
-          <p className="text-sm" style={{ color: "#6B9AC4" }}>Danh sách tất cả các phòng ban.</p>
+            style={{ color: "#ffffff" }}>Phòng ban</h1>
+          <p className="text-sm" style={{ color: "#aaaaaa" }}>Danh sách tất cả các phòng ban.</p>
         </div>
-        <div className="flex items-center gap-1 rounded-xl p-1" style={{ background: "rgba(10,29,60,0.8)" }}>
-          <button onClick={() => setView("tree")} className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition" style={{ color: "#6B9AC4" }}>
+        <div className="flex items-center gap-1 rounded-xl p-1" style={{ background: "rgba(42,42,42,0.8)" }}>
+          <button onClick={() => setView("tree")} className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium transition" style={{ color: "#aaaaaa" }}>
             🌳 Growth Tree
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium shadow-sm" style={{ background: "linear-gradient(135deg, #0E6FAE, #12B8E8)", color: "#fff" }}>
+          <button className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium shadow-sm" style={{ background: "#3a3a3a", color: "#fff" }}>
             ☰ Cards
           </button>
         </div>

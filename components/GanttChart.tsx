@@ -4,9 +4,9 @@ import { Task } from "@/lib/types";
 import { useMemo } from "react";
 
 const STATUS_COLORS: Record<string, string> = {
-  Done:  "#10b981",
-  Doing: "#f59e0b",
-  Todo:  "#94a3b8",
+  Done:  "#cccccc",
+  Doing: "#aaaaaa",
+  Todo:  "#666666",
 };
 
 interface GanttChartProps {
@@ -78,14 +78,14 @@ export default function GanttChart({ tasks, teamColor }: GanttChartProps) {
     const width = Math.max(1, right - left);
 
     const isOverdue = task.status !== "Done" && end < today;
-    const color = isOverdue ? "#ef4444" : STATUS_COLORS[task.status] ?? teamColor;
+    const color = isOverdue ? "#777777" : STATUS_COLORS[task.status] ?? teamColor;
 
     return { left, width, color, isOverdue };
   }
 
   if (tasks.length === 0) {
     return (
-      <div className="flex items-center justify-center h-32 text-slate-400 text-sm">
+      <div className="flex items-center justify-center h-32 text-white/40 text-sm">
         Không có công việc nào để hiển thị.
       </div>
     );
@@ -95,11 +95,11 @@ export default function GanttChart({ tasks, teamColor }: GanttChartProps) {
     <div className="overflow-x-auto">
       <div style={{ minWidth: Math.max(600, days * 16) + "px" }}>
         {/* Week header */}
-        <div className="relative h-8 mb-1 border-b border-slate-200">
+        <div className="relative h-8 mb-1 border-b border-white/10">
           {weekMarkers.map((m) => (
             <span
               key={m.pct}
-              className="absolute top-1 text-[10px] text-slate-400 font-medium transform -translate-x-1/2 select-none"
+              className="absolute top-1 text-[10px] text-white/40 font-medium transform -translate-x-1/2 select-none"
               style={{ left: m.pct + "%" }}
             >
               {m.label}
@@ -109,14 +109,14 @@ export default function GanttChart({ tasks, teamColor }: GanttChartProps) {
           {weekMarkers.map((m) => (
             <div
               key={"line-" + m.pct}
-              className="absolute top-0 bottom-0 border-l border-slate-200"
+              className="absolute top-0 bottom-0 border-l border-white/8"
               style={{ left: m.pct + "%" }}
             />
           ))}
           {/* Today line */}
           {showToday && (
             <div
-              className="absolute top-0 bottom-0 border-l-2 border-red-400 z-10"
+              className="absolute top-0 bottom-0 border-l-2 border-white/30 z-10"
               style={{ left: todayPct + "%" }}
             />
           )}
@@ -129,26 +129,26 @@ export default function GanttChart({ tasks, teamColor }: GanttChartProps) {
             <div key={task.id} className="flex items-center mb-1 group">
               {/* Label */}
               <div className="w-40 shrink-0 pr-2">
-                <p className="text-xs font-medium text-slate-700 truncate leading-tight">
+                <p className="text-xs font-medium text-white/70 truncate leading-tight">
                   {task.title}
                 </p>
-                <p className="text-[10px] text-slate-400 truncate">{task.owner}</p>
+                <p className="text-[10px] text-white/40 truncate">{task.owner}</p>
               </div>
 
               {/* Bar track */}
-              <div className="relative flex-1 h-7 bg-slate-100 rounded overflow-hidden">
+              <div className="relative flex-1 h-7 bg-white/5 rounded overflow-hidden">
                 {/* Week grid lines */}
                 {weekMarkers.map((m) => (
                   <div
                     key={"row-" + m.pct}
-                    className="absolute top-0 bottom-0 border-l border-slate-200"
+                    className="absolute top-0 bottom-0 border-l border-white/8"
                     style={{ left: m.pct + "%" }}
                   />
                 ))}
                 {/* Today line */}
                 {showToday && (
                   <div
-                    className="absolute top-0 bottom-0 border-l-2 border-red-400 z-10"
+                    className="absolute top-0 bottom-0 border-l-2 border-white/30 z-10"
                     style={{ left: todayPct + "%" }}
                   />
                 )}
@@ -169,7 +169,7 @@ export default function GanttChart({ tasks, teamColor }: GanttChartProps) {
 
               {/* Deadline label */}
               <div className="w-14 shrink-0 pl-2">
-                <span className={`text-[10px] ${bar.isOverdue ? "text-red-500 font-semibold" : "text-slate-400"}`}>
+                <span className={`text-[10px] ${bar.isOverdue ? "text-white/50 font-semibold" : "text-white/40"}`}>
                   {new Date(task.deadline).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" })}
                 </span>
               </div>
@@ -178,22 +178,22 @@ export default function GanttChart({ tasks, teamColor }: GanttChartProps) {
         })}
 
         {/* Legend */}
-        <div className="flex items-center gap-4 mt-4 pt-3 border-t border-slate-100">
+        <div className="flex items-center gap-4 mt-4 pt-3 border-t border-white/8">
           {[
             { color: STATUS_COLORS.Done,  label: "Hoàn thành" },
             { color: STATUS_COLORS.Doing, label: "Đang làm" },
             { color: STATUS_COLORS.Todo,  label: "Chờ làm" },
-            { color: "#ef4444",           label: "Quá hạn" },
+            { color: "#777777",           label: "Quá hạn" },
           ].map((l) => (
             <div key={l.label} className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-sm" style={{ background: l.color }} />
-              <span className="text-xs text-slate-500">{l.label}</span>
+              <span className="text-xs text-white/40">{l.label}</span>
             </div>
           ))}
           {showToday && (
             <div className="flex items-center gap-1.5 ml-auto">
-              <div className="w-0.5 h-3 bg-red-400" />
-              <span className="text-xs text-slate-500">Hôm nay</span>
+              <div className="w-0.5 h-3 bg-white/30" />
+              <span className="text-xs text-white/40">Hôm nay</span>
             </div>
           )}
         </div>

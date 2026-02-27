@@ -162,14 +162,14 @@ const MEMBER_PLATFORMS = [
 ];
 
 // ─── Stage hues (ý tưởng=red, demo=yellow, ra thị trường=green) ──────────────
-const STAGE_HUES = ["#ef4444", "#eab308", "#22c55e"];
+const STAGE_HUES = ["#ea0f00", "#faba01", "#72f104"];
 
 function getHealth(pct: number) {
   const expected = (Q1_ELAPSED / Q1_TOTAL) * 100;
   const ratio    = expected > 0 ? pct / expected : 1;
-  if (ratio >= 0.8) return { label: "Đúng tiến độ", cls: "bg-emerald-50 text-emerald-700 border-emerald-200" };
-  if (ratio >= 0.5) return { label: "Hơi chậm",      cls: "bg-amber-50   text-amber-700   border-amber-200"   };
-  return             { label: "Nguy hiểm",      cls: "bg-red-50     text-red-600     border-red-200"     };
+  if (ratio >= 0.8) return { label: "Đúng tiến độ", cls: "bg-white/5 text-emerald-400 border-emerald-600/40" };
+  if (ratio >= 0.5) return { label: "Hơi chậm",      cls: "bg-white/5 text-amber-400   border-amber-600/40"   };
+  return             { label: "Nguy hiểm",      cls: "bg-white/5 text-red-400     border-red-600/40"     };
 }
 
 function fmtNum(n: number, unit: string) {
@@ -328,13 +328,17 @@ export default function DashboardPage() {
   const timeElapsedPct = Math.round((Q1_ELAPSED / Q1_TOTAL) * 100);
 
   return (
-    <div className="p-6 md:p-8 max-w-6xl mx-auto">
+    <div className="relative min-h-screen"
+      style={{ backgroundImage: 'url("/bg-tongquan.png")', backgroundSize: "cover", backgroundPosition: "center", backgroundAttachment: "fixed" }}>
+      {/* Dark overlay */}
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(18,18,18,0.50)", zIndex: 0 }} />
+    <div className="relative p-6 md:p-8 max-w-6xl mx-auto" style={{ zIndex: 1 }}>
 
       {/* ── Floating auth button (fixed top-right) ───────────────────────── */}
       <div className="fixed top-4 right-4 z-40">
         {role === "guest" ? (
           <button onClick={() => setAuthOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/90 backdrop-blur border border-slate-200 shadow-lg hover:shadow-xl text-xs font-semibold text-slate-500 hover:text-indigo-600 hover:border-indigo-300 transition-all">
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/90 backdrop-blur border border-slate-200 shadow-lg hover:shadow-xl text-xs font-semibold text-slate-500 hover:text-white/80 hover:border-white/30 transition-all">
             🔐 <span>Quản lý</span>
           </button>
         ) : (
@@ -349,45 +353,57 @@ export default function DashboardPage() {
 
       {/* ── Page header ───────────────────────────────────────────────────── */}
       <div className="mb-8 text-center">
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 leading-tight"
-          style={{ background: "linear-gradient(135deg, #38E1FF 0%, #51F3FF 50%, #20CFED 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", filter: "drop-shadow(0 0 16px rgba(56,225,255,0.45))" }}>
-          Tổng Quan Điều Hành
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 leading-tight tracking-widest" style={{ color: "#ffffff" }}>
+          TỔNG QUAN
         </h1>
-        <p className="text-sm font-semibold max-w-xs mx-auto leading-relaxed tracking-widest uppercase" style={{ color: "#6B9AC4" }}>Năng Lượng — Trí Tuệ — Tốc Độ</p>
         {lastUpdated && (
-          <p className="text-xs text-slate-400 mt-2 flex items-center justify-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-            Live · Cập nhật lúc {new Date(lastUpdated).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}
+          <p className="text-xs mt-2 flex items-center justify-center gap-1.5" style={{ color: "#888888" }}>
+            Cập nhật lúc {new Date(lastUpdated).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })} - 27/02/2026
           </p>
         )}
+      </div>
+
+      {/* -- Row 0: Uptime mini-cards --------------------------------------- */}
+      <div className="grid grid-cols-3 gap-3 mb-3">
+        {[
+          { label: "Tháng", value: "98%" },
+          { label: "Quý",   value: "24,5%" },
+          { label: "Năm",   value: "8,3%" },
+        ].map((u) => (
+          <div key={u.label} className="rounded-lg px-2 py-1.5 text-center backdrop-blur-md"
+            style={{ background: "rgba(20,20,20,0.22)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 2px 12px rgba(0,0,0,0.40)" }}>
+            <p className="text-[10px] font-medium mb-0.5" style={{ color: "#999999" }}>{u.label}</p>
+            <p className="text-sm font-bold" style={{ color: "#ffffff" }}>{u.value}</p>
+          </div>
+        ))}
       </div>
 
       {/* ── Row 1: Summary stat cards ──────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         {[
-          { label: "Xgroup",         value: `${overallPct}%`,              sub: "theo trọng số",             accent: "#6366f1", noBar: true },
-          { label: "CV hoàn thành",  value: `${totalDone}/${tasks.length}`, sub: "weighted progress",         accent: "#10b981" },
+          { label: "GMV",            value: "2",                           sub: "tỷ USD",                    accent: "#6366f1", noBar: true },
+          { label: "Xgroup",         value: `${overallPct}%`,              sub: "theo trọng số",             accent: "#10b981" },
           { label: "OKR trung bình", value: `${avgOKRPct}%`,               sub: "kết quả then chốt",         accent: "#8b5cf6" },
           { label: "Team nguy hiểm", value: `${atRiskCount}`,              sub: `${onTrackCount} đúng hạn`,  accent: atRiskCount > 0 ? "#ef4444" : "#10b981" },
           { label: "Quá hạn",        value: `${totalOverdue}`,             sub: "cần xử lý ngay",            accent: totalOverdue > 0 ? "#f97316" : "#94a3b8" },
-          { label: "Thời gian Q1",   value: `${timeElapsedPct}%`,          sub: `${Q1_REMAINING} ngày còn`, accent: "#f59e0b" },
         ].map((s) => (
-          <div key={s.label} className="stat-card bg-white rounded-2xl px-4 py-4 text-center relative overflow-hidden border border-slate-100/60"
-        style={{ boxShadow: `0 2px 16px -4px ${s.accent}22, 0 1px 3px rgba(0,0,0,0.4)`, background: "linear-gradient(135deg, #0D2548 0%, #0A1E38 100%)", border: "1px solid rgba(56,225,255,0.12)" }}>
-            {'noBar' in s && s.noBar ? null : (
-              <div className="absolute top-0 inset-x-0 h-[3px] rounded-t-2xl" style={{ background: `linear-gradient(90deg, transparent, ${s.accent}cc, transparent)` }} />
-            )}
-            <p className="text-[10px] font-bold mb-1.5 leading-tight uppercase tracking-wider" style={{ color: "#6B9AC4" }}>{s.label}</p>
-            <p className="text-[1.6rem] font-black leading-none mb-1 tabular-nums" style={{ color: s.accent }}>{s.value}</p>
-            <p className="text-[10px] leading-tight" style={{ color: "#4A7A9B" }}>{s.sub}</p>
+          <div key={s.label} className="backdrop-blur-md rounded-2xl px-4 py-4 text-center relative overflow-hidden"
+            style={{
+              background: "rgba(55,55,62,0.52)",
+              border: "1px solid rgba(155,155,165,0.32)",
+              boxShadow: "0 4px 18px rgba(0,0,0,0.45)",
+            }}>
+            <p className="text-[10px] font-bold mb-1.5 leading-tight uppercase tracking-wider" style={{ color: "#b0b0b8" }}>{s.label}</p>
+            <p className="text-[1.6rem] font-black leading-none mb-1 tabular-nums" style={{ color: "#ffffff" }}>{s.value}</p>
+            <p className="text-[10px] leading-tight" style={{ color: "#888890" }}>{s.sub}</p>
           </div>
         ))}
       </div>
 
       {/* ── Row 2: Annual KPI targets ──────────────────────────────────────── */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/70 px-6 py-5 mb-6" style={{ boxShadow: "0 4px 24px -4px rgba(56,225,255,0.08), 0 1px 3px rgba(0,0,0,0.4)" }}>
+      <div className="backdrop-blur-md rounded-2xl px-6 py-5 mb-6" style={{ background: "rgba(20,20,20,0.22)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 2px 12px rgba(0,0,0,0.40)" }}>
         <div className="text-center mb-5">
-          <h2 className="font-bold text-base tracking-tight flex items-center justify-center gap-2" style={{ color: "#EEF6FF" }}><Target size={14} style={{ color: "#38E1FF" }} /> KPI Chiến Lược Năm 2026</h2>
+          <h2 className="font-bold text-base tracking-tight flex items-center justify-center gap-2" style={{ color: "#ffffff" }}><Target size={14} style={{ color: "#aaaaaa" }} /> KPI CHIẾN LƯỢC NĂM 2026</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
           {ANNUAL_KPIS.map((kpi) => {
@@ -396,25 +412,25 @@ export default function DashboardPage() {
             const restricted = role === "guest" && kpi.id !== "k1" && 'clickable' in kpi && kpi.clickable;
             return (
                 <div key={kpi.id}
-                  className={`relative flex flex-col gap-2 ${'clickable' in kpi && kpi.clickable ? 'cursor-pointer hover:bg-indigo-50 rounded-xl p-2 -m-2 transition-colors' : ''}`}
+                  className={`relative flex flex-col gap-2 ${'clickable' in kpi && kpi.clickable ? 'cursor-pointer hover:bg-white/5 rounded-xl p-2 -m-2 transition-colors' : ''}`}
                   onClick={'clickable' in kpi && kpi.clickable ? () => handleKpiClick(kpi.id) : undefined}
                   title={'clickable' in kpi && kpi.clickable ? (restricted ? 'Đăng nhập để xem chi tiết nội bộ' : 'Click để xem chi tiết') : undefined}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-600 flex items-center gap-1">
+                    <span className="text-xs font-semibold flex items-center gap-1" style={{ color: "#cccccc" }}>
                       {kpi.label}
-                      {restricted && <span className="text-slate-300 text-[10px]">🔒</span>}
+                      {restricted && <span className="text-white/40 text-[10px]">🔒</span>}
                     </span>
                     <span className="text-xs font-bold" style={{ color: kpi.color }}>{pct}%</span>
                   </div>
-                <div className="relative h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="absolute top-0 bottom-0 w-0.5 bg-slate-400/50 z-10" style={{ left: `${Math.round(YEAR_ELAPSED / YEAR_TOTAL * 100)}%` }} />
+                <div className="relative h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.10)" }}>
+                  <div className="absolute top-0 bottom-0 w-0.5 z-10" style={{ left: `${Math.round(YEAR_ELAPSED / YEAR_TOTAL * 100)}%`, background: "rgba(255,255,255,0.40)" }} />
                   <div className="absolute left-0 top-0 h-full rounded-full transition-all duration-700"
-                    style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${kpi.color}99, ${kpi.color})`, boxShadow: pct > 5 ? `0 0 8px -1px ${kpi.color}80` : 'none' }} />
+                    style={{ width: `${pct}%`, background: `linear-gradient(90deg, #c9a227, #f5d060)`, boxShadow: pct > 5 ? `0 0 8px -1px #f5d06080` : 'none' }} />
                 </div>
-                <div className="flex items-center justify-between text-[11px] text-slate-400">
-                  <span><span className="font-semibold text-slate-600">{fmtNum(kpi.current, kpi.unit)}</span> / {fmtNum(kpi.target, kpi.unit)} {kpi.unit}</span>
-                  <span className="text-slate-400">Dự báo: <span className={yearForecast >= 80 ? "text-emerald-600 font-semibold" : yearForecast >= 50 ? "text-amber-600 font-semibold" : "text-red-500 font-semibold"}>{yearForecast}%</span></span>
+                <div className="flex items-center justify-between text-[11px]" style={{ color: "#888888" }}>
+                  <span><span className="font-semibold" style={{ color: "#cccccc" }}>{fmtNum(kpi.current, kpi.unit)}</span> / {fmtNum(kpi.target, kpi.unit)} {kpi.unit}</span>
+                  <span>Dự báo: <span className="font-semibold" style={{ color: yearForecast >= 80 ? "#ffffff" : yearForecast >= 50 ? "#aaaaaa" : "#777777" }}>{yearForecast}%</span></span>
                 </div>
                 </div>
             );
@@ -423,10 +439,10 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Row 3: Team progress + health + forecast ──────────────────────── */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/70 overflow-hidden mb-6" style={{ boxShadow: "0 4px 24px -4px rgba(56,225,255,0.08), 0 1px 3px rgba(0,0,0,0.4)" }}>
-        <div className="text-center px-6 py-5" style={{ borderBottom: "1px solid rgba(56,225,255,0.10)" }}>
-          <h2 className="font-bold text-base tracking-tight" style={{ color: "#EEF6FF" }}>Tiến Độ Các Phòng Ban</h2>
-          <p className="text-xs mt-0.5" style={{ color: "#6B9AC4" }}>Tính theo trọng số · Đường dọc = mức kỳ vọng hôm nay ({timeElapsedPct}%)</p>
+      <div className="backdrop-blur-md rounded-2xl overflow-hidden mb-6" style={{ background: "rgba(20,20,20,0.22)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 2px 12px rgba(0,0,0,0.40)" }}>
+        <div className="text-center px-6 py-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <h2 className="font-bold text-base tracking-tight" style={{ color: "#ffffff" }}>TIẾN ĐỘ CÁC PHÒNG BAN</h2>
+          <p className="text-xs mt-0.5" style={{ color: "#888888" }}>Tính theo trọng số · Đường dọc = mức kỳ vọng hôm nay ({timeElapsedPct}%)</p>
         </div>
 
         <div className="px-6 py-5 space-y-4">
@@ -436,31 +452,31 @@ export default function DashboardPage() {
             const animDelay = `${i * 80}ms`;
             return (
               <Link key={team.id} href={`/teams/${team.id}`}>
-                <div className="group rounded-xl px-3 py-3 -mx-3 hover:bg-slate-50 transition-colors cursor-pointer">
+                <div className="group rounded-xl px-3 py-3 -mx-3 hover:bg-white/5 transition-colors cursor-pointer">
                   {/* Top row: name + health badge + stats */}
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center shadow-sm text-white"
                       style={{ backgroundColor: team.color }}>
                       <TeamIcon id={team.id} />
                     </div>
-                    <span className="text-sm font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors w-28 shrink-0 truncate">{team.name}</span>
+                    <span className="text-sm font-semibold transition-colors w-28 shrink-0 truncate" style={{ color: "#ffffff" }}>{team.name}</span>
                     <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${health.cls} shrink-0`}>
                       {health.label}
                     </span>
-                    <div className="hidden sm:flex items-center gap-3 ml-auto text-xs text-slate-400 shrink-0">
-                      <span><span className="font-semibold text-slate-600">{stats.done}</span>/{stats.total} xong</span>
-                      {stats.overdue > 0 && <span className="text-red-400 font-semibold flex items-center gap-0.5"><AlertTriangle size={10} /> {stats.overdue} quá hạn</span>}
-                      <span className="text-slate-400">Dự báo cuối Q1: <span className={forecast >= 80 ? "text-emerald-600 font-bold" : forecast >= 50 ? "text-amber-600 font-bold" : "text-red-500 font-bold"}>{forecast}%</span></span>
+                    <div className="hidden sm:flex items-center gap-3 ml-auto text-xs shrink-0" style={{ color: "#888888" }}>
+                      <span><span className="font-semibold" style={{ color: "#cccccc" }}>{stats.done}</span>/{stats.total} xong</span>
+                      {stats.overdue > 0 && <span className="font-semibold flex items-center gap-0.5" style={{ color: "#ff6666" }}><AlertTriangle size={10} /> {stats.overdue} quá hạn</span>}
+                      <span>Dự báo cuối Q1: <span className="font-bold" style={{ color: forecast >= 80 ? "#ffffff" : forecast >= 50 ? "#aaaaaa" : "#777777" }}>{forecast}%</span></span>
                     </div>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
-                      className="w-4 h-4 text-slate-300 group-hover:text-indigo-400 transition-colors shrink-0 ml-auto sm:ml-0">
+                      className="w-4 h-4 transition-colors shrink-0 ml-auto sm:ml-0" style={{ color: "rgba(255,255,255,0.30)" }}>
                       <polyline points="9 18 15 12 9 6" />
                     </svg>
                   </div>
 
                   {/* Bar */}
                   <div className="relative h-7 rounded-xl overflow-hidden"
-                    style={{ background: "rgba(10,25,50,0.7)" }}>
+                    style={{ background: "rgba(36,36,36,0.8)" }}>
                     {/* Expected-progress marker line */}
                     <div className="absolute top-0 bottom-0 w-0.5 bg-slate-400/40 z-10"
                       style={{ left: `${timeElapsedPct}%` }} />
@@ -478,9 +494,9 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Mobile forecast */}
-                  <div className="sm:hidden flex items-center justify-between mt-1.5 text-[11px] text-slate-400">
+                  <div className="sm:hidden flex items-center justify-between mt-1.5 text-[11px]" style={{ color: "#888888" }}>
                     <span>{stats.done}/{stats.total} xong</span>
-                    <span>Dự báo cuối Q1: <span className={forecast >= 80 ? "text-emerald-600 font-bold" : forecast >= 50 ? "text-amber-600 font-bold" : "text-red-500 font-bold"}>{forecast}%</span></span>
+                    <span>Dự báo cuối Q1: <span className="font-bold" style={{ color: forecast >= 80 ? "#ffffff" : forecast >= 50 ? "#aaaaaa" : "#777777" }}>{forecast}%</span></span>
                   </div>
                 </div>
               </Link>
@@ -490,16 +506,16 @@ export default function DashboardPage() {
 
         {/* X-axis */}
         <div className="px-6 pb-4">
-          <div className="ml-[4.5rem] flex justify-between text-xs font-medium" style={{ color: "#3B6899" }}>
+          <div className="ml-[4.5rem] flex justify-between text-xs font-medium" style={{ color: "#555555" }}>
             <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
           </div>
         </div>
       </div>
 
       {/* ── Row 4: AI Analysis + Cảnh Báo (merged panel) ─────────────────── */}
-      <div className="relative backdrop-blur-sm rounded-2xl px-5 py-5 mb-6 overflow-hidden"
-        style={{ background: "rgba(10,25,54,0.90)", border: "1px solid rgba(56,225,255,0.15)", boxShadow: "0 4px 32px -4px rgba(56,225,255,0.14), 0 1px 4px rgba(0,0,0,0.4)" }}>
-        <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ background: "linear-gradient(135deg, rgba(14,111,174,0.12) 0%, rgba(18,184,232,0.06) 100%)" }} />
+      <div className="relative backdrop-blur-md rounded-2xl px-5 py-5 mb-6 overflow-hidden"
+        style={{ background: "rgba(20,20,20,0.22)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 2px 12px rgba(0,0,0,0.40)" }}>
+        <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ background: "rgba(255,255,255,0.0)" }} />
         <div className="relative z-10">
 
           {/* Two-column body */}
@@ -508,22 +524,22 @@ export default function DashboardPage() {
             {/* ── Left: AI Quick Analysis ── */}
             <div>
               <div className="mb-3">
-                <h3 className="font-bold text-sm tracking-tight flex items-center gap-2 mb-1" style={{ color: "#EEF6FF" }}>
-                  <Bot size={14} strokeWidth={2} className="shrink-0" style={{ color: "#38E1FF" }} />
+                <h3 className="font-bold text-sm tracking-tight flex items-center gap-2 mb-1" style={{ color: "#ffffff" }}>
+                  <Bot size={14} strokeWidth={2} className="shrink-0" style={{ color: "#aaaaaa" }} />
                   Phân Tích Nhanh · AI
                 </h3>
                 <div className="flex items-center gap-1.5">
                   {aiLoading
-                    ? <span className="text-[10px] text-indigo-400 animate-pulse flex items-center gap-1"><div className="w-2.5 h-2.5 border border-indigo-400 border-t-transparent rounded-full animate-spin shrink-0" /> Đang cập nhật...</span>
+                    ? <span className="text-[10px] animate-pulse flex items-center gap-1" style={{ color: "#888888" }}><div className="w-2.5 h-2.5 border border-slate-400 border-t-transparent rounded-full animate-spin shrink-0" /> Đang cập nhật...</span>
                     : aiUpdatedAt
-                      ? <span className="text-[10px] text-slate-400 flex items-center gap-1"><Clock size={9} /> Cập nhật lúc {aiUpdatedAt.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} · tự động mỗi 2 giờ</span>
-                      : <span className="text-[10px] text-slate-300">Tự động cập nhật mỗi 2 giờ</span>
+                      ? <span className="text-[10px] flex items-center gap-1" style={{ color: "#888888" }}><Clock size={9} /> Cập nhật lúc {aiUpdatedAt.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" })} · tự động mỗi 2 giờ</span>
+                      : <span className="text-[10px]" style={{ color: "#888888" }}>Tự động cập nhật mỗi 2 giờ</span>
                   }
                 </div>
               </div>
               <div className="space-y-2">
                 {aiLoading && aiAnalysis.length === 0 && (
-                  <div className="flex items-center gap-3 py-5 text-indigo-500">
+                  <div className="flex items-center gap-3 py-5" style={{ color: "#888888" }}>
                     <div className="w-4 h-4 border-2 border-indigo-200 border-t-indigo-500 rounded-full animate-spin shrink-0" />
                     <p className="text-xs leading-relaxed">AI đang đọc toàn bộ dữ liệu hệ thống và phân tích...</p>
                   </div>
@@ -540,10 +556,10 @@ export default function DashboardPage() {
                   <ul className="space-y-2">
                     {aiAnalysis.map((bullet, i) => (
                       <li key={i} className={`flex gap-3 items-start rounded-xl px-3 py-2.5 transition-opacity ${aiLoading ? "opacity-40" : ""}`}
-                        style={{ background: "linear-gradient(135deg, rgba(10,37,90,0.7), rgba(14,50,108,0.5))", border: "1px solid rgba(56,225,255,0.18)" }}>
+                        style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)" }}>
                         <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white mt-0.5"
-                          style={{ background: "linear-gradient(135deg, #0E6FAE, #12B8E8)", boxShadow: "0 0 8px rgba(56,225,255,0.4)" }}>{i + 1}</span>
-                        <p className="text-xs leading-relaxed" style={{ color: "#B8D7F2" }}>{bullet}</p>
+                          style={{ background: "linear-gradient(135deg, #c9a227, #f5d060)" }}>{i + 1}</span>
+                        <p className="text-xs leading-relaxed" style={{ color: "#cccccc" }}>{bullet}</p>
                       </li>
                     ))}
                   </ul>
@@ -553,13 +569,13 @@ export default function DashboardPage() {
 
             {/* ── Right: Strategic Alerts ── */}
             <div>
-              <h3 className="font-bold text-sm mb-3 tracking-tight flex items-center gap-2" style={{ color: "#EEF6FF" }}>
-                <Zap size={14} strokeWidth={2} className="shrink-0" style={{ color: "#38E1FF" }} />
+              <h3 className="font-bold text-sm mb-3 tracking-tight flex items-center gap-2" style={{ color: "#ffffff" }}>
+                <Zap size={14} strokeWidth={2} className="shrink-0" style={{ color: "#aaaaaa" }} />
                 Cảnh Báo Chiến Lược
               </h3>
               <div className="space-y-2">
                 {teamHealthData.filter((d) => d.health.label !== "Đúng tiến độ").length === 0 && (
-                  <p className="text-xs text-emerald-600 font-semibold flex items-center gap-1">
+                  <p className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
                     <CheckCircle2 size={13} /> Tất cả phòng ban đang đúng tiến độ!
                   </p>
                 )}
@@ -573,14 +589,14 @@ export default function DashboardPage() {
                     const gap = Math.round((Q1_ELAPSED / Q1_TOTAL) * 100) - pct;
                     return (
                       <Link key={team.id} href={`/teams/${team.id}`}>
-                        <div className="flex items-center gap-3 py-1.5 hover:bg-slate-50 rounded-lg px-2 -mx-2 transition-colors">
+                        <div className="flex items-center gap-3 py-1.5 hover:bg-white/5 rounded-lg px-2 -mx-2 transition-colors">
                           <div className="w-5 h-5 rounded flex items-center justify-center shrink-0 text-white"
-                            style={{ backgroundColor: team.color }}>
+                            style={{ background: `linear-gradient(135deg, #c9a227, #f5d060)` }}>
                             <TeamIcon id={team.id} size={11} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-slate-700">{team.name} — {pct}%</p>
-                            <p className="text-[11px] text-slate-400">Chậm {gap}% so với kỳ vọng</p>
+                            <p className="text-xs font-semibold" style={{ color: "#ffffff" }}>{team.name} — {pct}%</p>
+                            <p className="text-[11px]" style={{ color: "#888888" }}>Chậm {gap}% so với kỳ vọng</p>
                           </div>
                           <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${health.cls} shrink-0`}>
                             {health.label}
@@ -595,12 +611,12 @@ export default function DashboardPage() {
           </div>
 
           {/* Centered refresh button */}
-          <div className="flex justify-center pt-3" style={{ borderTop: "1px solid rgba(56,225,255,0.10)" }}>
+          <div className="flex justify-center pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.10)" }}>
             <button
               onClick={() => fetchAI("POST")}
               disabled={aiLoading}
               className="px-8 py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] flex items-center gap-2"
-              style={{ background: "linear-gradient(135deg, #0E6FAE, #12B8E8)", color: "white", boxShadow: "0 4px 16px -2px rgba(56,225,255,0.40)" }}
+              style={{ background: "linear-gradient(135deg, #c9a227, #f5d060)", color: "#222222", boxShadow: "0 4px 16px -2px rgba(245,208,96,0.40)" }}
             >
               <RefreshCw size={12} />
               {aiLoading ? "Đang phân tích..." : "Cập nhật ngay"}
@@ -615,15 +631,15 @@ export default function DashboardPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setProjectModalOpen(false)}>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}
-            style={{ background: "#081D3D", border: "1px solid rgba(56,225,255,0.20)", boxShadow: "0 24px 80px -8px rgba(0,0,0,0.8), 0 0 0 1px rgba(56,225,255,0.10)" }}>
+            style={{ background: "#181818", border: "1px solid rgba(255,255,255,0.10)", boxShadow: "0 24px 80px -8px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.06)" }}>
             {/* Modal header */}
-            <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid rgba(56,225,255,0.10)" }}>
+            <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
               <div>
-                <h2 className="font-bold text-lg flex items-center gap-2" style={{ color: "#EEF6FF", letterSpacing: "0.06em" }}><Rocket size={16} style={{ color: "#38E1FF" }} /> 30 DỰ ÁN TRIỂN KHAI</h2>
-                <p className="text-xs mt-0.5" style={{ color: "#6B9AC4" }}>8 đang triển khai · 22 đang lên kế hoạch</p>
+                <h2 className="font-bold text-lg flex items-center gap-2" style={{ color: "#ffffff", letterSpacing: "0.06em" }}><Rocket size={16} style={{ color: "#aaaaaa" }} /> 30 DỰ ÁN TRIỂN KHAI</h2>
+                <p className="text-xs mt-0.5" style={{ color: "#aaaaaa" }}>8 đang triển khai · 22 đang lên kế hoạch</p>
               </div>
               <button onClick={() => setProjectModalOpen(false)} className="w-8 h-8 rounded-full flex items-center justify-center text-lg transition-colors"
-                style={{ color: "#6B9AC4", background: "rgba(56,225,255,0.06)" }}>✕</button>
+                style={{ color: "#aaaaaa", background: "rgba(255,255,255,0.06)" }}>✕</button>
             </div>
             {/* Modal body */}
             <div className="overflow-y-auto p-6">
@@ -639,26 +655,26 @@ export default function DashboardPage() {
                           : "opacity-50 hover:opacity-75"
                       }`}
                       style={p.active ? {
-                        borderColor: "rgba(56,225,255,0.30)",
-                        background: "linear-gradient(135deg, rgba(14,111,174,0.12) 0%, rgba(18,184,232,0.06) 100%)",
-                        boxShadow: "0 2px 12px -2px rgba(56,225,255,0.12)"
+                        borderColor: "rgba(255,255,255,0.18)",
+                        background: "rgba(42,42,42,0.72)",
+                        boxShadow: "0 2px 12px -2px rgba(0,0,0,0.40)"
                       } : {
-                        borderColor: "rgba(56,225,255,0.08)",
-                        background: "rgba(10,25,50,0.6)"
+                        borderColor: "rgba(255,255,255,0.06)",
+                        background: "rgba(36,36,36,0.60)"
                       }}
                     >
                       <div className="flex items-start gap-2 mb-3">
                         <span className={`mt-0.5 text-xs font-bold px-1.5 py-0.5 rounded ${
                           p.active ? "text-white" : "text-xs font-bold"
                         }`}
-                          style={p.active ? { background: "linear-gradient(135deg, #0E6FAE, #12B8E8)" } : { background: "rgba(56,225,255,0.10)", color: "#6B9AC4" }}
+                          style={p.active ? { background: "#2a2a2a", color: "#ffffff", border: "1px solid rgba(255,255,255,0.18)" } : { background: "rgba(255,255,255,0.06)", color: "#aaaaaa" }}
                         >{String(p.id).padStart(2, "0")}</span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold leading-tight" style={{ color: "#EEF6FF" }}>{p.name}</p>
-                          <p className="text-[11px] mt-0.5" style={{ color: "#6B9AC4" }}>{p.note}</p>
+                          <p className="text-sm font-semibold leading-tight" style={{ color: "#ffffff" }}>{p.name}</p>
+                          <p className="text-[11px] mt-0.5" style={{ color: "#aaaaaa" }}>{p.note}</p>
                         </div>
                         {p.docs.length > 0 && (
-                          <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: "rgba(56,225,255,0.12)", color: "#38E1FF" }}>{p.docs.length} tài liệu</span>
+                          <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.08)", color: "#aaaaaa" }}>{p.docs.length} tài liệu</span>
                         )}
                       </div>
                       {/* Stages */}
@@ -666,7 +682,7 @@ export default function DashboardPage() {
                         {p.stages.map((s, si) => (
                           <div key={si} className="flex-1 text-center">
                             <div className="h-1.5 rounded-full mb-1" style={{ background: s === "pending" ? `${STAGE_HUES[si]}40` : STAGE_HUES[si] }} />
-                            <p className="text-[10px] font-medium" style={{ color: s === "pending" ? `${STAGE_HUES[si]}99` : STAGE_HUES[si] }}>{stageLabels[si]}</p>
+                            <p className="text-[10px] font-medium" style={{ color: "#aaaaaa" }}>{stageLabels[si]}</p>
                           </div>
                         ))}
                       </div>
@@ -679,8 +695,8 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <p className="text-xs text-center mt-4" style={{ color: "#4A7A9B" }}>
-        Nhấn vào phòng ban để xem chi tiết công việc · Đường dọc trên biểu đồ = mức kỳ vọng tiến độ hôm nay
+      <p className="text-xs text-center mt-4 tracking-widest font-semibold uppercase" style={{ color: "#888888" }}>
+        Trí Tuệ · Năng Lượng · Tốc Độ
       </p>
 
       {/* ── Partner Modal ────────────────────────────────────────────────── */}
@@ -1157,23 +1173,23 @@ export default function DashboardPage() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" onClick={() => setSelectedProject(null)}>
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <div className="relative rounded-2xl shadow-2xl w-full max-w-lg flex flex-col" onClick={(e) => e.stopPropagation()}
-            style={{ background: "#081D3D", border: "1px solid rgba(56,225,255,0.20)", boxShadow: "0 24px 80px -8px rgba(0,0,0,0.8)" }}>
+            style={{ background: "#181818", border: "1px solid rgba(255,255,255,0.10)", boxShadow: "0 24px 80px -8px rgba(0,0,0,0.8)" }}>
             {/* Header */}
-            <div className="px-6 py-4" style={{ borderBottom: "1px solid rgba(56,225,255,0.10)" }}>
+            <div className="px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`text-xs font-bold px-2 py-0.5 rounded text-white`}
-                      style={selectedProject.active ? { background: "linear-gradient(135deg, #0E6FAE, #12B8E8)" } : { background: "rgba(56,225,255,0.10)", color: "#6B9AC4" }}>
+                      style={selectedProject.active ? { background: "#2a2a2a", color: "#ffffff", border: "1px solid rgba(255,255,255,0.18)" } : { background: "rgba(255,255,255,0.06)", color: "#aaaaaa" }}>
                       {String(selectedProject.id).padStart(2, "0")}
                     </span>
                     {selectedProject.active && <span className="text-xs bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full flex items-center gap-1"><CheckCircle2 size={10} /> Đang triển khai</span>}
                   </div>
-                  <h3 className="font-bold text-base text-center" style={{ color: "#EEF6FF" }}>{selectedProject.name}</h3>
-                  <p className="text-xs mt-0.5" style={{ color: "#6B9AC4" }}>{selectedProject.note}</p>
+                  <h3 className="font-bold text-base text-center" style={{ color: "#ffffff" }}>{selectedProject.name}</h3>
+                  <p className="text-xs mt-0.5" style={{ color: "#aaaaaa" }}>{selectedProject.note}</p>
                 </div>
                 <button onClick={() => setSelectedProject(null)} className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors"
-                style={{ color: "#6B9AC4", background: "rgba(56,225,255,0.06)" }}>✕</button>
+                style={{ color: "#aaaaaa", background: "rgba(255,255,255,0.06)" }}>✕</button>
               </div>
               {/* Stages recap */}
               <div className="flex gap-2 mt-3">
@@ -1190,7 +1206,7 @@ export default function DashboardPage() {
             </div>
             {/* Docs */}
             <div className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider mb-3 flex items-center gap-1.5" style={{ color: "#6B9AC4" }}><FolderOpen size={12} /> Tài liệu đính kèm</p>
+              <p className="text-xs font-semibold uppercase tracking-wider mb-3 flex items-center gap-1.5" style={{ color: "#aaaaaa" }}><FolderOpen size={12} /> Tài liệu đính kèm</p>
               {selectedProject.docs.length === 0 ? (
                 <div className="text-center py-8 text-slate-400">
                   <div className="flex justify-center mb-2"><Inbox size={36} style={{ color: "rgba(100,116,139,0.4)" }} /></div>
@@ -1206,23 +1222,23 @@ export default function DashboardPage() {
                         doc.url ? "cursor-pointer" : ""
                       }`}
                       style={doc.url ? {
-                        background: "linear-gradient(135deg, rgba(14,111,174,0.12) 0%, rgba(18,184,232,0.06) 100%)",
-                        borderColor: "rgba(56,225,255,0.25)"
+                        background: "rgba(42,42,42,0.72)",
+                        borderColor: "rgba(255,255,255,0.18)"
                       } : {
-                        background: "rgba(10,25,50,0.5)",
-                        borderColor: "rgba(56,225,255,0.10)"
+                        background: "rgba(36,36,36,0.60)",
+                        borderColor: "rgba(255,255,255,0.06)"
                       }}
                     >
-                      <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(56,225,255,0.10)" }}>
-                        <FileText size={15} style={{ color: "#38E1FF" }} />
+                      <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(255,255,255,0.08)" }}>
+                        <FileText size={15} style={{ color: "#aaaaaa" }} />
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-semibold truncate" style={{ color: "#EEF6FF" }}>{doc.name}</p>
-                          <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: "rgba(56,225,255,0.10)", color: "#38E1FF" }}>{doc.type}</span>
-                          {doc.url && <span className="shrink-0 text-[10px]" style={{ color: "#38E1FF" }}>↗ Mở</span>}
+                          <p className="text-sm font-semibold truncate" style={{ color: "#ffffff" }}>{doc.name}</p>
+                          <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: "rgba(255,255,255,0.08)", color: "#aaaaaa" }}>{doc.type}</span>
+                          {doc.url && <span className="shrink-0 text-[10px]" style={{ color: "#aaaaaa" }}>↗ Mở</span>}
                         </div>
-                        <p className="text-[11px] mt-0.5" style={{ color: "#6B9AC4" }}>{doc.desc}</p>
+                        <p className="text-[11px] mt-0.5" style={{ color: "#888888" }}>{doc.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -1232,6 +1248,7 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }
