@@ -379,7 +379,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Row 1: Summary stat cards ──────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
         {[
           { label: "GMV",            value: "2",                           sub: "tỷ USD",                    accent: "#6366f1", noBar: true },
           { label: "Xgroup",         value: `${overallPct}%`,              sub: "theo trọng số",             accent: "#10b981" },
@@ -554,7 +554,7 @@ export default function DashboardPage() {
                 )}
                 {aiAnalysis.length > 0 && (
                   <ul className="space-y-2">
-                    {aiAnalysis.map((bullet, i) => (
+                    {aiAnalysis.slice(0, 3).map((bullet, i) => (
                       <li key={i} className={`flex gap-3 items-start rounded-xl px-3 py-2.5 transition-opacity ${aiLoading ? "opacity-40" : ""}`}
                         style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)" }}>
                         <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white mt-0.5"
