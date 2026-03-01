@@ -7,8 +7,8 @@ import { LABEL_TO_TEAM_ID } from "@/lib/authConfig";
 import React from "react";
 import {
   Cog, Megaphone, Users, Handshake, FileText, Building2,
-  Target, Bot, Zap, RefreshCw, Clock, AlertTriangle, CheckCircle2,
-  Rocket, FolderOpen, Inbox,
+  RefreshCw, Clock, AlertTriangle, CheckCircle2,
+  FolderOpen, Inbox,
 } from "lucide-react";
 
 // ─── Q1 2026 time reference ────────────────────────────────────────────────
@@ -26,7 +26,7 @@ const YEAR_ELAPSED = Math.round((TODAY.getTime() - YEAR_START.getTime()) / 86400
 type ProjectDoc = { icon: string; name: string; type: string; url?: string; desc: string };
 type Project = { id: number; name: string; active: boolean; stages: string[]; note: string; docs: ProjectDoc[] };
 const PROJECTS: Project[] = [
-  { id: 1,  name: "Xgroup Platform Web",           active: true,  stages: ["done","done","active"], note: "Ra thị trường Q1 2026",
+  { id: 1,  name: "Xgroup CRM",                    active: true,  stages: ["done","done","active"], note: "Ra thị trường Q1 2026",
     docs: [
       { icon: "📋", name: "Tài liệu nghiệp vụ tổng thể", type: "PDF", desc: "Mô tả toàn bộ luồng nghiệp vụ nền tảng web" },
       { icon: "🎨", name: "Thiết kế UI/UX Figma", type: "Figma", url: "#", desc: "Mockup & prototype giao diện người dùng" },
@@ -34,68 +34,68 @@ const PROJECTS: Project[] = [
       { icon: "✅", name: "Test cases & QA Checklist", type: "Sheet", desc: "Danh sách kiểm thử chức năng & regression" },
     ]
   },
-  { id: 2,  name: "Xgroup Mobile App",              active: true,  stages: ["done","active","pending"], note: "Đang phát triển demo",
+  { id: 2,  name: "Xpiano",                         active: true,  stages: ["done","active","pending"], note: "Đang phát triển demo",
     docs: [
       { icon: "📋", name: "Product Requirements Document", type: "PDF", desc: "PRD đầy đủ cho iOS & Android" },
       { icon: "🎨", name: "Mobile UI Prototype", type: "Figma", url: "#", desc: "Prototype tương tác, user flow" },
       { icon: "📱", name: "Tech Stack & Architecture", type: "Notion", desc: "React Native, state management, CI/CD" },
     ]
   },
-  { id: 3,  name: "AI Content Assistant",           active: true,  stages: ["done","active","pending"], note: "Tích hợp AI nội bộ",
+  { id: 3,  name: "Spiano Coffee",                  active: true,  stages: ["done","active","pending"], note: "Tích hợp AI nội bộ",
     docs: [
       { icon: "🤖", name: "AI Model Specification", type: "PDF", desc: "Đặc tả mô hình LLM, fine-tuning strategy" },
       { icon: "📋", name: "Luồng nghiệp vụ AI Assistant", type: "Notion", desc: "Use case, prompt engineering, safety" },
       { icon: "🔧", name: "Integration Guide", type: "Doc", desc: "Hướng dẫn tích hợp vào hệ thống hiện tại" },
     ]
   },
-  { id: 4,  name: "Partner Management System",      active: true,  stages: ["done","done","done"],   note: "Đã vận hành",
+  { id: 4,  name: "VN Share",                       active: true,  stages: ["done","done","done"],   note: "Đã vận hành",
     docs: [
       { icon: "📋", name: "Hướng dẫn sử dụng", type: "PDF", desc: "User manual cho partner & admin" },
       { icon: "🔧", name: "System Architecture", type: "Notion", desc: "Sơ đồ kiến trúc & database schema" },
       { icon: "📊", name: "SLA & KPI Dashboard", type: "Sheet", desc: "Chỉ tiêu vận hành & báo cáo định kỳ" },
     ]
   },
-  { id: 5,  name: "Payment Gateway Integration",    active: true,  stages: ["done","done","active"], note: "Kết nối cổng thanh toán",
+  { id: 5,  name: "Space Share",                    active: true,  stages: ["done","done","active"], note: "Kết nối cổng thanh toán",
     docs: [
       { icon: "💳", name: "Payment Flow Diagram", type: "PDF", desc: "Luồng thanh toán, refund, dispute handling" },
       { icon: "🔒", name: "Security & Compliance", type: "Doc", desc: "PCI-DSS, mã hóa dữ liệu thẻ" },
       { icon: "🔧", name: "Webhook & API Docs", type: "Notion", desc: "Tích hợp webhook thông báo trạng thái" },
     ]
   },
-  { id: 6,  name: "Business Intelligence Dashboard",active: true,  stages: ["done","done","active"], note: "Phân tích kinh doanh",
+  { id: 6,  name: "Work Now",                       active: true,  stages: ["done","done","active"], note: "Phân tích kinh doanh",
     docs: [
       { icon: "📊", name: "Dashboard Requirements", type: "PDF", desc: "Danh sách metrics, biểu đồ, drill-down" },
       { icon: "🗄️", name: "Data Model & ETL Pipeline", type: "Notion", desc: "Sơ đồ data warehouse, cronjob" },
       { icon: "📋", name: "Báo cáo mẫu & Template", type: "Sheet", desc: "Các template báo cáo định kỳ" },
     ]
   },
-  { id: 7,  name: "Developer API Marketplace",      active: true,  stages: ["done","active","pending"], note: "Marketplace API mở",
+  { id: 7,  name: "AI Salon",                       active: true,  stages: ["done","active","pending"], note: "Marketplace API mở",
     docs: [
       { icon: "🔧", name: "API Catalog & Docs", type: "Notion", url: "#", desc: "Danh mục API public, sandbox, pricing" },
       { icon: "📋", name: "Onboarding Developer Guide", type: "PDF", desc: "Hướng dẫn đăng ký & tích hợp cho dev" },
       { icon: "📊", name: "Usage Analytics Spec", type: "Doc", desc: "Theo dõi lượt gọi, quota, billing" },
     ]
   },
-  { id: 8,  name: "Internal CRM System",            active: true,  stages: ["done","done","active"], note: "CRM nội bộ",
+  { id: 8,  name: "Local Link",                     active: true,  stages: ["done","done","active"], note: "CRM nội bộ",
     docs: [
       { icon: "📋", name: "Luồng nghiệp vụ CRM", type: "PDF", desc: "Pipeline sale, chăm sóc khách hàng, escalation" },
       { icon: "🎨", name: "CRM UI Wireframe", type: "Figma", desc: "Thiết kế giao diện CRM nội bộ" },
       { icon: "🗄️", name: "Database Schema", type: "Notion", desc: "Cấu trúc bảng dữ liệu khách hàng, contact" },
     ]
   },
-  { id: 9,  name: "E-learning Platform",            active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Ý tưởng & Scope ban đầu", type: "Doc", desc: "Brainstorm, target user, MVP features" }] },
-  { id: 10, name: "Customer Loyalty Program",       active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Loyalty Program Concept", type: "Doc", desc: "Cơ chế điểm thưởng, tier, redemption" }] },
-  { id: 11, name: "Supply Chain Management",        active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
-  { id: 12, name: "HR Performance Portal",          active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "HR Portal Requirements", type: "Doc", desc: "KPI cá nhân, review 360, OKR cá nhân" }] },
-  { id: 13, name: "Event Management System",        active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
-  { id: 14, name: "B2B Commerce Portal",            active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "B2B Commerce Scope", type: "Doc", desc: "Luồng đặt hàng B2B, pricing, approval" }] },
-  { id: 15, name: "Social Commerce Features",       active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
-  { id: 16, name: "Inventory Management",           active: false, stages: ["pending","pending","pending"], note: "Q4 2026", docs: [] },
-  { id: 17, name: "Customer Support System",        active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Support Ticket Flow", type: "Doc", desc: "Luồng xử lý ticket, SLA, escalation" }] },
-  { id: 18, name: "Affiliate Marketing Platform",   active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
-  { id: 19, name: "Data Warehouse v2",              active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "DWH v2 Migration Plan", type: "Doc", desc: "Kế hoạch nâng cấp data warehouse" }] },
-  { id: 20, name: "Security Audit System",          active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
-  { id: 21, name: "Multi-language Support",         active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "i18n Scope & Language List", type: "Doc", desc: "Danh sách ngôn ngữ, chiến lược dịch thuật" }] },
+  { id: 9,  name: "Gia Sư Cam Kết",                 active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Ý tưởng & Scope ban đầu", type: "Doc", desc: "Brainstorm, target user, MVP features" }] },
+  { id: 10, name: "Dịch Vụ Cam Kết",                active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Loyalty Program Concept", type: "Doc", desc: "Cơ chế điểm thưởng, tier, redemption" }] },
+  { id: 11, name: "Website Diệu Liên",              active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 12, name: "Tiny Coworking",                 active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "HR Portal Requirements", type: "Doc", desc: "KPI cá nhân, review 360, OKR cá nhân" }] },
+  { id: 13, name: "Ipiano",                         active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 14, name: "Ypiano",                         active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "B2B Commerce Scope", type: "Doc", desc: "Luồng đặt hàng B2B, pricing, approval" }] },
+  { id: 15, name: "Piano IQ",                       active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 16, name: "Free & Free",                    active: false, stages: ["pending","pending","pending"], note: "Q4 2026", docs: [] },
+  { id: 17, name: "ConnectGrow",                    active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Support Ticket Flow", type: "Doc", desc: "Luồng xử lý ticket, SLA, escalation" }] },
+  { id: 18, name: "Photo Now",                      active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 19, name: "Xmedia",                         active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "DWH v2 Migration Plan", type: "Doc", desc: "Kế hoạch nâng cấp data warehouse" }] },
+  { id: 20, name: "Xmedia",                         active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
+  { id: 21, name: "SmartKids",                      active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "i18n Scope & Language List", type: "Doc", desc: "Danh sách ngôn ngữ, chiến lược dịch thuật" }] },
   { id: 22, name: "Partner API v2",                 active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
   { id: 23, name: "Mobile Payment App",             active: false, stages: ["pending","pending","pending"], note: "Q4 2026", docs: [] },
   { id: 24, name: "Business Process Automation",    active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
@@ -178,17 +178,8 @@ function fmtNum(n: number, unit: string) {
   return String(n);
 }
 
-function avgOKR(krs: { current: number; target: number }[]) {
-  if (!krs.length) return 0;
-  const total = krs.reduce((s, k) => {
-    const pct = k.target > 0 ? Math.min(1, k.current / k.target) : 0;
-    return s + pct;
-  }, 0);
-  return Math.round((total / krs.length) * 100);
-}
-
 export default function DashboardPage() {
-  const { teams, tasks, lastUpdated, loading, getTeamProgress, getTeamStats, getTeamObjectives, getCompanyObjectives,
+  const { teams, tasks, lastUpdated, loading, getTeamProgress, getTeamStats,
           role, roleName, setAuth, logoutAuth } = useApp();
   const [projectModalOpen, setProjectModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -298,19 +289,9 @@ export default function DashboardPage() {
   const allWeight   = tasks.reduce((s, t) => s + t.weight, 0);
   const doneWeight  = tasks.filter((t) => t.done).reduce((s, t) => s + t.weight, 0);
   const overallPct  = allWeight > 0 ? Math.round((doneWeight / allWeight) * 100) : 0;
-  const totalDone   = tasks.filter((t) => t.done).length;
-  const todayStr    = TODAY.toISOString().split("T")[0];
-  const totalOverdue = tasks.filter((t) => !t.done && t.deadline < todayStr).length;
-
-  // ── OKR average ──────────────────────────────────────────────────────────
-  const allObjs = [...getCompanyObjectives(), ...teams.flatMap((t) => getTeamObjectives(t.id))];
-  const allKRs  = allObjs.flatMap((o) => o.keyResults);
-  const avgOKRPct = avgOKR(allKRs);
 
   // ── Teams at risk ─────────────────────────────────────────────────────────
   const teamHealthData = teams.map((t) => ({ team: t, pct: getTeamProgress(t.id), health: getHealth(getTeamProgress(t.id)) }));
-  const atRiskCount    = teamHealthData.filter((d) => d.health.label === "Nguy hiểm").length;
-  const onTrackCount   = teamHealthData.filter((d) => d.health.label === "Đúng tiến độ").length;
 
   // ── Bottleneck: owner with most pending tasks ────────────────────────────
   const pending = tasks.filter((t) => !t.done);
@@ -381,11 +362,12 @@ export default function DashboardPage() {
       {/* ── Row 1: Summary stat cards ──────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
         {[
-          { label: "GMV",            value: "2",                           sub: "tỷ USD",                    accent: "#6366f1", noBar: true },
-          { label: "Xgroup",         value: `${overallPct}%`,              sub: "theo trọng số",             accent: "#10b981" },
-          { label: "OKR trung bình", value: `${avgOKRPct}%`,               sub: "kết quả then chốt",         accent: "#8b5cf6" },
-          { label: "Team nguy hiểm", value: `${atRiskCount}`,              sub: `${onTrackCount} đúng hạn`,  accent: atRiskCount > 0 ? "#ef4444" : "#10b981" },
-          { label: "Quá hạn",        value: `${totalOverdue}`,             sub: "cần xử lý ngay",            accent: totalOverdue > 0 ? "#f97316" : "#94a3b8" },
+          { label: "Xgroup",         value: `${overallPct}%`,              sub: "theo OKR trung bình",       accent: "#10b981" },
+          { label: "GMV",            value: "500",                         sub: "M USD",                     accent: "#6366f1", noBar: true },
+          { label: "DOANH THU",      value: "50",                          sub: "M USD",                     accent: "#f59e0b" },
+          { label: "NHÂN SỰ HỆ THỐNG", value: "5000",                      sub: "người",                     accent: "#8b5cf6" },
+          { label: "TEAM VƯỢT TRỘI", value: "5",                           sub: "team",                      accent: "#10b981" },
+          { label: "TEAM QUÁ HẠN",   value: "1",                           sub: "team",                      accent: "#f97316" },
         ].map((s) => (
           <div key={s.label} className="backdrop-blur-md rounded-2xl px-4 py-4 text-center relative overflow-hidden"
             style={{
@@ -403,7 +385,7 @@ export default function DashboardPage() {
       {/* ── Row 2: Annual KPI targets ──────────────────────────────────────── */}
       <div className="backdrop-blur-md rounded-2xl px-6 py-5 mb-6" style={{ background: "rgba(20,20,20,0.22)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 2px 12px rgba(0,0,0,0.40)" }}>
         <div className="text-center mb-5">
-          <h2 className="font-bold text-base tracking-tight flex items-center justify-center gap-2" style={{ color: "#ffffff" }}><Target size={14} style={{ color: "#aaaaaa" }} /> KPI CHIẾN LƯỢC NĂM 2026</h2>
+          <h2 className="font-bold text-base tracking-tight text-center" style={{ color: "#ffffff" }}>KPI CHIẾN LƯỢC NĂM 2026</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
           {ANNUAL_KPIS.map((kpi) => {
@@ -450,17 +432,37 @@ export default function DashboardPage() {
             const stats    = getTeamStats(team.id);
             const forecast = q1Forecast(pct);
             const animDelay = `${i * 80}ms`;
+            const clampedPct = Math.max(0, Math.min(100, pct));
+            const glowStrength = clampedPct / 100;
+            const effectScale = 0.5;
+            const highEndBoost = 1 + glowStrength * 0.333; // +33% at 100%
+            const barBrightness = 1 + glowStrength * 2 * effectScale * highEndBoost;
+            const barSaturate = 1 + glowStrength * 0.8 * effectScale * highEndBoost;
+            const nearGlow = (4 + glowStrength * 10) * effectScale * highEndBoost;
+            const farGlow = (8 + glowStrength * 18) * effectScale * highEndBoost;
+            const sheenOpacity = Math.min(1, (0.20 + glowStrength * 0.60) * effectScale * highEndBoost);
+            const hotspotOpacity = Math.min(1, (0.15 + glowStrength * 0.75) * effectScale * highEndBoost);
+            const nearGlowAlpha = Math.min(0.9, 0.35 * highEndBoost);
+            const farGlowAlpha = Math.min(0.9, 0.28 * highEndBoost);
             return (
               <Link key={team.id} href={`/teams/${team.id}`}>
                 <div className="group rounded-xl px-3 py-3 -mx-3 hover:bg-white/5 transition-colors cursor-pointer">
                   {/* Top row: name + health badge + stats */}
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center shadow-sm text-white"
-                      style={{ backgroundColor: team.color }}>
+                      style={{ background: "linear-gradient(135deg, #c9a227, #f5d060)" }}>
                       <TeamIcon id={team.id} />
                     </div>
                     <span className="text-sm font-semibold transition-colors w-28 shrink-0 truncate" style={{ color: "#ffffff" }}>{team.name}</span>
-                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${health.cls} shrink-0`}>
+                    <span className="text-xs font-bold shrink-0" style={{ color: "#f5d060" }}>{pct}%</span>
+                    <span
+                      className="text-[11px] font-semibold px-2 py-0.5 rounded-full border shrink-0"
+                      style={{
+                        color: "#f5d060",
+                        borderColor: "rgba(245,208,96,0.45)",
+                        background: "rgba(201,162,39,0.14)",
+                      }}
+                    >
                       {health.label}
                     </span>
                     <div className="hidden sm:flex items-center gap-3 ml-auto text-xs shrink-0" style={{ color: "#888888" }}>
@@ -475,22 +477,47 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Bar */}
-                  <div className="relative h-7 rounded-xl overflow-hidden"
-                    style={{ background: "rgba(36,36,36,0.8)" }}>
+                  <div
+                    className="relative h-2 rounded-full overflow-visible"
+                    style={{ background: "rgba(255,255,255,0.10)", boxShadow: "inset 0 0 0 1px rgba(245,208,96,0.10)" }}
+                  >
                     {/* Expected-progress marker line */}
                     <div className="absolute top-0 bottom-0 w-0.5 bg-slate-400/40 z-10"
                       style={{ left: `${timeElapsedPct}%` }} />
                     {/* Filled bar */}
-                    <div className="absolute left-0 top-0 h-full rounded-xl transition-all duration-700 ease-out"
-                      style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${team.color}bb, ${team.color})`, boxShadow: pct > 0 ? `0 2px 12px -2px ${team.color}66` : 'none', minWidth: pct > 0 ? "2rem" : "0", transitionDelay: animDelay }} />
+                    <div
+                      className="absolute left-0 top-0 h-full rounded-full transition-all duration-700 ease-out"
+                      style={{
+                        width: `${pct}%`,
+                        background: "linear-gradient(90deg, #8b6108 0%, #c9a227 35%, #f5d060 72%, #fff4b8 100%)",
+                        filter: `brightness(${barBrightness.toFixed(2)}) saturate(${barSaturate.toFixed(2)})`,
+                        boxShadow: pct > 5
+                          ? `0 0 ${nearGlow.toFixed(1)}px rgba(245,208,96,${nearGlowAlpha.toFixed(2)}), 0 0 ${farGlow.toFixed(1)}px rgba(245,208,96,${farGlowAlpha.toFixed(2)}), inset 0 0 2px rgba(255,248,210,0.40)`
+                          : "none",
+                        transitionDelay: animDelay,
+                      }}
+                    >
+                      <div
+                        className="absolute inset-0 rounded-full pointer-events-none"
+                        style={{
+                          background: "linear-gradient(108deg, transparent 0%, rgba(255,243,184,0.12) 33%, rgba(255,248,210,0.95) 50%, rgba(255,243,184,0.14) 67%, transparent 100%)",
+                          opacity: sheenOpacity,
+                          mixBlendMode: "screen",
+                        }}
+                      />
+                      <div
+                        className="absolute right-0 top-1/2 -translate-y-1/2 rounded-full pointer-events-none"
+                        style={{
+                          width: "0.9rem",
+                          height: "0.9rem",
+                          background: "radial-gradient(circle, rgba(255,248,210,0.98) 0%, rgba(245,208,96,0.60) 46%, rgba(245,208,96,0) 75%)",
+                          opacity: hotspotOpacity,
+                        }}
+                      />
+                    </div>
                     {[25, 50, 75].map((mark) => (
                       <div key={mark} className="absolute top-0 bottom-0 w-px bg-white/60" style={{ left: `${mark}%` }} />
                     ))}
-                    {pct >= 10 && (
-                      <span className="absolute left-0 top-0 h-full flex items-center pl-3 text-xs font-bold text-white" style={{ width: `${pct}%` }}>
-                        {pct}%
-                      </span>
-                    )}
                   </div>
 
                   {/* Mobile forecast */}
@@ -524,11 +551,10 @@ export default function DashboardPage() {
             {/* ── Left: AI Quick Analysis ── */}
             <div>
               <div className="mb-3">
-                <h3 className="font-bold text-sm tracking-tight flex items-center gap-2 mb-1" style={{ color: "#ffffff" }}>
-                  <Bot size={14} strokeWidth={2} className="shrink-0" style={{ color: "#aaaaaa" }} />
+                <h3 className="font-bold text-sm tracking-tight text-center mb-1" style={{ color: "#ffffff" }}>
                   Phân Tích Nhanh · AI
                 </h3>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center justify-center gap-1.5">
                   {aiLoading
                     ? <span className="text-[10px] animate-pulse flex items-center gap-1" style={{ color: "#888888" }}><div className="w-2.5 h-2.5 border border-slate-400 border-t-transparent rounded-full animate-spin shrink-0" /> Đang cập nhật...</span>
                     : aiUpdatedAt
@@ -569,13 +595,16 @@ export default function DashboardPage() {
 
             {/* ── Right: Strategic Alerts ── */}
             <div>
-              <h3 className="font-bold text-sm mb-3 tracking-tight flex items-center gap-2" style={{ color: "#ffffff" }}>
-                <Zap size={14} strokeWidth={2} className="shrink-0" style={{ color: "#aaaaaa" }} />
-                Cảnh Báo Chiến Lược
-              </h3>
+              <div className="mb-3">
+                <h3 className="font-bold text-sm tracking-tight text-center mb-1" style={{ color: "#ffffff" }}>
+                  Cảnh Báo Chiến Lược
+                </h3>
+                {/* Spacer to align first alert row with the first AI bullet row on the left column */}
+                <div className="h-[14px]" />
+              </div>
               <div className="space-y-2">
                 {teamHealthData.filter((d) => d.health.label !== "Đúng tiến độ").length === 0 && (
-                  <p className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+                  <p className="text-xs font-semibold flex items-center gap-1" style={{ color: "#f5d060" }}>
                     <CheckCircle2 size={13} /> Tất cả phòng ban đang đúng tiến độ!
                   </p>
                 )}
@@ -630,20 +659,50 @@ export default function DashboardPage() {
       {projectModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setProjectModalOpen(false)}>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}
-            style={{ background: "#181818", border: "1px solid rgba(255,255,255,0.10)", boxShadow: "0 24px 80px -8px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.06)" }}>
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}
+              style={{ background: "#181818", border: "1px solid rgba(255,255,255,0.10)", boxShadow: "0 24px 80px -8px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.06)" }}>
             {/* Modal header */}
-            <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-              <div>
-                <h2 className="font-bold text-lg flex items-center gap-2" style={{ color: "#ffffff", letterSpacing: "0.06em" }}><Rocket size={16} style={{ color: "#aaaaaa" }} /> 30 DỰ ÁN TRIỂN KHAI</h2>
+            <div className="relative px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+              <div className="text-center">
+                <h2 className="font-bold text-lg text-center" style={{ color: "#ffffff", letterSpacing: "0.06em" }}>30 DỰ ÁN TRIỂN KHAI</h2>
                 <p className="text-xs mt-0.5" style={{ color: "#aaaaaa" }}>8 đang triển khai · 22 đang lên kế hoạch</p>
               </div>
-              <button onClick={() => setProjectModalOpen(false)} className="w-8 h-8 rounded-full flex items-center justify-center text-lg transition-colors"
+              <button onClick={() => setProjectModalOpen(false)} className="absolute right-6 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center text-lg transition-colors"
                 style={{ color: "#aaaaaa", background: "rgba(255,255,255,0.06)" }}>✕</button>
             </div>
             {/* Modal body */}
             <div className="overflow-y-auto p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div
+                  className="rounded-xl border p-4 transition-all cursor-pointer hover:shadow-md"
+                  style={{
+                    borderColor: "rgba(255,255,255,0.22)",
+                    background: "rgba(28,28,28,0.78)",
+                    boxShadow: "0 2px 12px -2px rgba(0,0,0,0.40)",
+                  }}
+                  title="Khởi tạo dự án mới"
+                >
+                  <div className="flex items-start gap-2 mb-3">
+                    <span
+                      className="mt-0.5 w-6 h-6 rounded flex items-center justify-center text-sm font-bold"
+                      style={{ background: "rgba(255,255,255,0.08)", color: "#cccccc", border: "1px solid rgba(255,255,255,0.20)" }}
+                    >
+                      +
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold leading-tight" style={{ color: "#ffffff" }}>Thêm dự án</p>
+                      <p className="text-[11px] mt-0.5" style={{ color: "#aaaaaa" }}>Khởi tạo dự án mới</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-1.5">
+                    {(["Ý tưởng", "Demo", "Ra thị trường"] as const).map((label, idx) => (
+                      <div key={label} className="flex-1 text-center">
+                        <div className="h-1.5 rounded-full mb-1" style={{ background: "rgba(255,255,255,0.14)" }} />
+                        <p className="text-[10px] font-medium" style={{ color: `rgba(170,170,170,${0.75 - idx * 0.15})` }}>{label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
                 {PROJECTS.map((p) => {
                   const stageLabels = ["Ý tưởng", "Demo", "Ra thị trường"];
                   return (
@@ -1185,7 +1244,7 @@ export default function DashboardPage() {
                     </span>
                     {selectedProject.active && <span className="text-xs bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full flex items-center gap-1"><CheckCircle2 size={10} /> Đang triển khai</span>}
                   </div>
-                  <h3 className="font-bold text-base text-center" style={{ color: "#ffffff" }}>{selectedProject.name}</h3>
+                  <h3 className="font-bold text-base" style={{ color: "#ffffff" }}>{selectedProject.name}</h3>
                   <p className="text-xs mt-0.5" style={{ color: "#aaaaaa" }}>{selectedProject.note}</p>
                 </div>
                 <button onClick={() => setSelectedProject(null)} className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors"
@@ -1198,7 +1257,7 @@ export default function DashboardPage() {
                   return (
                     <div key={si} className="flex-1 text-center">
                       <div className="h-1.5 rounded-full mb-1" style={{ background: s === "pending" ? `${STAGE_HUES[si]}40` : STAGE_HUES[si] }} />
-                      <p className="text-[10px] font-medium" style={{ color: s === "pending" ? `${STAGE_HUES[si]}99` : STAGE_HUES[si] }}>{lbl}</p>
+                      <p className="text-[10px] font-medium" style={{ color: "#aaaaaa" }}>{lbl}</p>
                     </div>
                   );
                 })}
@@ -1244,6 +1303,18 @@ export default function DashboardPage() {
                   ))}
                 </div>
               )}
+              <div className="mt-3">
+                <div
+                  className="w-full rounded-xl px-3 py-3 text-center text-sm font-semibold border border-dashed"
+                  style={{
+                    color: "#aaaaaa",
+                    borderColor: "rgba(255,255,255,0.24)",
+                    background: "rgba(255,255,255,0.06)",
+                  }}
+                >
+                  Thêm tài liệu
+                </div>
+              </div>
             </div>
           </div>
         </div>

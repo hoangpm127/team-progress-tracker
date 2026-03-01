@@ -8,16 +8,28 @@ import Goal, { objProgress } from "@/components/Goal";
 /* ── Department metadata ─────────────────────────────────── */
 
 const TEAM_META: Record<string, { name: string; color: string; icon: string }> = {
-  company:      { name: "Toàn công ty", color: "#64748b", icon: "CO" },
-  mkt:          { name: "Marketing",    color: "#ec4899", icon: "MK" },
-  partnerships: { name: "Hợp tác",      color: "#aaaaaa", icon: "HT" },
-  tech:         { name: "Công nghệ",    color: "#888888", icon: "CN" },
-  hr:           { name: "Nhân sự",      color: "#cccccc", icon: "NS" },
-  assistant:    { name: "Hành chính",   color: "#3b82f6", icon: "HC" },
+  company:      { name: "Toàn Công Ty", color: "#8b5cf6", icon: "TC" },
+  tech:         { name: "Công Nghệ",    color: "#ef4444", icon: "CN" },
+  hr:           { name: "Nhân Lực",     color: "#f97316", icon: "NL" },
+  mkt:          { name: "Chuyển Đổi",   color: "#eab308", icon: "CD" },
+  partnerships: { name: "Đối Tác",      color: "#22c55e", icon: "DT" },
+  assistant:    { name: "Trợ Lý",       color: "#3b82f6", icon: "TL" },
 };
 
-/* Clockwise: Toàn công ty → Marketing → Hợp tác → Công nghệ → Nhân sự → Hành chính */
-const SEGMENT_ORDER = ["company", "mkt", "partnerships", "assistant", "hr", "tech"];
+/* Clockwise: Toàn Công Ty (fixed) → Công Nghệ → Nhân Lực → Chuyển Đổi → Đối Tác → Trợ Lý */
+const SEGMENT_ORDER = ["company", "tech", "hr", "mkt", "partnerships", "assistant"];
+
+type EquitySlice = { id: string; label: string; pct: number; color: string };
+const EQUITY_SLICES: EquitySlice[] = [
+  { id: "chair",      label: "Chủ Tịch",        pct: 50, color: "#8b5cf6" },
+  { id: "tech",       label: "Công Nghệ",       pct: 10, color: "#ef4444" },
+  { id: "hr",         label: "Nhân Lực",        pct: 6,  color: "#f97316" },
+  { id: "mkt",        label: "Chuyển Đổi",      pct: 6,  color: "#eab308" },
+  { id: "partner",    label: "Đối Tác",         pct: 5,  color: "#22c55e" },
+  { id: "assistant",  label: "Trợ Lý",          pct: 3,  color: "#3b82f6" },
+  { id: "esop",       label: "ESOP",            pct: 15, color: "#14b8a6" },
+  { id: "advisory",   label: "Cố Vấn/Dự Phòng", pct: 5,  color: "#94a3b8" },
+];
 
 /* ── Add Objective Modal ─────────────────────────────────── */
 
@@ -295,14 +307,6 @@ function DeptWheel({
             <feDropShadow dx="0" dy="0" stdDeviation="7" floodColor={seg.meta.color} floodOpacity="0.55" />
           </filter>
         ))}
-        {/* Center gradient + shadow */}
-        <radialGradient id="ctrG" cx="40%" cy="35%" r="65%">
-          <stop offset="0%" stopColor="#2a2a2a" />
-          <stop offset="100%" stopColor="#181818" />
-        </radialGradient>
-        <filter id="ctrShd" x="-25%" y="-25%" width="150%" height="150%">
-          <feDropShadow dx="0" dy="3" stdDeviation="10" floodColor="#aaaaaa" floodOpacity="0.12" />
-        </filter>
       </defs>
 
       {/* Outer decorative halo */}
@@ -349,14 +353,120 @@ function DeptWheel({
         );
       })}
 
-      {/* Premium center circle */}
-      <circle cx={cx} cy={cy} r={innerR - 2} fill="url(#ctrG)" filter="url(#ctrShd)" />
+      {/* Center circle */}
+      <circle cx={cx} cy={cy} r={innerR - 2} fill="rgba(139, 92, 246, 0.35)" />
       <circle cx={cx} cy={cy} r={innerR - 2} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" />
       <circle cx={cx} cy={cy} r={innerR - 18} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="3 6" />
       <text x={cx} y={cy - 20} textAnchor="middle" fontSize={8.5} fill="#aaaaaa" fontWeight={700} letterSpacing="0.12em">TỔNG QUAN</text>
       <text x={cx} y={cy + 12} textAnchor="middle" fontSize={30} fontWeight={800} fill="#ffffff">{overallAvg}%</text>
       <text x={cx} y={cy + 28} textAnchor="middle" fontSize={9.5} fill="#aaaaaa">{totalObjs} mục tiêu</text>
     </svg>
+  );
+}
+
+function EquityWheel() {
+  const size = 420;
+  const cx = size / 2;
+  const cy = size / 2;
+  const outerR = 195;
+  const innerR = 80;
+  const gapDeg = 1.4;
+
+  const [hovered, setHovered] = useState<string | null>(null);
+
+  function arc(ro: number, ri: number, a1: number, a2: number, la: number) {
+    const xs1 = cx + ro * Math.cos(a1), ys1 = cy + ro * Math.sin(a1);
+    const xs2 = cx + ro * Math.cos(a2), ys2 = cy + ro * Math.sin(a2);
+    const xs3 = cx + ri * Math.cos(a2), ys3 = cy + ri * Math.sin(a2);
+    const xs4 = cx + ri * Math.cos(a1), ys4 = cy + ri * Math.sin(a1);
+    return `M ${xs1} ${ys1} A ${ro} ${ro} 0 ${la} 1 ${xs2} ${ys2} L ${xs3} ${ys3} A ${ri} ${ri} 0 ${la} 0 ${xs4} ${ys4} Z`;
+  }
+
+  const segments = EQUITY_SLICES
+    .reduce<{
+      cursorDeg: number;
+      list: Array<EquitySlice & { path: string; lx: number; ly: number; nameY: number; pctY: number; nameFs: number; pctFs: number }>;
+    }>((acc, slice) => {
+      const sweep = (slice.pct / 100) * 360;
+      const startDeg = acc.cursorDeg + gapDeg / 2;
+      const endDeg = acc.cursorDeg + sweep - gapDeg / 2;
+
+      const startRad = (startDeg * Math.PI) / 180;
+      const endRad = (endDeg * Math.PI) / 180;
+      const largeArc = endDeg - startDeg > 180 ? 1 : 0;
+      const path = arc(outerR, innerR, startRad, endRad, largeArc);
+
+      const midDeg = (startDeg + endDeg) / 2;
+      const midRad = (midDeg * Math.PI) / 180;
+      const labelR = (outerR + innerR) / 2;
+      const lx = cx + labelR * Math.cos(midRad);
+      const ly = cy + labelR * Math.sin(midRad);
+      const nameFs = slice.pct >= 15 ? 10.5 : 8.5;
+      const pctFs = slice.pct >= 15 ? 12.5 : 10.5;
+      const nameY = ly - 2;
+      const pctY = ly + 10;
+
+      return {
+        cursorDeg: acc.cursorDeg + sweep,
+        list: [...acc.list, { ...slice, path, lx, ly, nameY, pctY, nameFs, pctFs }],
+      };
+    }, { cursorDeg: -90, list: [] })
+    .list;
+
+  return (
+    <div className="flex flex-col items-center">
+      <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full max-w-[420px] max-h-[420px] select-none">
+        <defs>
+          {segments.map(seg => (
+            <linearGradient key={`eq-grad-${seg.id}`} id={`eq-grad-${seg.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={seg.color} stopOpacity="0.72" />
+              <stop offset="100%" stopColor={seg.color} stopOpacity="1" />
+            </linearGradient>
+          ))}
+          {segments.map(seg => (
+            <filter key={`eq-glow-${seg.id}`} id={`eq-glow-${seg.id}`} x="-25%" y="-25%" width="150%" height="150%">
+              <feDropShadow dx="0" dy="0" stdDeviation="7" floodColor={seg.color} floodOpacity="0.5" />
+            </filter>
+          ))}
+        </defs>
+
+        <circle cx={cx} cy={cy} r={outerR + 6} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="2" />
+
+        {segments.map(seg => {
+          const isHover = hovered === seg.id;
+          return (
+            <g key={seg.id}
+              className="cursor-default"
+              onMouseEnter={() => setHovered(seg.id)}
+              onMouseLeave={() => setHovered(null)}>
+              <path
+                d={seg.path}
+                fill={isHover ? `url(#eq-grad-${seg.id})` : seg.color + "14"}
+                stroke={isHover ? seg.color : seg.color + "66"}
+                strokeWidth={isHover ? 2.5 : 1.2}
+                filter={isHover ? `url(#eq-glow-${seg.id})` : undefined}
+                className="transition-all duration-200"
+              />
+              <text x={seg.lx} y={seg.nameY} textAnchor="middle" fontSize={seg.nameFs} fontWeight={700}
+                fill={isHover ? "#ffffff" : "#d4d4d8"} className="pointer-events-none">
+                {seg.label}
+              </text>
+              <text x={seg.lx} y={seg.pctY} textAnchor="middle" fontSize={seg.pctFs} fontWeight={800}
+                fill={isHover ? "#ffffff" : seg.color} className="pointer-events-none">
+                {seg.pct}%
+              </text>
+            </g>
+          );
+        })}
+
+        <circle cx={cx} cy={cy} r={innerR - 2} fill="rgba(139, 92, 246, 0.35)" />
+        <circle cx={cx} cy={cy} r={innerR - 2} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" />
+        <circle cx={cx} cy={cy} r={innerR - 18} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="3 6" />
+        <text x={cx} y={cy - 20} textAnchor="middle" fontSize={8.5} fill="#aaaaaa" fontWeight={700} letterSpacing="0.12em">XGROUP</text>
+        <text x={cx} y={cy + 12} textAnchor="middle" fontSize={30} fontWeight={800} fill="#ffffff">3,5T</text>
+        <text x={cx} y={cy + 28} textAnchor="middle" fontSize={9.5} fill="#aaaaaa">USD</text>
+      </svg>
+    </div>
   );
 }
 
@@ -434,23 +544,6 @@ export default function OKRPage() {
         ))}
       </div>
 
-      {/* Summary stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        {[
-          { label: "Tổng Mục Tiêu",     value: totalObjs,         sub: "toàn công ty" },
-          { label: "Hoàn Thành",        value: completedObjs,     sub: "đã đạt 100%" },
-          { label: "Kết Quả Then Chốt", value: totalKRs,          sub: "key results" },
-          { label: "Tiến Độ TB",        value: `${avgOverall}%`,  sub: "trung bình OKR" },
-        ].map(s => (
-          <div key={s.label} className="rounded-2xl px-4 py-4 text-center backdrop-blur-md"
-            style={{ background: "rgba(55,55,62,0.52)", border: "1px solid rgba(155,155,165,0.32)", boxShadow: "0 4px 18px rgba(0,0,0,0.45)" }}>
-            <p className="text-[10px] font-bold mb-1.5 leading-tight uppercase tracking-wider" style={{ color: "#b0b0b8" }}>{s.label}</p>
-            <p className="text-[1.6rem] font-black leading-none mb-1 tabular-nums" style={{ color: "#ffffff" }}>{s.value}</p>
-            <p className="text-[10px] leading-tight" style={{ color: "#888890" }}>{s.sub}</p>
-          </div>
-        ))}
-      </div>
-
       {/* Action buttons */}
       <div className="flex items-center justify-center gap-3 mb-6">
         {openDepts.size < 6 && (
@@ -475,11 +568,31 @@ export default function OKRPage() {
         </button>
       </div>
 
-      {/* Wheel */}
-      <div className="flex justify-center mb-6">
+      {/* Wheels */}
+      <div className="flex flex-col lg:flex-row items-center justify-center gap-6 mb-6">
         <div className="w-[300px] h-[300px] sm:w-[360px] sm:h-[360px] md:w-[420px] md:h-[420px]">
           <DeptWheel teamStats={teamStats} openSet={openDepts} onToggle={toggleDept} />
         </div>
+        <div className="w-[300px] sm:w-[360px] md:w-[420px]">
+          <EquityWheel />
+        </div>
+      </div>
+
+      {/* Summary stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        {[
+          { label: "Tổng Mục Tiêu",     value: totalObjs,         sub: "toàn công ty" },
+          { label: "Hoàn Thành",        value: completedObjs,     sub: "đã đạt 100%" },
+          { label: "Kết Quả Then Chốt", value: totalKRs,          sub: "key results" },
+          { label: "Tiến Độ TB",        value: `${avgOverall}%`,  sub: "trung bình OKR" },
+        ].map(s => (
+          <div key={s.label} className="rounded-2xl px-4 py-4 text-center backdrop-blur-md"
+            style={{ background: "rgba(55,55,62,0.52)", border: "1px solid rgba(155,155,165,0.32)", boxShadow: "0 4px 18px rgba(0,0,0,0.45)" }}>
+            <p className="text-[10px] font-bold mb-1.5 leading-tight uppercase tracking-wider" style={{ color: "#b0b0b8" }}>{s.label}</p>
+            <p className="text-[1.6rem] font-black leading-none mb-1 tabular-nums" style={{ color: "#ffffff" }}>{s.value}</p>
+            <p className="text-[10px] leading-tight" style={{ color: "#888890" }}>{s.sub}</p>
+          </div>
+        ))}
       </div>
 
       {/* Expanded panels */}
