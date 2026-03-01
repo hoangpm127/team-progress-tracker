@@ -8,7 +8,7 @@ import Goal, { objProgress } from "@/components/Goal";
 /* ── Department metadata ─────────────────────────────────── */
 
 const TEAM_META: Record<string, { name: string; color: string; icon: string }> = {
-  company:      { name: "Toàn Công Ty", color: "#8b5cf6", icon: "TC" },
+  company:      { name: "Toàn Công Ty", color: "#4f46e5", icon: "TC" },
   tech:         { name: "Công Nghệ",    color: "#ef4444", icon: "CN" },
   hr:           { name: "Nhân Lực",     color: "#f97316", icon: "NL" },
   mkt:          { name: "Chuyển Đổi",   color: "#eab308", icon: "CD" },
@@ -18,6 +18,7 @@ const TEAM_META: Record<string, { name: string; color: string; icon: string }> =
 
 /* Clockwise: Toàn Công Ty (fixed) → Công Nghệ → Nhân Lực → Chuyển Đổi → Đối Tác → Trợ Lý */
 const SEGMENT_ORDER = ["company", "tech", "hr", "mkt", "partnerships", "assistant"];
+const WHEEL_SEGMENT_ORDER = ["company", "tech", "hr", "mkt", "partnerships", "assistant"];
 
 type EquitySlice = { id: string; label: string; pct: number; color: string };
 const EQUITY_SLICES: EquitySlice[] = [
@@ -27,7 +28,7 @@ const EQUITY_SLICES: EquitySlice[] = [
   { id: "mkt",        label: "Chuyển Đổi",      pct: 6,  color: "#eab308" },
   { id: "partner",    label: "Đối Tác",         pct: 5,  color: "#22c55e" },
   { id: "assistant",  label: "Trợ Lý",          pct: 3,  color: "#3b82f6" },
-  { id: "esop",       label: "ESOP",            pct: 15, color: "#14b8a6" },
+  { id: "esop",       label: "ESOP",            pct: 15, color: "#4f46e5" },
   { id: "advisory",   label: "Cố Vấn/Dự Phòng", pct: 5,  color: "#94a3b8" },
 ];
 
@@ -225,7 +226,7 @@ function DeptWheel({
   const cy = size / 2;
   const outerR = 195;
   const innerR = 80;
-  const segCount = SEGMENT_ORDER.length;
+  const segCount = WHEEL_SEGMENT_ORDER.length;
   const gapDeg = 2;
 
   const [hovered, setHovered] = useState<string | null>(null);
@@ -239,7 +240,7 @@ function DeptWheel({
     return `M ${xs1} ${ys1} A ${ro} ${ro} 0 ${la} 1 ${xs2} ${ys2} L ${xs3} ${ys3} A ${ri} ${ri} 0 ${la} 0 ${xs4} ${ys4} Z`;
   }
 
-  const segments = SEGMENT_ORDER.map((id, i) => {
+  const segments = WHEEL_SEGMENT_ORDER.map((id, i) => {
     const meta = TEAM_META[id];
     const startDeg = (i * 360) / segCount - 90 + gapDeg / 2;
     const endDeg = ((i + 1) * 360) / segCount - 90 - gapDeg / 2;
@@ -285,12 +286,6 @@ function DeptWheel({
     return { id, meta, path, lx, ly, stats, isOpen, trackPath, fillPath };
   });
 
-  const allCounts = Object.values(teamStats);
-  const totalObjs = allCounts.reduce((s, t) => s + t.count, 0);
-  const overallAvg = totalObjs > 0
-    ? Math.round(Object.values(teamStats).reduce((s, t) => s + t.avg * t.count, 0) / totalObjs)
-    : 0;
-
   return (
     <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full max-w-[420px] max-h-[420px] select-none">
       <defs>
@@ -334,21 +329,40 @@ function DeptWheel({
             {seg.fillPath && (
               <path d={seg.fillPath} fill={isActive ? "rgba(255,255,255,0.65)" : seg.meta.color} opacity={isActive ? 1 : 0.65} className="pointer-events-none" />
             )}
-            {/* Department name */}
-            <text x={seg.lx} y={seg.ly + 3} textAnchor="middle" fontSize={10.5} fontWeight={700}
-              fill={isActive ? "#fff" : "#cccccc"} className="pointer-events-none">
-              {seg.meta.name}
-            </text>
-            {/* Obj count */}
-            <text x={seg.lx} y={seg.ly + 16} textAnchor="middle" fontSize={9}
-              fill={isActive ? "#ffffffbb" : "#aaaaaa"} className="pointer-events-none">
-              {seg.stats.count} MT
-            </text>
-            {/* Avg % */}
-            <text x={seg.lx} y={seg.ly + 30} textAnchor="middle" fontSize={13} fontWeight={800}
-              fill={isActive ? "#fff" : seg.meta.color} className="pointer-events-none">
-              {seg.stats.avg}%
-            </text>
+            {seg.id === "company" ? (
+              <>
+                <text x={seg.lx} y={seg.ly + 3} textAnchor="middle" fontSize={10.5} fontWeight={700}
+                  fill={isActive ? "#fff" : "#cccccc"} className="pointer-events-none">
+                  ESOP/Cố Vấn
+                </text>
+                <text x={seg.lx} y={seg.ly + 16} textAnchor="middle" fontSize={9}
+                  fill={isActive ? "#ffffffd0" : "#aaaaaa"} className="pointer-events-none">
+                  4 MT
+                </text>
+                <text x={seg.lx} y={seg.ly + 30} textAnchor="middle" fontSize={13} fontWeight={800}
+                  fill={isActive ? "#fff" : seg.meta.color} className="pointer-events-none">
+                  58%
+                </text>
+              </>
+            ) : (
+              <>
+                {/* Department name */}
+                <text x={seg.lx} y={seg.ly + 3} textAnchor="middle" fontSize={10.5} fontWeight={700}
+                  fill={isActive ? "#fff" : "#cccccc"} className="pointer-events-none">
+                  {seg.meta.name}
+                </text>
+                {/* Obj count */}
+                <text x={seg.lx} y={seg.ly + 16} textAnchor="middle" fontSize={9}
+                  fill={isActive ? "#ffffffbb" : "#aaaaaa"} className="pointer-events-none">
+                  {seg.stats.count} MT
+                </text>
+                {/* Avg % */}
+                <text x={seg.lx} y={seg.ly + 30} textAnchor="middle" fontSize={13} fontWeight={800}
+                  fill={isActive ? "#fff" : seg.meta.color} className="pointer-events-none">
+                  {seg.stats.avg}%
+                </text>
+              </>
+            )}
           </g>
         );
       })}
@@ -357,9 +371,8 @@ function DeptWheel({
       <circle cx={cx} cy={cy} r={innerR - 2} fill="rgba(139, 92, 246, 0.35)" />
       <circle cx={cx} cy={cy} r={innerR - 2} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" />
       <circle cx={cx} cy={cy} r={innerR - 18} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="3 6" />
-      <text x={cx} y={cy - 20} textAnchor="middle" fontSize={8.5} fill="#aaaaaa" fontWeight={700} letterSpacing="0.12em">TỔNG QUAN</text>
-      <text x={cx} y={cy + 12} textAnchor="middle" fontSize={30} fontWeight={800} fill="#ffffff">{overallAvg}%</text>
-      <text x={cx} y={cy + 28} textAnchor="middle" fontSize={9.5} fill="#aaaaaa">{totalObjs} mục tiêu</text>
+      <text x={cx} y={cy - 16} textAnchor="middle" fontSize={8.5} fill="#aaaaaa" fontWeight={700} letterSpacing="0.12em">TIẾN ĐỘ</text>
+      <text x={cx} y={cy + 12} textAnchor="middle" fontSize={30} fontWeight={800} fill="#ffffff">68%</text>
     </svg>
   );
 }
@@ -462,9 +475,9 @@ function EquityWheel() {
         <circle cx={cx} cy={cy} r={innerR - 2} fill="rgba(139, 92, 246, 0.35)" />
         <circle cx={cx} cy={cy} r={innerR - 2} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" />
         <circle cx={cx} cy={cy} r={innerR - 18} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="3 6" />
-        <text x={cx} y={cy - 20} textAnchor="middle" fontSize={8.5} fill="#aaaaaa" fontWeight={700} letterSpacing="0.12em">XGROUP</text>
-        <text x={cx} y={cy + 12} textAnchor="middle" fontSize={30} fontWeight={800} fill="#ffffff">3,5T</text>
-        <text x={cx} y={cy + 28} textAnchor="middle" fontSize={9.5} fill="#aaaaaa">USD</text>
+        <text x={cx} y={cy - 16} textAnchor="middle" fontSize={8.5} fill="#aaaaaa" fontWeight={700} letterSpacing="0.12em">MỤC TIÊU</text>
+        <text x={cx} y={cy + 12} textAnchor="middle" fontSize={30} fontWeight={800} fill="#ffffff">3,5</text>
+        <text x={cx} y={cy + 28} textAnchor="middle" fontSize={9.5} fill="#aaaaaa">T USD</text>
       </svg>
     </div>
   );
@@ -545,6 +558,16 @@ export default function OKRPage() {
       </div>
 
       {/* Action buttons */}
+      {/* Wheels */}
+      <div className="flex flex-col lg:flex-row items-center justify-center gap-6 mb-6">
+        <div className="w-[300px] h-[300px] sm:w-[360px] sm:h-[360px] md:w-[420px] md:h-[420px]">
+          <DeptWheel teamStats={teamStats} openSet={openDepts} onToggle={toggleDept} />
+        </div>
+        <div className="w-[300px] sm:w-[360px] md:w-[420px]">
+          <EquityWheel />
+        </div>
+      </div>
+
       <div className="flex items-center justify-center gap-3 mb-6">
         {openDepts.size < 6 && (
           <button onClick={() => setOpenDepts(new Set(SEGMENT_ORDER))}
@@ -566,16 +589,6 @@ export default function OKRPage() {
           <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" /></svg>
           Thêm mục tiêu
         </button>
-      </div>
-
-      {/* Wheels */}
-      <div className="flex flex-col lg:flex-row items-center justify-center gap-6 mb-6">
-        <div className="w-[300px] h-[300px] sm:w-[360px] sm:h-[360px] md:w-[420px] md:h-[420px]">
-          <DeptWheel teamStats={teamStats} openSet={openDepts} onToggle={toggleDept} />
-        </div>
-        <div className="w-[300px] sm:w-[360px] md:w-[420px]">
-          <EquityWheel />
-        </div>
       </div>
 
       {/* Summary stats */}

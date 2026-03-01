@@ -676,8 +676,8 @@ export default function DashboardPage() {
                 <div
                   className="rounded-xl border p-4 transition-all cursor-pointer hover:shadow-md"
                   style={{
-                    borderColor: "rgba(255,255,255,0.22)",
-                    background: "rgba(28,28,28,0.78)",
+                    borderColor: "rgba(255,255,255,0.26)",
+                    background: "rgba(48,48,48,0.76)",
                     boxShadow: "0 2px 12px -2px rgba(0,0,0,0.40)",
                   }}
                   title="Khởi tạo dự án mới"
@@ -1265,7 +1265,17 @@ export default function DashboardPage() {
             </div>
             {/* Docs */}
             <div className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider mb-3 flex items-center gap-1.5" style={{ color: "#aaaaaa" }}><FolderOpen size={12} /> Tài liệu đính kèm</p>
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#aaaaaa" }}><FolderOpen size={12} /> Tài liệu đính kèm</p>
+                <button
+                  type="button"
+                  className="w-6 h-6 rounded-md border flex items-center justify-center text-sm font-bold transition-colors hover:bg-white/10"
+                  style={{ color: "#aaaaaa", borderColor: "rgba(255,255,255,0.24)", background: "rgba(255,255,255,0.06)" }}
+                  title="Thêm tài liệu"
+                >
+                  +
+                </button>
+              </div>
               {selectedProject.docs.length === 0 ? (
                 <div className="text-center py-8 text-slate-400">
                   <div className="flex justify-center mb-2"><Inbox size={36} style={{ color: "rgba(100,116,139,0.4)" }} /></div>
@@ -1303,18 +1313,6 @@ export default function DashboardPage() {
                   ))}
                 </div>
               )}
-              <div className="mt-3">
-                <div
-                  className="w-full rounded-xl px-3 py-3 text-center text-sm font-semibold border border-dashed"
-                  style={{
-                    color: "#aaaaaa",
-                    borderColor: "rgba(255,255,255,0.24)",
-                    background: "rgba(255,255,255,0.06)",
-                  }}
-                >
-                  Thêm tài liệu
-                </div>
-              </div>
             </div>
           </div>
         </div>
