@@ -1,0 +1,57 @@
+{
+  "original_size": {
+    "width": 4500,
+    "height": 3375
+  },
+  "viewBox": "0 0 4500 3375",
+  "layers": [
+    {
+      "id": "aligned_5.png",
+      "x": 1917,
+      "y": 706,
+      "width": 1294,
+      "height": 2029,
+      "source": "5.png"
+    },
+    {
+      "id": "aligned_6.png",
+      "x": 1282,
+      "y": 0,
+      "width": 2461,
+      "height": 1884,
+      "source": "6.png"
+    },
+    {
+      "id": "aligned_9.png",
+      "x": 931,
+      "y": 0,
+      "width": 2584,
+      "height": 2872,
+      "source": "9.png"
+    },
+    {
+      "id": "aligned_10.png",
+      "x": 1118,
+      "y": 791,
+      "width": 1225,
+      "height": 678,
+      "source": "10.png"
+    },
+    {
+      "id": "aligned_13.png",
+      "x": 8,
+      "y": 2922,
+      "width": 4492,
+      "height": 276,
+      "source": "13.png"
+    },
+    {
+      "id": "aligned_14.png",
+      "x": 0,
+      "y": 3196,
+      "width": 4500,
+      "height": 177,
+      "source": "14.png"
+    }
+  ]
+}

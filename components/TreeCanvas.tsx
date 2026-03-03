@@ -1,25 +1,41 @@
-"use client";
+﻿"use client";
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { useApp } from "@/lib/AppContext";
 
-// ─────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+//  LAYER JSON â€” static import (public/pic_layers/ for images)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const RAW = require("@/scripts/pic_layers_report.json") as {
+  original_size: { width: number; height: number };
+  layers: LayerEntry[];
+};
+interface LayerEntry {
+  id: string; source: string;
+  x: number; y: number; width: number; height: number;
+  rotation?: number; flipX?: boolean;
+  zIndex: number; opacity: number;
+  isSliced?: boolean; sliceType?: string; origH?: number; origY?: number;
+}
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //  ZONE META
-// ─────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 type ZoneId = "tech"|"hr"|"mkt"|"heaven"|"partnerships"|"market"|"assistant"|"piano";
 const ZONE_META: Record<ZoneId,{icon:string;title:string;color:string;border:string;subtitle:string;teamId:string|null}> = {
-  tech:         {icon:"⚙️", title:"Công nghệ",  color:"#888888",border:"#aaaaaa",subtitle:"Thân cây — Technology Core",        teamId:"tech"},
-  hr:           {icon:"👥", title:"Nhân sự",    color:"#cccccc",border:"#dddddd",subtitle:"Rễ cây — Human Resources",          teamId:"hr"},
-  mkt:          {icon:"📣", title:"Marketing",  color:"#999999",border:"#aaaaaa",subtitle:"Mây trái — Quảng bá & Thương hiệu", teamId:"mkt"},
-  heaven:       {icon:"🌦", title:"Thiên thời", color:"#888888",border:"#aaaaaa",subtitle:"Mây phải — Cơ hội & Thời điểm",    teamId:null},
-  partnerships: {icon:"🤝", title:"Hợp tác",    color:"#aaaaaa",border:"#bbbbbb",subtitle:"Cỏ xanh — 4 nhóm đối tác",         teamId:"partnerships"},
-  market:       {icon:"🌍", title:"Thị trường", color:"#888888",border:"#aaaaaa",subtitle:"Đất — Bối cảnh kinh doanh",         teamId:null},
-  assistant:    {icon:"📋", title:"Hành chính", color:"#aaaaaa",border:"#bbbbbb",subtitle:"Nhánh phải — BOD / Admin",          teamId:"assistant"},
-  piano:        {icon:"🎹", title:"Piano",      color:"#999999",border:"#aaaaaa",subtitle:"Nhánh trái — Piano Division",       teamId:"piano"},
+  tech:         {icon:"âš™ï¸", title:"CÃ´ng nghá»‡",  color:"#888888",border:"#aaaaaa",subtitle:"ThÃ¢n cÃ¢y â€” Technology Core",        teamId:"tech"},
+  hr:           {icon:"ðŸ‘¥", title:"NhÃ¢n sá»±",    color:"#cccccc",border:"#dddddd",subtitle:"Rá»… cÃ¢y â€” Human Resources",          teamId:"hr"},
+  mkt:          {icon:"ðŸ“£", title:"Marketing",  color:"#999999",border:"#aaaaaa",subtitle:"MÃ¢y trÃ¡i â€” Quáº£ng bÃ¡ & ThÆ°Æ¡ng hiá»‡u", teamId:"mkt"},
+  heaven:       {icon:"ðŸŒ¦", title:"ThiÃªn thá»i", color:"#888888",border:"#aaaaaa",subtitle:"MÃ¢y pháº£i â€” CÆ¡ há»™i & Thá»i Ä‘iá»ƒm",    teamId:null},
+  partnerships: {icon:"ðŸ¤", title:"Há»£p tÃ¡c",    color:"#aaaaaa",border:"#bbbbbb",subtitle:"Cá» xanh â€” 4 nhÃ³m Ä‘á»‘i tÃ¡c",         teamId:"partnerships"},
+  market:       {icon:"ðŸŒ", title:"Thá»‹ trÆ°á»ng", color:"#888888",border:"#aaaaaa",subtitle:"Äáº¥t â€” Bá»‘i cáº£nh kinh doanh",         teamId:null},
+  assistant:    {icon:"ðŸ“‹", title:"HÃ nh chÃ­nh", color:"#aaaaaa",border:"#bbbbbb",subtitle:"NhÃ¡nh pháº£i â€” BOD / Admin",          teamId:"assistant"},
+  piano:        {icon:"ðŸŽ¹", title:"Piano",      color:"#999999",border:"#aaaaaa",subtitle:"NhÃ¡nh pháº£i â€” Piano Division",       teamId:"piano"},
 };
 
-// ─────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //  HELPERS
-// ─────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function mkRng(seed:number){
   let s=seed;
   return()=>{s=s+0x6d2b79f5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};
@@ -28,14 +44,66 @@ const Q1_START=+new Date("2026-01-01"), Q1_END=+new Date("2026-03-31"), TODAY_TS
 const ELAPSED=Math.round(Math.min(1,(TODAY_TS-Q1_START)/(Q1_END-Q1_START))*100);
 function healthOf(prog:number){
   const r=ELAPSED>0?prog/ELAPSED:1;
-  if(r>=0.80)return{label:"Đúng tiến độ",color:"#cccccc",dot:"●"};
-  if(r>=0.50)return{label:"Hơi chậm",color:"#aaaaaa",dot:"●"};
-  return{label:"Nguy hiểm",color:"#777777",dot:"●"};
+  if(r>=0.80)return{label:"ÄÃºng tiáº¿n Ä‘á»™",color:"#cccccc",dot:"â—"};
+  if(r>=0.50)return{label:"HÆ¡i cháº­m",color:"#aaaaaa",dot:"â—"};
+  return{label:"Nguy hiá»ƒm",color:"#777777",dot:"â—"};
+}
+// Rule XI: weighted health score
+function calcHealthScore(techP:number,hrP:number,pianoP:number,asstP:number,mktP:number,partP:number){
+  return Math.round(techP*0.30+hrP*0.20+pianoP*0.15+asstP*0.15+mktP*0.10+partP*0.10);
+}
+// Branch level threshold (Rule V â†’ applied to image levels)
+function levelFor(prog:number):number{
+  if(prog>=75)return 4;
+  if(prog>=50)return 3;
+  if(prog>=25)return 2;
+  return 1;
 }
 
-// ─────────────────────────────────────────────────────────────
-//  MINI POPUP
-// ─────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+//  IMAGE LAYER HELPERS
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function imgSrc(source:string){ return `/pic_layers/layer_${source}`; }
+function layerTransform(l:LayerEntry, renderY:number, renderH:number){
+  const cx=l.x+l.width/2, cy=renderY+renderH/2;
+  const parts:string[]=[];
+  if(l.rotation) parts.push(`rotate(${l.rotation},${cx},${cy})`);
+  if(l.flipX)    parts.push(`translate(${cx},0) scale(-1,1) translate(${-cx},0)`);
+  return parts.join(" ");
+}
+// Classify a layer: bg | env | branch(group,level)
+function classifyLayer(l:LayerEntry):{type:"bg"|"env"|"branch";group?:string;level?:number}{
+  if(l.source==="15.png") return{type:"bg"};
+  const m=l.id.match(/^branch_([A-E])_lv(\d)_/);
+  if(m) return{type:"branch",group:m[1],level:parseInt(m[2])};
+  const BRANCH_A:{[k:string]:number}={"7.png":1,"8.png":2,"9.png":3,"10.png":4};
+  if(BRANCH_A[l.source]) return{type:"branch",group:"A",level:BRANCH_A[l.source]};
+  return{type:"env"};
+}
+// Group A â†’ piano, Group B â†’ assistant, C/D/E â†’ decorative (health score)
+const GROUP_ZONE:{[g:string]:ZoneId|null}={A:"piano",B:"assistant",C:null,D:null,E:null};
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+//  NEW TREE LAYOUT CONSTANTS  (viewBox 5120 Ã— 3365)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const VW=5120, VH=3365;
+// Animated layer group anchors
+const TRUNK_BASE_CX=2571, TRUNK_BASE_CY=2730; // layer_5 bottom center
+// Branch badge anchor positions (above Lv1 bounding boxes)
+const PIANO_CX=2921, PIANO_CY=460;  // Group A Lv1 cx=2921, above it
+const ASST_CX=2100,  ASST_CY=130;   // Group B Lv1, adjusted for rot=40
+const TECH_CX=2570,  TECH_CY=120;   // top of layer_6 canopy
+// FlowerTip anchor (top of highest branch level)
+const PIANO_FLOWER_CX=3072, PIANO_FLOWER_BASE_Y=310; // Group A Lv4 top
+const ASST_FLOWER_CX=2240,  ASST_FLOWER_BASE_Y=20;   // Group B Lv4 top
+// Rain drops (near layer_4 / heaven zone)  [Rule X]
+const RAIN_DROPS=Array.from({length:26},(_,i)=>{const r=mkRng(i*137);return{x:3400+r()*800,y:250+r()*300,del:r()*1.6,dur:.46+r()*.44};});
+// Wind lines (near layer_2 / mkt zone)  [Rule VIII]
+const WIND_LINES=[{x:100,y:1000,w:320,d:"0s",dr:"2.2s"},{x:80,y:1110,w:390,d:".5s",dr:"2.5s"},{x:180,y:1240,w:280,d:".9s",dr:"1.9s"}];
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+//  MINI POPUP  (Rule: MiniPopup unchanged)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface PopupState{zone:ZoneId;sx:number;sy:number}
 function MiniPopup({popup,onClose,onDetail,prog,done,total,overdue,extra}:
   {popup:PopupState;onClose():void;onDetail():void;prog:number;done:number;total:number;overdue:number;extra?:string}){
@@ -51,20 +119,20 @@ function MiniPopup({popup,onClose,onDetail,prog,done,total,overdue,extra}:
           <div className="font-bold text-white text-sm">{meta.title}</div>
           <div className="text-xs mt-0.5 truncate" style={{color:`${meta.color}cc`}}>{meta.subtitle}</div>
         </div>
-        <button onClick={onClose} className="text-slate-500 hover:text-white text-2xl leading-none">×</button>
+        <button onClick={onClose} className="text-slate-500 hover:text-white text-2xl leading-none">Ã—</button>
       </div>
       {meta.teamId&&(
         <div className="px-4 pt-3 pb-2">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-slate-400">Tiến độ Q1</span>
+            <span className="text-xs text-slate-400">Tiáº¿n Ä‘á»™ Q1</span>
             <span className="text-base font-bold" style={{color:meta.color}}>{prog}%</span>
           </div>
           <div className="h-2.5 bg-slate-800 rounded-full overflow-hidden mb-2">
             <div className="h-2.5 rounded-full" style={{width:`${prog}%`,background:`linear-gradient(90deg,${meta.color}66,${meta.color})`}}/>
           </div>
           <div className="flex gap-3 text-xs text-slate-400 mb-1">
-            <span>✅ {done}/{total} tasks</span>
-            {overdue>0&&<span className="text-white/40">⚠ {overdue} quá hạn</span>}
+            <span>âœ… {done}/{total} tasks</span>
+            {overdue>0&&<span className="text-white/40">âš  {overdue} quÃ¡ háº¡n</span>}
           </div>
           <div className="text-xs font-medium" style={{color:h.color}}>{h.dot} {h.label}</div>
         </div>
@@ -73,21 +141,21 @@ function MiniPopup({popup,onClose,onDetail,prog,done,total,overdue,extra}:
       <div className="px-4 py-3 border-t border-white/5">
         <button onClick={onDetail} className="w-full py-2.5 rounded-xl text-sm font-bold text-white active:scale-95 hover:brightness-110"
           style={{background:`linear-gradient(135deg,${meta.color}dd,${meta.color})`}}>
-          Xem chi tiết →
+          Xem chi tiáº¿t â†’
         </button>
       </div>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-//  FULL SIDE PANEL
-// ─────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+//  FULL SIDE PANEL  (Rule: FullPanel unchanged)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const PARTNER_CATS=[
-  {id:1,label:"Nhà cung cấp",icon:"📦",color:"#cccccc"},
-  {id:2,label:"HR Partners", icon:"👥",color:"#aaaaaa"},
-  {id:3,label:"Kiến thức",   icon:"🎓",color:"#bbbbbb"},
-  {id:4,label:"Tài chính",   icon:"💰",color:"#aaaaaa"},
+  {id:1,label:"NhÃ  cung cáº¥p",icon:"ðŸ“¦",color:"#cccccc"},
+  {id:2,label:"HR Partners", icon:"ðŸ‘¥",color:"#aaaaaa"},
+  {id:3,label:"Kiáº¿n thá»©c",   icon:"ðŸŽ“",color:"#bbbbbb"},
+  {id:4,label:"TÃ i chÃ­nh",   icon:"ðŸ’°",color:"#aaaaaa"},
 ];
 function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
   const app=useApp();const meta=ZONE_META[zone];const teamId=meta.teamId;
@@ -98,7 +166,7 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
   const today=new Date().toISOString().split("T")[0];
   const h=healthOf(prog);
   const SC:{[k:string]:string}={Todo:"#555555",Doing:"#888888",Done:"#cccccc"};
-  const SL:{[k:string]:string}={Todo:"Chờ làm",Doing:"Đang làm",Done:"Hoàn thành"};
+  const SL:{[k:string]:string}={Todo:"Chá» lÃ m",Doing:"Äang lÃ m",Done:"HoÃ n thÃ nh"};
   return(
     <div className="fixed inset-0 z-[60] flex justify-end">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose}/>
@@ -113,7 +181,7 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
             {teamId&&(
               <div className="mt-3">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs text-slate-500">Tiến độ Q1</span>
+                  <span className="text-xs text-slate-500">Tiáº¿n Ä‘á»™ Q1</span>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium" style={{color:h.color}}>{h.dot} {h.label}</span>
                     <span className="font-bold text-lg" style={{color:meta.color}}>{prog}%</span>
@@ -123,28 +191,28 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
                   <div className="h-3 rounded-full" style={{width:`${prog}%`,background:`linear-gradient(90deg,${meta.color}88,${meta.color})`}}/>
                 </div>
                 <div className="flex gap-4 mt-2 text-xs text-slate-500">
-                  <span>✅ {stats.done}/{stats.total} tasks</span>
-                  {stats.overdue>0&&<span className="text-white/40">⚠ {stats.overdue} quá hạn</span>}
+                  <span>âœ… {stats.done}/{stats.total} tasks</span>
+                  {stats.overdue>0&&<span className="text-white/40">âš  {stats.overdue} quÃ¡ háº¡n</span>}
                 </div>
               </div>
             )}
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 text-2xl leading-none ml-3">×</button>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 text-2xl leading-none ml-3">Ã—</button>
         </div>
         <div className="flex-1 overflow-y-auto p-5 space-y-6">
           {zone==="tech"&&(
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide">30 Dự Án Công Nghệ</h3>
+                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide">30 Dá»± Ãn CÃ´ng Nghá»‡</h3>
                 <div className="flex gap-2 text-xs">
-                  <span className="text-white/70">● {app.projects.filter(p=>p.status==="live").length}</span>
-                  <span className="text-white/50">🔨 {app.projects.filter(p=>p.status==="building").length}</span>
-                  <span className="text-slate-400">💡 {app.projects.filter(p=>p.status==="idea").length}</span>
+                  <span className="text-white/70">â— {app.projects.filter(p=>p.status==="live").length}</span>
+                  <span className="text-white/50">ðŸ”¨ {app.projects.filter(p=>p.status==="building").length}</span>
+                  <span className="text-slate-400">ðŸ’¡ {app.projects.filter(p=>p.status==="idea").length}</span>
                 </div>
               </div>
               <div className="space-y-1.5">
                 {app.projects.map(p=>{
-                  const m:{[k:string]:{dot:string;bg:string;tc:string}}={live:{dot:"●",bg:"#f0fdf4",tc:"#166534"},building:{dot:"◐",bg:"#fffbeb",tc:"#92400e"},idea:{dot:"○",bg:"#f8fafc",tc:"#475569"}};
+                  const m:{[k:string]:{dot:string;bg:string;tc:string}}={live:{dot:"â—",bg:"#f0fdf4",tc:"#166534"},building:{dot:"â—",bg:"#fffbeb",tc:"#92400e"},idea:{dot:"â—‹",bg:"#f8fafc",tc:"#475569"}};
                   const{dot,bg,tc}=m[p.status];
                   return(<div key={p.id} className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{background:bg}}><span className="text-sm shrink-0">{dot}</span><div className="flex-1 min-w-0"><div className="text-xs font-medium truncate" style={{color:tc}}>{p.name}</div><div className="text-xs text-slate-400">{p.owner}</div></div></div>);
                 })}
@@ -153,13 +221,13 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
           )}
           {zone==="partnerships"&&(
             <div>
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">4 Nhóm Đối Tác</h3>
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">4 NhÃ³m Äá»‘i TÃ¡c</h3>
               {PARTNER_CATS.map(cat=>{
                 const list=app.partners.filter(p=>p.category===cat.id);
                 return(
                   <div key={cat.id} className="mb-5">
                     <div className="flex items-center gap-2 mb-2"><span>{cat.icon}</span><span className="text-sm font-semibold" style={{color:cat.color}}>{cat.label}</span><span className="ml-auto text-xs text-slate-400">{list.filter(p=>p.status==="active").length}/{list.length} active</span></div>
-                    {list.length===0?<p className="text-xs text-slate-400 italic pl-5">Chưa có dữ liệu</p>
+                    {list.length===0?<p className="text-xs text-slate-400 italic pl-5">ChÆ°a cÃ³ dá»¯ liá»‡u</p>
                     :<div className="space-y-1 pl-5">{list.map(p=>(<div key={p.id} className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:p.status==="active"?"#cccccc":"#555555"}}/><span className="text-xs text-slate-600 flex-1">{p.name}</span><span className="text-xs text-slate-400">{p.status==="active"?"Active":"Pipeline"}</span></div>))}</div>}
                   </div>
                 );
@@ -168,23 +236,23 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
           )}
           {zone==="market"&&(
             <div>
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Chỉ Số Thị Trường</h3>
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Chá»‰ Sá»‘ Thá»‹ TrÆ°á»ng</h3>
               <div className="rounded-xl p-4 mb-3" style={{background:"#fef3c7",border:"1px solid #fde68a"}}>
                 <div className="flex items-center justify-between mb-2"><span className="text-sm text-white/60">Market Index</span><span className="text-3xl font-bold text-white/80">{app.market.marketIndex}</span></div>
-          <div className="h-3 bg-white/10 rounded-full overflow-hidden"><div className="h-3 rounded-full" style={{width:`${app.market.marketIndex}%`,background:"linear-gradient(90deg,#555555,#aaaaaa)"}}/></div>
+                <div className="h-3 bg-white/10 rounded-full overflow-hidden"><div className="h-3 rounded-full" style={{width:`${app.market.marketIndex}%`,background:"linear-gradient(90deg,#555555,#aaaaaa)"}}/></div>
               </div>
               {app.market.notes&&<p className="text-xs text-white/50 bg-white/5 rounded-lg p-3 border border-white/10 leading-relaxed">{app.market.notes}</p>}
             </div>
           )}
           {zone==="heaven"&&(
             <div>
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Thiên Thời</h3>
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">ThiÃªn Thá»i</h3>
               <div className="rounded-xl p-4 mb-4" style={{background:"#f0f9ff",border:"1px solid #bae6fd"}}>
                 <div className="flex items-center justify-between mb-2"><span className="text-sm text-sky-800">Heaven Timing Index</span><span className="text-3xl font-bold text-sky-900">{app.heavenTiming.heavenTimingIndex}</span></div>
                 <div className="h-3 bg-sky-100 rounded-full overflow-hidden"><div className="h-3 rounded-full" style={{width:`${app.heavenTiming.heavenTimingIndex}%`,background:"linear-gradient(90deg,#38bdf8,#0ea5e9)"}}/></div>
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-white">
-                <span className="text-sm text-slate-700">🌧 Hiệu ứng mưa</span>
+                <span className="text-sm text-slate-700">ðŸŒ§ Hiá»‡u á»©ng mÆ°a</span>
                 <button onClick={()=>app.setHeavenTiming({rainEnabled:!app.heavenTiming.rainEnabled})} className={`relative w-11 h-6 rounded-full transition-colors ${app.heavenTiming.rainEnabled?"bg-sky-400":"bg-slate-200"}`}>
                   <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${app.heavenTiming.rainEnabled?"translate-x-5":"translate-x-0.5"}`}/>
                 </button>
@@ -193,21 +261,21 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
           )}
           {teamId&&tasks.length>0&&(
             <div>
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Công Việc ({tasks.length})</h3>
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">CÃ´ng Viá»‡c ({tasks.length})</h3>
               <div className="space-y-2">
                 {tasks.map(t=>{
                   const over=!t.done&&t.deadline<today;
                   return(
                     <div key={t.id} className={`flex gap-2.5 p-2.5 rounded-lg border ${t.done?"bg-white/8 border-white/10":over?"bg-white/5 border-white/8":"bg-slate-50 border-slate-100"}`}>
-                      <button onClick={()=>{if(app.canEdit(teamId??"")){app.toggleTask(t.id,"Tree");}}} title={app.canEdit(teamId??"") ? undefined : "Cần đăng nhập để thay đổi"} className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 ${t.done?"bg-green-500 border-green-500 text-white":"border-slate-300"} ${!app.canEdit(teamId??"") ? "opacity-50 cursor-not-allowed" : ""}`}>
+                      <button onClick={()=>{if(app.canEdit(teamId??"")){app.toggleTask(t.id,"Tree");}}} title={app.canEdit(teamId??"") ? undefined : "Cáº§n Ä‘Äƒng nháº­p Ä‘á»ƒ thay Ä‘á»•i"} className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 ${t.done?"bg-green-500 border-green-500 text-white":"border-slate-300"} ${!app.canEdit(teamId??"") ? "opacity-50 cursor-not-allowed" : ""}`}>
                         {t.done&&<svg className="w-2.5 h-2.5" viewBox="0 0 10 10" fill="none" strokeWidth="1.8" stroke="currentColor"><path d="M1.5 5.5L4 8 8.5 2"/></svg>}
                       </button>
                       <div className="flex-1 min-w-0">
                         <p className={`text-xs font-medium leading-snug ${t.done?"line-through text-slate-400":"text-slate-700"}`}>{t.title}</p>
                         <div className="flex flex-wrap gap-x-2 mt-0.5">
-                          <span className="text-xs" style={{color:SC[t.status]}}>{SL[t.status]}</span>
-                          <span className="text-xs text-slate-400">· Hạn {t.deadline}</span>
-                          {over&&<span className="text-xs text-white/40 font-medium">⚠ Quá hạn</span>}
+                          <span className="text-xs" style={{color:{Todo:"#555555",Doing:"#888888",Done:"#cccccc"}[t.status]}}>{({Todo:"Chá» lÃ m",Doing:"Äang lÃ m",Done:"HoÃ n thÃ nh"})[t.status]}</span>
+                          <span className="text-xs text-slate-400">Â· Háº¡n {t.deadline}</span>
+                          {over&&<span className="text-xs text-white/40 font-medium">âš  QuÃ¡ háº¡n</span>}
                         </div>
                       </div>
                     </div>
@@ -218,8 +286,8 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
           )}
           {acts.length>0&&(
             <div>
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Hoạt Động Gần Đây</h3>
-              <div className="space-y-2">{acts.map(a=>(<div key={a.id} className="flex gap-2 text-xs text-slate-500"><span className="text-slate-300 shrink-0">•</span><span className="leading-relaxed">{a.message}</span></div>))}</div>
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Hoáº¡t Äá»™ng Gáº§n ÄÃ¢y</h3>
+              <div className="space-y-2">{acts.map(a=>(<div key={a.id} className="flex gap-2 text-xs text-slate-500"><span className="text-slate-300 shrink-0">â€¢</span><span className="leading-relaxed">{a.message}</span></div>))}</div>
             </div>
           )}
         </div>
@@ -228,215 +296,104 @@ function FullPanel({zone,onClose}:{zone:ZoneId;onClose():void}){
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-//  CANOPY LABEL (permanent, expands on hover)
-// ─────────────────────────────────────────────────────────────
-function CanopyLabel({cx,cy,r,icon,title,prog,color,teamId,onClick,hovered,onEnter,onLeave,done,total}:{
-  cx:number;cy:number;r:number;icon:string;title:string;prog:number;color:string;
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+//  CANOPY BADGE  (replaces CanopyLabel, scaled for 5120Ã—3365)
+//  Rule V / Rule XIV â€” permanent label, expands on hover
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const S=5; // scale: 5120/1000 â‰ˆ 5
+function CanopyBadge({cx,cy,icon,title,prog,color,teamId,onClick,hovered,onEnter,onLeave,done,total}:{
+  cx:number;cy:number;icon:string;title:string;prog:number;color:string;
   teamId:string|null;onClick(e:React.MouseEvent<SVGElement>):void;
   hovered:boolean;onEnter():void;onLeave():void;done:number;total:number;
 }){
   const h=healthOf(prog);
-  const W=hovered?192:164, H=hovered?58:44;
-  const bx=cx-W/2, by=cy+r+10;
-  const iconX=bx+22, iconY=by+H/2;
+  const W=(hovered?192:164)*S, H=(hovered?58:44)*S;
+  const bx=cx-W/2, by=cy+32;
+  const iconX=bx+22*S, iconY=by+H/2;
   return(
     <g onMouseEnter={onEnter} onMouseLeave={onLeave} onClick={onClick} style={{cursor:"pointer"}}>
-      {/* hit zone */}
-      <ellipse cx={cx} cy={cy} rx={r+36} ry={r+28} fill="transparent"/>
-      {/* soft shadow */}
-      <rect x={bx+1} y={by+4} width={W} height={H} rx="14"
-        fill="rgba(0,0,0,0.28)" style={{filter:"blur(5px)",pointerEvents:"none"}}/>
-      {/* badge */}
-      <rect x={bx} y={by} width={W} height={H} rx="14"
+      <ellipse cx={cx} cy={cy} rx={36*S} ry={28*S} fill="transparent"/>
+      <rect x={bx+S} y={by+4*S} width={W} height={H} rx={14*S}
+        fill="rgba(0,0,0,0.28)" style={{filter:`blur(${5*S}px)`,pointerEvents:"none"}}/>
+      <rect x={bx} y={by} width={W} height={H} rx={14*S}
         fill={hovered?color:"rgba(8,12,26,0.92)"}
         stroke={hovered?"rgba(255,255,255,0.35)":color}
-        strokeWidth={hovered?1.5:2.2}
-        style={{filter:hovered?`drop-shadow(0 0 20px ${color}66)`:"none",pointerEvents:"none"}}/>
-      {/* icon circle */}
-      <circle cx={iconX} cy={iconY} r={15}
+        strokeWidth={hovered?1.5*S:2.2*S}
+        style={{filter:hovered?`drop-shadow(0 0 ${20*S}px ${color}66)`:"none",pointerEvents:"none"}}/>
+      <circle cx={iconX} cy={iconY} r={15*S}
         fill={hovered?"rgba(255,255,255,0.22)":color+"22"}
         stroke={hovered?"rgba(255,255,255,0.45)":color}
-        strokeWidth="2" style={{pointerEvents:"none"}}/>
-      <text x={iconX} y={iconY+5} textAnchor="middle" fontSize="14" style={{pointerEvents:"none"}}>{icon}</text>
-      {/* title */}
-      <text x={bx+44} y={by+(hovered?18:H/2)} textAnchor="start" fill="white" fontSize="11" fontWeight="800" style={{pointerEvents:"none"}}>{title}</text>
+        strokeWidth={2*S} style={{pointerEvents:"none"}}/>
+      <text x={iconX} y={iconY+5*S} textAnchor="middle" fontSize={14*S} style={{pointerEvents:"none"}}>{icon}</text>
+      <text x={bx+44*S} y={by+(hovered?18:H/2)*S/S}
+        textAnchor="start" fill="white" fontSize={11*S} fontWeight="800" style={{pointerEvents:"none"}}>{title}</text>
       {teamId&&(
-        <text x={bx+44} y={by+(hovered?32:H/2+13)} textAnchor="start"
-          fill={hovered?"rgba(255,255,255,.92)":color}
-          fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>{prog}% · {h.dot} {h.label}</text>
+        <text x={bx+44*S} y={by+(hovered?32:H/2+13)*S/S}
+          textAnchor="start" fill={hovered?"rgba(255,255,255,.92)":color}
+          fontSize={10*S} fontWeight="700" style={{pointerEvents:"none"}}>{prog}% Â· {h.dot} {h.label}</text>
       )}
       {hovered&&teamId&&(
-        <text x={bx+44} y={by+47} textAnchor="start" fill="rgba(255,255,255,.78)" fontSize="9" style={{pointerEvents:"none"}}>✅ {done}/{total} hoàn thành</text>
+        <text x={bx+44*S} y={by+47*S} textAnchor="start"
+          fill="rgba(255,255,255,.78)" fontSize={9*S} style={{pointerEvents:"none"}}>âœ… {done}/{total} hoÃ n thÃ nh</text>
       )}
     </g>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-//  BRANCH PATH BUILDER (filled tapered curve)
-// ─────────────────────────────────────────────────────────────
-function branchPath(x0:number,y0:number,x1:number,y1:number,w0:number,w1:number):string{
-  // normal to branch direction
-  const ddx=y1-y0, ddy=-(x1-x0); const len=Math.sqrt(ddx*ddx+ddy*ddy)||1;
-  const nx=ddx/len, ny=ddy/len;
-  // control point with S-curve bias
-  const side=x1<500?-1:1;
-  const cx=(x0+x1)/2+side*50, cy=(y0+y1)/2-25;
-  return [
-    `M ${x0-nx*w0},${y0-ny*w0}`,
-    `Q ${cx-nx*((w0+w1)/2)},${cy-ny*((w0+w1)/2)} ${x1-nx*w1},${y1-ny*w1}`,
-    `L ${x1+nx*w1},${y1+ny*w1}`,
-    `Q ${cx+nx*((w0+w1)/2)},${cy+ny*((w0+w1)/2)} ${x0+nx*w0},${y0+ny*w0}`,
-    `Z`,
-  ].join(" ");
-}
-
-// ─────────────────────────────────────────────────────────────
-//  SVG CONSTANTS   viewBox 0 0 1000 700    GY=560
-// ─────────────────────────────────────────────────────────────
-const VW=1000, VH=700, GY=560;
-const TX=500;
-const TRUNK_TOP_Y=258;
-// Organic trunk: natural S-curve taper, left & right sides differ for asymmetry
-const TRUNK_PATH=`
-  M 444,560
-  C 440,468 474,382 487,312
-  C 488,290 488,270 489,${TRUNK_TOP_Y}
-  L 513,${TRUNK_TOP_Y}
-  C 514,268 515,288 516,316
-  C 528,384 560,470 556,560
-  Z`;
-
-// Branch fork points — ASYMMETRIC (left forks a bit lower than right)
-const LBX=489, LBY=290;
-const RBX=513, RBY=278;
-// Canopy anchors — asymmetric by design: left reaches further, right sits lower
-const PIANO_CX=215, PIANO_CY=182;
-const ASST_CX=762,  ASST_CY=208;
-const TECH_CX=498,  TECH_CY=112;
-const ML_CX=308, ML_CY=338;
-const MR_CX=674, MR_CY=352;
-// Logical canopy radius from progress (used for CanopyLabel y-offset)
-const cR=(prog:number)=>Math.round(52+prog*0.54);
-
-// Pre-baked seeded values for grass & rain
-const RAIN_DROPS=Array.from({length:26},(_,i)=>{const r=mkRng(i*137);return{x:600+r()*240,y:28+r()*120,del:r()*1.6,dur:.46+r()*.44};});
-function makeGrass(count:number){
-  return Array.from({length:count},(_,i)=>{
-    const r=mkRng(i*17+3);const bx=r()*VW;const h=12+r()*24;
-    return{bx,h,lx:bx-3-r()*5,rx:bx+3+r()*5,col:["#236018","#2a6e1e","#328426","#246018","#389224"][i%5]};
-  });
-}
-
-// Leaf colour palettes — bright-on-dark for depth
-const LEAF_BRIGHT=["#aee84e","#bef460","#c8f472","#9ee040","#d0f47a","#8cd83a"];
-const LEAF_MID   =["#7cc82c","#88d636","#68be1e","#74ca28","#6ab820"];
-
-// ─────────────────────────────────────────────────────────────
-//  ORGANIC CANOPY  — secondary branches + scattered leaves, no circles
-// ─────────────────────────────────────────────────────────────
-function OrganicCanopy({cx,cy,prog,color,done,overdue,seed}:{
-  cx:number;cy:number;prog:number;color:string;done:number;overdue:number;seed:number;
-}){
-  const rng=mkRng(seed*3+19);
-  const bCnt=Math.max(5,Math.round(4+prog*0.08));    // 5–12 branches
-  const bLen=70+prog*0.82;                            // 70→152 px reach
-  const lPer=Math.max(4,Math.round(3+prog*0.06));    // 4–10 leaves/branch
-  const els:React.ReactElement[]=[];
-  const BASE_ANG=-Math.PI/2;
-  const SPREAD=1.55+prog*0.003;
-  for(let i=0;i<bCnt;i++){
-    const ni=bCnt>1?i/(bCnt-1):0.5;
-    const ang=BASE_ANG-SPREAD/2+ni*SPREAD+(rng()-0.5)*0.15;
-    const bL=bLen*(0.72+rng()*0.42);
-    const cAng=ang+(rng()-0.5)*0.30;
-    const mx=cx+Math.cos(cAng)*bL*0.52;
-    const my=cy+Math.sin(cAng)*bL*0.52;
-    const ex=cx+Math.cos(ang+(rng()-0.5)*0.08)*bL;
-    const ey=cy+Math.sin(ang+(rng()-0.5)*0.08)*bL;
-    const bw=Math.max(0.5,(1.8-ni*0.6)*(0.4+rng()*0.8));
-    // thin branch stroke
-    els.push(<path key={`b${i}`}
-      d={`M ${cx.toFixed(1)} ${cy.toFixed(1)} Q ${mx.toFixed(1)} ${my.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`}
-      stroke={i%2===0?"#3d2006":"#4e2c0a"} strokeWidth={bw.toFixed(1)}
-      fill="none" strokeLinecap="round" opacity="0.82"/>);
-    // leaves concentrated in outer 50% of branch (t=0.52 to 1.0)
-    for(let j=0;j<lPer;j++){
-      const t=0.52+rng()*0.52;
-      const t1=1-t;
-      const lx=t1*t1*cx+2*t*t1*mx+t*t*ex+(rng()-0.5)*9;
-      const ly=t1*t1*cy+2*t*t1*my+t*t*ey+(rng()-0.5)*9;
-      const rot=ang*180/Math.PI+(rng()-0.5)*88;
-      const sz=9+rng()*13;
-      const col=rng()<0.42?LEAF_BRIGHT[Math.floor(rng()*LEAF_BRIGHT.length)]:LEAF_MID[Math.floor(rng()*LEAF_MID.length)];
-      els.push(<path key={`l${i}_${j}`}
-        d={`M 0,0 C ${(sz*.38).toFixed(1)},${(-sz*.26).toFixed(1)} ${(sz*.32).toFixed(1)},${(-sz*.80).toFixed(1)} 0,${(-sz).toFixed(1)} C ${(-sz*.32).toFixed(1)},${(-sz*.80).toFixed(1)} ${(-sz*.38).toFixed(1)},${(-sz*.26).toFixed(1)} 0,0 Z`}
-        fill={col} stroke="rgba(0,38,0,.14)" strokeWidth="0.5"
-        opacity={(0.72+rng()*.26).toFixed(2)}
-        transform={`translate(${lx.toFixed(1)},${ly.toFixed(1)}) rotate(${rot.toFixed(1)})`}/>);
-    }
-    // overdue yellow leaf near tip
-    if(overdue>0 && i<Math.min(overdue,4)){
-      const lx=ex+(rng()-0.5)*6; const ly=ey+rng()*7;
-      const sz=8+rng()*5; const rot=ang*180/Math.PI+46+rng()*20;
-      els.push(<path key={`ov${i}`}
-        d={`M 0,0 C ${(sz*.38).toFixed(1)},${(-sz*.26).toFixed(1)} ${(sz*.32).toFixed(1)},${(-sz*.80).toFixed(1)} 0,${(-sz).toFixed(1)} C ${(-sz*.32).toFixed(1)},${(-sz*.80).toFixed(1)} ${(-sz*.38).toFixed(1)},${(-sz*.26).toFixed(1)} 0,0 Z`}
-        fill="#fcd34d" stroke="rgba(120,60,0,.18)" strokeWidth="0.5" opacity="0.88"
-        transform={`translate(${lx.toFixed(1)},${ly.toFixed(1)}) rotate(${rot.toFixed(1)})`}/>);
-    }
-  }
-  // Done-task marker: small bright dots at the very end of random completed branches
-  const dotCount=Math.min(done,Math.floor(bCnt*0.6));
-  for(let d=0;d<dotCount;d++){
-    const bi=Math.floor(rng()*bCnt);
-    const ni2=bCnt>1?bi/(bCnt-1):0.5;
-    const ang2=BASE_ANG-SPREAD/2+ni2*SPREAD;
-    const ex2=cx+Math.cos(ang2)*bLen*(0.72+rng()*0.42);
-    const ey2=cy+Math.sin(ang2)*bLen*(0.72+rng()*0.42);
-    els.push(<circle key={`dk${d}`} cx={ex2} cy={ey2} r={2.5} fill="#d0f47a" opacity="0.7"/>);
-  }
-  return <g style={{pointerEvents:"none"}}>{els}</g>;
-}
-
-// ─────────────────────────────────────────────────────────────
-//  FLOWER / FRUIT (milestone: 80% → flower, 100% → fruit)
-// ─────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+//  FLOWER / FRUIT MILESTONE  (Rule VII â€” unchanged logic, coords adapted)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function FlowerTip({cx,cy,prog}:{cx:number;cy:number;prog:number}){
   if(prog<80) return null;
+  const r=18*S;
   if(prog>=100){
     return(
       <g filter="url(#fruitGlow)" style={{pointerEvents:"none"}}>
-        <circle cx={cx} cy={cy} r={13} fill="url(#fruitG)"/>
-        <circle cx={cx-3.5} cy={cy-4} r={3.4} fill="rgba(255,255,255,.42)"/>
-        <path d={`M ${cx},${cy-13} Q ${cx+6},${cy-21} ${cx+3},${cy-25}`}
-          stroke="#3d6012" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
-        <ellipse cx={cx+5} cy={cy-22} rx="5" ry="3"
-          fill="#3d6012" opacity=".8" transform={`rotate(-25 ${cx+5} ${cy-22})`}/>
+        <circle cx={cx} cy={cy} r={r} fill="url(#fruitG)"/>
+        <circle cx={cx-3.5*S} cy={cy-4*S} r={3.4*S} fill="rgba(255,255,255,.42)"/>
+        <path d={`M ${cx},${cy-r} Q ${cx+6*S},${cy-21*S} ${cx+3*S},${cy-25*S}`}
+          stroke="#3d6012" strokeWidth={2.2*S} fill="none" strokeLinecap="round"/>
+        <ellipse cx={cx+5*S} cy={cy-22*S} rx={5*S} ry={3*S}
+          fill="#3d6012" opacity=".8" transform={`rotate(-25,${cx+5*S},${cy-22*S})`}/>
       </g>
     );
   }
-  // flower at 80–99% — larger petals, visible against the sky
-  const PR=9;
   return(
     <g style={{pointerEvents:"none"}} filter="url(#fruitGlow)">
       {Array.from({length:6},(_,i)=>{
         const a=i*60*Math.PI/180-Math.PI/2;
-        const px=cx+Math.cos(a)*PR*2;
-        const py=cy+Math.sin(a)*PR*2;
-        return(<ellipse key={i} cx={px} cy={py} rx={PR} ry={PR*.48}
-          fill="#f5f5f5" stroke="#cccccc" strokeWidth="1.2" opacity=".96"
-          transform={`rotate(${i*60-90} ${px} ${py})`}/>);
+        const px=cx+Math.cos(a)*r*2, py=cy+Math.sin(a)*r*2;
+        return(<ellipse key={i} cx={px} cy={py} rx={r} ry={r*.48}
+          fill="#f5f5f5" stroke="#cccccc" strokeWidth={1.2*S} opacity=".96"
+          transform={`rotate(${i*60-90},${px},${py})`}/>);
       })}
-      <circle cx={cx} cy={cy} r={PR*.72} fill="#cccccc" stroke="#aaaaaa" strokeWidth="1"/>
-      <circle cx={cx-1.5} cy={cy-1.5} r={PR*.28} fill="rgba(255,255,255,.5)"/>
+      <circle cx={cx} cy={cy} r={r*.72} fill="#cccccc" stroke="#aaaaaa" strokeWidth={S}/>
+      <circle cx={cx-1.5*S} cy={cy-1.5*S} r={r*.28} fill="rgba(255,255,255,.5)"/>
     </g>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+//  SINGLE IMAGE LAYER RENDERER
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function LayerImg({l,extraStyle,clipId}:{l:LayerEntry;extraStyle?:React.CSSProperties;clipId?:string}){
+  const isSliced=l.isSliced===true;
+  const renderY=isSliced&&l.sliceType==="bottom"?(l.origY??l.y):l.y;
+  const renderH=isSliced?(l.origH??l.height):l.height;
+  const tr=layerTransform(l,renderY,renderH);
+  return(
+    <g transform={tr||undefined} clipPath={clipId?`url(#${clipId})`:undefined}>
+      <image href={imgSrc(l.source)} x={l.x} y={renderY}
+        width={l.width} height={renderH}
+        preserveAspectRatio="none" opacity={l.opacity}
+        style={extraStyle}/>
+    </g>
+  );
+}
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //  MAIN COMPONENT
-// ─────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function TreeCanvas(){
   const app=useApp();
   const [popup,    setPopup]    =useState<PopupState|null>(null);
@@ -461,311 +418,264 @@ export default function TreeCanvas(){
   const asstP=gp("assistant"), pianoP=gp("piano");
   const techS=gs("tech"), hrS=gs("hr"), mktS=gs("mkt"), partS=gs("partnerships");
   const asstS=gs("assistant"), pianoS=gs("piano");
-  const rainOn=app.heavenTiming.rainEnabled, mkIdx=app.market.marketIndex, hvIdx=app.heavenTiming.heavenTimingIndex;
+  const rainOn=app.heavenTiming.rainEnabled;
+  const mkIdx=app.market.marketIndex;
+  const hvIdx=app.heavenTiming.heavenTimingIndex;
 
-  // Canopy radii for CanopyLabel y-offset (logical enclosing radius)
-  const pianoR=cR(pianoP), asstR=cR(asstP), techR=cR(techP);
-  const blades=    useMemo(()=>makeGrass(32+Math.round(partP*.4)),[partP]);
+  // Rule XI â€” health score for desaturation + decorative branch levels
+  const hScore=calcHealthScore(techP,hrP,pianoP,asstP,mktP,partP);
+  const lowHealth=hScore<40;
 
-  // Trunk colour (warmer when tech is doing well)
-  const sat=40+techP*.12;
-  const tA=`hsl(22,${sat}%,18%)`, tB=`hsl(26,${sat+10}%,30%)`, tC=`hsl(24,${sat+5}%,24%)`;
-  void tB; // reserved
+  // Branch levels (Rule V applied to image levels)
+  const pianoLvl=levelFor(pianoP);
+  const asstLvl=levelFor(asstP);
+  const decoLvl=levelFor(hScore); // Groups C,D,E follow overall health
+
+  // Classify all layers
+  const allLayers=RAW.layers;
+  const bgLayer=allLayers.find(l=>l.source==="15.png");
+  const envLayers=useMemo(()=>allLayers.filter(l=>classifyLayer(l).type==="env").sort((a,b)=>a.zIndex-b.zIndex),[allLayers]);
+  const branchLayers=useMemo(()=>allLayers.filter(l=>classifyLayer(l).type==="branch"),[allLayers]);
+
+
+
+  // Hover filter helper
+  const zF=(zone:ZoneId)=>hovered===zone
+    ?`brightness(1.4) drop-shadow(0 0 ${30*S}px ${ZONE_META[zone].color}88)`
+    :"none";
+
+  // Which env layers belong to which zone
+  function envZone(src:string):ZoneId|null{
+    if(src==="2.png")  return "mkt";
+    if(src==="3.png")  return "hr";
+    if(src==="4.png")  return "heaven";
+    if(["5.png"].includes(src)) return "tech";
+    if(src==="6.png")  return "tech";
+    if(src==="11.png"||src==="12.png") return "partnerships";
+    if(src==="13.png"||src==="14.png") return "market";
+    return null;
+  }
 
   return(
-    <div className="relative w-full h-full" style={{background:"linear-gradient(180deg,#92c8e4 0%,#b8dff2 32%,#c2e4b8 68%,#b8dca8 100%)"}}>
-      {/* controls */}
+    <div className="relative w-full h-full">
+      {/* Rule XII: sway/float/rain CSS keyframes */}
+      <style>{`
+        @keyframes imgSway{0%,100%{transform:rotate(-0.6deg)}50%{transform:rotate(0.6deg)}}
+        @keyframes floatL{0%,100%{transform:translateY(0)}50%{transform:translateY(${-40*S}px)}}
+        @keyframes floatR{0%,100%{transform:translateY(0)}50%{transform:translateY(${-30*S}px)}}
+        @keyframes rainFall{0%{opacity:0;transform:translate(0,0)}15%{opacity:.7}85%{opacity:.5}100%{opacity:0;transform:translate(${-9*S}px,${58*S}px)}}
+        @keyframes windGust{0%,100%{opacity:0;transform:scaleX(.04)}44%,56%{opacity:.58;transform:scaleX(1)}}
+        .branch-sway{animation:imgSway 5.5s ease-in-out infinite;transform-origin:${TRUNK_BASE_CX}px ${TRUNK_BASE_CY}px}
+        .canopy-sway{animation:imgSway 6.2s 0.4s ease-in-out infinite;transform-origin:${TRUNK_BASE_CX}px ${TRUNK_BASE_CY}px}
+        .cloud-l{animation:floatL 7.5s ease-in-out infinite}
+        .cloud-r{animation:floatR 9s 1.8s ease-in-out infinite}
+        .rain-drop{animation:rainFall linear infinite}
+        .wind-line{animation:windGust ease-in-out infinite;transform-origin:left center}
+      `}</style>
+
+      {/* â”€â”€ CONTROLS  (Rule X toggle rain, market/heaven shortcuts) â”€â”€ */}
       <div className="absolute top-2 right-3 z-10 flex gap-2">
-        <button onClick={()=>app.setHeavenTiming({rainEnabled:!rainOn})} className="px-3 py-1.5 rounded-xl text-xs font-semibold border shadow transition-all active:scale-95" style={{background:rainOn?"#555555":"white",color:rainOn?"white":"#475569",borderColor:rainOn?"#888888":"#e2e8f0"}}>{rainOn?"🌧 Tắt mưa":"☀️ Bật mưa"}</button>
-        <button onClick={()=>openFull("market")} className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-white/20 text-slate-600 shadow hover:bg-white/80 active:scale-95">🌍 Market {mkIdx}</button>
-        <button onClick={()=>openFull("heaven")} className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-white/20 text-slate-600 shadow hover:bg-white/80 active:scale-95">🌦 Heaven {hvIdx}</button>
+        <button onClick={()=>app.setHeavenTiming({rainEnabled:!rainOn})}
+          className="px-3 py-1.5 rounded-xl text-xs font-semibold border shadow transition-all active:scale-95"
+          style={{background:rainOn?"#555555":"white",color:rainOn?"white":"#475569",borderColor:rainOn?"#888888":"#e2e8f0"}}>
+          {rainOn?"ðŸŒ§ Táº¯t mÆ°a":"â˜€ï¸ Báº­t mÆ°a"}
+        </button>
+        <button onClick={()=>openFull("market")}
+          className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-white/20 text-slate-600 shadow hover:bg-white/80 active:scale-95">
+          ðŸŒ Market {mkIdx}
+        </button>
+        <button onClick={()=>openFull("heaven")}
+          className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-white/20 text-slate-600 shadow hover:bg-white/80 active:scale-95">
+          ðŸŒ¦ Heaven {hvIdx}
+        </button>
       </div>
 
-      <svg viewBox={`0 0 ${VW} ${VH}`} preserveAspectRatio="xMidYMid meet" className="w-full h-full" style={{display:"block"}}>
+      {/* â”€â”€ SVG CANVAS â”€â”€ */}
+      <svg viewBox={`0 0 ${VW} ${VH}`} preserveAspectRatio="xMidYMid meet"
+        className="w-full h-full" style={{display:"block"}}>
+
         <defs>
-          <linearGradient id="trunkG" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"   stopColor={tA}/>
-            <stop offset="28%"  stopColor={tC}/>
-            <stop offset="50%"  stopColor={tB}/>
-            <stop offset="72%"  stopColor={tC}/>
-            <stop offset="100%" stopColor={tA}/>
-          </linearGradient>
-          <linearGradient id="hrRootG" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#b45309"/>
-            <stop offset="60%"  stopColor="#92400e"/>
-            <stop offset="100%" stopColor="#7c2d12"/>
-          </linearGradient>
-          <linearGradient id="soilG" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor={`hsl(26,${36+mkIdx*.08}%,${20+mkIdx*.05}%)`}/>
-            <stop offset="100%" stopColor="hsl(20,30%,10%)"/>
-          </linearGradient>
-          <linearGradient id="underG" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#100502"/>
-            <stop offset="100%" stopColor="#050100"/>
-          </linearGradient>
-          <pattern id="barkPat" x="0" y="0" width="10" height="30" patternUnits="userSpaceOnUse">
-            <path d="M5,0 Q3,9 5,15 Q7,21 5,30" stroke="rgba(0,0,0,.08)" strokeWidth="1" fill="none"/>
-          </pattern>
-          <filter id="leafShadow" x="-18%" y="-18%" width="136%" height="136%">
-            <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#09200e" floodOpacity=".10"/>
-          </filter>
-          <filter id="trunkShd">
-            <feDropShadow dx="5" dy="8" stdDeviation="9" floodColor="#030602" floodOpacity=".26"/>
-          </filter>
-          <filter id="cloudBlur">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="6"/>
-          </filter>
+          {/* Rule VII: fruit gradient + glow */}
           <radialGradient id="fruitG" cx="38%" cy="32%" r="62%">
             <stop offset="0%"   stopColor="#ff9a3c"/>
             <stop offset="55%"  stopColor="#e85c00"/>
             <stop offset="100%" stopColor="#aa2800"/>
           </radialGradient>
           <filter id="fruitGlow" x="-55%" y="-55%" width="210%" height="210%">
-            <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#ff9a3c" floodOpacity=".75"/>
+            <feDropShadow dx="0" dy="0" stdDeviation={5*S} floodColor="#ff9a3c" floodOpacity=".75"/>
           </filter>
-          <style>{`
-            @keyframes sway{0%,100%{transform:rotate(-1deg)}50%{transform:rotate(1deg)}}
-            @keyframes floatL{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-            @keyframes floatR{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-            @keyframes rainFall{0%{opacity:0;transform:translate(0,0)}15%{opacity:.7}85%{opacity:.5}100%{opacity:0;transform:translate(-9px,58px)}}
-            @keyframes windGust{0%,100%{opacity:0;transform:scaleX(.04)}44%,56%{opacity:.58;transform:scaleX(1)}}
-            .tree-grp{animation:sway 5.5s ease-in-out infinite;transform-origin:${TX}px ${GY}px}
-            .cl{animation:floatL 7.5s ease-in-out infinite}
-            .cr{animation:floatR 9s 1.8s ease-in-out infinite}
-            .rd{animation:rainFall linear infinite}
-            .wl{animation:windGust ease-in-out infinite;transform-origin:left center}
-            @keyframes leafPop{0%{opacity:0;transform:scale(.15) rotate(var(--lr,0deg))}60%{transform:scale(1.12) rotate(var(--lr,0deg))}100%{opacity:1;transform:scale(1) rotate(var(--lr,0deg))}}
-            .leaf-new{animation:leafPop .45s ease-out both}
-          `}</style>
+          {/* Rule XI: desaturation filter when health < 40% */}
+          <filter id="healthFilter">
+            <feColorMatrix type="saturate" values={lowHealth?"0.25":"1"}/>
+            {lowHealth&&<feComponentTransfer>
+              <feFuncR type="linear" slope="0.75"/>
+              <feFuncG type="linear" slope="0.75"/>
+              <feFuncB type="linear" slope="0.75"/>
+            </feComponentTransfer>}
+          </filter>
+          {/* Sliced layer clip paths */}
+          {envLayers.filter(l=>l.isSliced).map(l=>{
+            const sid=l.id.replace(/[^a-zA-Z0-9_\-]/g,"");
+            return(
+              <clipPath key={sid} id={`clip-${sid}`}>
+                <rect x={l.x} y={l.y} width={l.width} height={l.height}/>
+              </clipPath>
+            );
+          })}
         </defs>
 
-        {/* ── SKY — muted, less saturated ──────────────────── */}
-        <defs>
-          <linearGradient id="skyG2" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"  stopColor="#7eaec4"/>
-            <stop offset="46%" stopColor="#a6ccde"/>
-            <stop offset="74%" stopColor="#b6d4a8"/>
-            <stop offset="100%" stopColor="#a6ca98"/>
-          </linearGradient>
-        </defs>
-        <rect x="0" y="0" width={VW} height={VH} fill="url(#skyG2)"/>
-        {/* sun — just a soft glow, no hard disc or visible rays */}
-        <circle cx="80" cy="74" r="68" fill="rgba(255,238,180,.12)" filter="url(#cloudBlur)"/>
-        <circle cx="80" cy="74" r="36" fill="rgba(255,228,110,.22)" filter="url(#cloudBlur)"/>
-        {/* horizon ambient */}
-        <ellipse cx={TX} cy={GY} rx="450" ry="48" fill="rgba(112,180,64,.10)"/>
+        {/* â”€â”€ 1. BACKGROUND (layer_15) â€” no interaction â”€â”€ */}
+        {bgLayer&&<image href={imgSrc(bgLayer.source)} x="0" y="0" width={VW} height={VH} preserveAspectRatio="none"/>}
 
-        {/* ── WIND LINES ─────────────────────────────────────── */}
-        {[{x:28,y:192,w:62,d:"0s",dr:"2.2s"},{x:20,y:218,w:76,d:".5s",dr:"2.5s"},{x:36,y:244,w:54,d:".9s",dr:"1.9s"}].map((wl,i)=>(
-          <line key={i} className="wl" x1={wl.x} y1={wl.y} x2={wl.x+wl.w} y2={wl.y}
-            stroke="rgba(120,185,226,.52)" strokeWidth="2.5" strokeLinecap="round"
+        {/* â”€â”€ 2. WIND LINES near mkt cloud (Rule VIII) â”€â”€ */}
+        {WIND_LINES.map((wl,i)=>(
+          <line key={i} className="wind-line"
+            x1={wl.x} y1={wl.y} x2={wl.x+wl.w} y2={wl.y}
+            stroke="rgba(120,185,226,.52)" strokeWidth={2.5*S} strokeLinecap="round"
             style={{animationDelay:wl.d,animationDuration:wl.dr}}/>
         ))}
 
-        {/* ── LEFT CLOUD — Marketing — wispy, smaller ─────── */}
-        <g className="cl" style={{cursor:"pointer"}} onClick={e=>openZone("mkt",e)}>
-          <ellipse cx="146" cy="102" rx="82" ry="48" fill="rgba(255,255,255,.10)" filter="url(#cloudBlur)"/>
-          <circle cx="134" cy="110" r="36" fill="rgba(255,255,255,.95)"/>
-          <circle cx="172" cy="106" r="30" fill="rgba(255,255,255,.93)"/>
-          <circle cx="106" cy="116" r="24" fill="rgba(255,255,255,.91)"/>
-          <circle cx="156" cy="84"  r="22" fill="rgba(255,255,255,.89)"/>
-          <circle cx="124" cy="80"  r="16" fill="rgba(255,255,255,.86)"/>
-          <circle cx="192" cy="118" r="18" fill="rgba(255,255,255,.87)"/>
-          <circle cx="178" cy="78"  r="12" fill="rgba(255,255,255,.82)"/>
-          {mktP>20&&<ellipse cx="146" cy="102" rx="64" ry="34" fill={`rgba(160,160,160,${(mktP-20)/330})`}/>}
-          <rect x="64" y="148" width="164" height={hovered==="mkt"?56:38} rx="14"
-            fill={hovered==="mkt"?"#777777":"rgba(8,12,26,0.92)"} stroke="#aaaaaa" strokeWidth={hovered==="mkt"?1.5:2}
-            style={{filter:hovered==="mkt"?"drop-shadow(0 0 18px rgba(150,150,150,0.4))":"drop-shadow(0 4px 8px rgba(0,0,0,.4))"}}/>
-          <circle cx="88" cy={hovered==="mkt"?176:167} r="14"
-            fill={hovered==="mkt"?"rgba(255,255,255,0.22)":"rgba(160,160,160,0.13)"}
-            stroke={hovered==="mkt"?"rgba(255,255,255,0.45)":"#aaaaaa"} strokeWidth="1.5" style={{pointerEvents:"none"}}/>
-          <text x={88} y={hovered==="mkt"?181:172} textAnchor="middle" fontSize="14" style={{pointerEvents:"none"}}>📣</text>
-          <text x="109" y="163" textAnchor="start" fill="white" fontSize="11" fontWeight="800" style={{pointerEvents:"none"}}>Marketing</text>
-          <text x="109" y="177" textAnchor="start" fill={hovered==="mkt"?"white":"#aaaaaa"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>{mktP}% · {healthOf(mktP).dot} {healthOf(mktP).label}</text>
-          {hovered==="mkt"&&<text x="109" y="192" textAnchor="start" fill="rgba(255,255,255,.85)" fontSize="9" style={{pointerEvents:"none"}}>✅ {mktS.done}/{mktS.total} việc</text>}
-          <rect x="22" y="42" width="248" height="158" rx="12" fill="transparent"
-            onMouseEnter={()=>setHovered("mkt")} onMouseLeave={()=>setHovered(null)}/>
+        {/* â”€â”€ 3. ENV LAYERS with zone-hover filter (Rule XIV) â”€â”€ */}
+        <g filter={lowHealth?"url(#healthFilter)":undefined}>
+          {envLayers.map(l=>{
+            const zone=envZone(l.source);
+            const isSliced=l.isSliced===true;
+            const sid=l.id.replace(/[^a-zA-Z0-9_\-]/g,"");
+            // cloud animation class
+            let extraClass="";
+            if(l.source==="2.png") extraClass="cloud-l";
+            if(l.source==="4.png") extraClass="cloud-r";
+            if(l.source==="6.png") extraClass="canopy-sway";
+            const filter=zone?zF(zone):"none";
+            const isSlicedClip=isSliced?`clip-${sid}`:undefined;
+            return(
+              <g key={l.id} className={extraClass}>
+                <LayerImg l={l} extraStyle={{filter,transition:"filter 0.25s"}} clipId={isSlicedClip}/>
+              </g>
+            );
+          })}
         </g>
 
-        {/* ── RIGHT CLOUD — Thiên Thời — wispy, smaller ────── */}
-        <g className="cr" style={{cursor:"pointer"}} onClick={e=>openZone("heaven",e)}>
-          <ellipse cx="852" cy="102" rx="86" ry="50" fill="rgba(255,255,255,.10)" filter="url(#cloudBlur)"/>
-          <circle cx="860" cy="110" r="38" fill="rgba(255,255,255,.95)"/>
-          <circle cx="820" cy="116" r="28" fill="rgba(255,255,255,.93)"/>
-          <circle cx="894" cy="114" r="26" fill="rgba(255,255,255,.91)"/>
-          <circle cx="840" cy="82"  r="20" fill="rgba(255,255,255,.89)"/>
-          <circle cx="872" cy="78"  r="16" fill="rgba(255,255,255,.86)"/>
-          <circle cx="812" cy="124" r="14" fill="rgba(255,255,255,.84)"/>
-          <circle cx="900" cy="122" r="12" fill="rgba(255,255,255,.82)"/>
-          {hvIdx>28&&<ellipse cx="852" cy="102" rx="68" ry="36" fill={`rgba(150,150,150,${(hvIdx-28)/350})`}/>}
-          {rainOn&&<g opacity=".68">{Array.from({length:6},(_,i)=>(<line key={i} x1={826+i*11} y1={143} x2={823+i*11} y2={157} stroke="#cccccc" strokeWidth="1.3" strokeLinecap="round"/>))}</g>}
-          <rect x="746" y="148" width="212" height={hovered==="heaven"?56:38} rx="14"
-            fill={hovered==="heaven"?"#666666":"rgba(8,12,26,0.92)"} stroke="#aaaaaa" strokeWidth={hovered==="heaven"?1.5:2}
-            style={{filter:hovered==="heaven"?"drop-shadow(0 0 18px rgba(150,150,150,0.4))":"drop-shadow(0 4px 8px rgba(0,0,0,.4))"}}/>
-          <circle cx="770" cy={hovered==="heaven"?176:167} r="14"
-            fill={hovered==="heaven"?"rgba(255,255,255,0.22)":"rgba(150,150,150,0.13)"}
-            stroke={hovered==="heaven"?"rgba(255,255,255,0.45)":"#aaaaaa"} strokeWidth="1.5" style={{pointerEvents:"none"}}/>
-          <text x="770" y={hovered==="heaven"?181:172} textAnchor="middle" fontSize="14" style={{pointerEvents:"none"}}>🌦</text>
-          <text x="791" y="163" textAnchor="start" fill="white" fontSize="11" fontWeight="800" style={{pointerEvents:"none"}}>Thiên Thời</text>
-          <text x="791" y="177" textAnchor="start" fill={hovered==="heaven"?"white":"#aaaaaa"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>Index: {hvIdx} · {rainOn?"🌧 Mưa":"☀️ Nắng"}</text>
-          {hovered==="heaven"&&<text x="791" y="192" textAnchor="start" fill="rgba(255,255,255,.85)" fontSize="9" style={{pointerEvents:"none"}}>Bấm để xem chi tiết thiên thời</text>}
-          <rect x="734" y="38" width="236" height="158" rx="12" fill="transparent"
-            onMouseEnter={()=>setHovered("heaven")} onMouseLeave={()=>setHovered(null)}/>
+        {/* â”€â”€ 4. BRANCH LAYERS â€” level-gated by KPI (Rule V) â”€â”€ */}
+        <g className="branch-sway" filter={lowHealth?"url(#healthFilter)":undefined}>
+          {branchLayers.map(l=>{
+            const cl=classifyLayer(l);
+            const grp=cl.group??"";
+            const lv=cl.level??0;
+            // Determine max visible level for this group
+            let maxLv=1;
+            if(grp==="A") maxLv=pianoLvl;
+            else if(grp==="B") maxLv=asstLvl;
+            else maxLv=decoLvl; // C, D, E
+            if(lv>maxLv) return null; // hidden (not yet grown)
+            const zone=GROUP_ZONE[grp];
+            const filter=zone?zF(zone):"none";
+            return(
+              <LayerImg key={l.id} l={l} extraStyle={{filter,transition:"filter 0.25s"}}/>
+            );
+          })}
         </g>
 
-        {/* ── RAIN — thin delicate drops ──────────────────── */}
-        {rainOn&&RAIN_DROPS.map((r,i)=>(
-          <line key={i} className="rd" x1={r.x} y1={r.y} x2={r.x-2} y2={r.y+13}
-            stroke="rgba(90,140,220,.32)" strokeWidth="1.0" strokeLinecap="round"
-            style={{animationDelay:`${r.del}s`,animationDuration:`${r.dur}s`}}/>
+        {/* â”€â”€ 5. FLOWER / FRUIT milestones (Rule VII) â”€â”€ */}
+        {pianoLvl>=4&&<FlowerTip cx={PIANO_FLOWER_CX} cy={PIANO_FLOWER_BASE_Y-30*S} prog={pianoP}/>}
+        {pianoLvl<4&&pianoP>=80&&<FlowerTip cx={PIANO_FLOWER_CX} cy={PIANO_FLOWER_BASE_Y} prog={pianoP}/>}
+        {asstLvl>=4&&<FlowerTip cx={ASST_FLOWER_CX} cy={ASST_FLOWER_BASE_Y-30*S} prog={asstP}/>}
+        {asstLvl<4&&asstP>=80&&<FlowerTip cx={ASST_FLOWER_CX} cy={ASST_FLOWER_BASE_Y} prog={asstP}/>}
+
+        {/* â”€â”€ 6. RAIN (Rule X) â€” near heaven zone (layer_4 area) â”€â”€ */}
+        {rainOn&&RAIN_DROPS.map((rd,i)=>(
+          <line key={i} className="rain-drop"
+            x1={rd.x} y1={rd.y} x2={rd.x-2*S} y2={rd.y+13*S}
+            stroke="rgba(90,140,220,.32)" strokeWidth={S} strokeLinecap="round"
+            style={{animationDelay:`${rd.del}s`,animationDuration:`${rd.dur}s`}}/>
         ))}
 
-        {/* ═══════════════════════════════════════════════
-               TREE — organic, asymmetric
-        ═══════════════════════════════════════════════ */}
-        <g className="tree-grp" filter="url(#leafShadow)">
+        {/* â”€â”€ 7. TRANSPARENT INTERACTIVE ZONES (click targets) â”€â”€ */}
+        {/* mkt: upper-left area over layer_2 */}
+        <rect x={0} y={0} width={900} height={850} fill="transparent" style={{cursor:"pointer"}}
+          onMouseEnter={()=>setHovered("mkt")} onMouseLeave={()=>setHovered(null)}
+          onClick={e=>openZone("mkt",e)}/>
+        {/* heaven: right area over layer_4 */}
+        <rect x={3300} y={120} width={1100} height={600} fill="transparent" style={{cursor:"pointer"}}
+          onMouseEnter={()=>setHovered("heaven")} onMouseLeave={()=>setHovered(null)}
+          onClick={e=>openZone("heaven",e)}/>
+        {/* tech: trunk column (layer_5) */}
+        <rect x={1880} y={600} width={1350} height={2100} fill="transparent" style={{cursor:"pointer"}}
+          onMouseEnter={()=>setHovered("tech")} onMouseLeave={()=>setHovered(null)}
+          onClick={e=>openZone("tech",e)}/>
+        {/* hr: lower-left layer_3 area */}
+        <rect x={0} y={350} width={1200} height={600} fill="transparent" style={{cursor:"pointer"}}
+          onMouseEnter={()=>setHovered("hr")} onMouseLeave={()=>setHovered(null)}
+          onClick={e=>openZone("hr",e)}/>
+        {/* partnerships: ground strips layer_11+12 */}
+        <rect x={7} y={2430} width={5110} height={580} fill="transparent" style={{cursor:"pointer"}}
+          onMouseEnter={()=>setHovered("partnerships")} onMouseLeave={()=>setHovered(null)}
+          onClick={e=>openZone("partnerships",e)}/>
+        {/* market: underground layer_13+14 */}
+        <rect x={0} y={2940} width={5130} height={425} fill="transparent" style={{cursor:"pointer"}}
+          onMouseEnter={()=>setHovered("market")} onMouseLeave={()=>setHovered(null)}
+          onClick={e=>openZone("market",e)}/>
+        {/* piano: Group A branch zone */}
+        <rect x={2450} y={280} width={900} height={760} fill="transparent" style={{cursor:"pointer"}}
+          onMouseEnter={()=>setHovered("piano")} onMouseLeave={()=>setHovered(null)}
+          onClick={e=>openZone("piano",e)}/>
+        {/* assistant: Group B branch zone */}
+        <rect x={1650} y={0} width={930} height={750} fill="transparent" style={{cursor:"pointer"}}
+          onMouseEnter={()=>setHovered("assistant")} onMouseLeave={()=>setHovered(null)}
+          onClick={e=>openZone("assistant",e)}/>
 
-          {/* ── TRUNK (bottom layer) ──────────────────────────── */}
-          <path d={TRUNK_PATH} fill="url(#trunkG)" filter="url(#trunkShd)"/>
-          <path d={TRUNK_PATH} fill="url(#barkPat)" opacity=".20"/>
-          {/* one-sided light sheen */}
-          <path d={`M 492,${TRUNK_TOP_Y} C 491,${TRUNK_TOP_Y+88} 490,${GY-130} 492,${GY} L 498,${GY} C 496,${GY-130} 495,${TRUNK_TOP_Y+88} 496,${TRUNK_TOP_Y} Z`}
-            fill="rgba(220,160,70,.12)"/>
-          <text x={TX} y={442} textAnchor="middle" fill="rgba(255,255,255,.14)" fontSize="8" fontWeight="700" letterSpacing="2.5">TECH CORE</text>
-          <text x={TX} y={456} textAnchor="middle" fill="rgba(255,255,255,.09)" fontSize="7.5">
-            {app.projects.filter(p=>p.status==="live").length} live · {app.projects.filter(p=>p.status==="building").length} đang xây
-          </text>
-
-          {/* ── MAIN BRANCHES — asymmetric ────────────────────── */}
-          {/* Left: longer, with one extra secondary branch (left has more sub-branches) */}
-          <path d={branchPath(LBX,LBY,PIANO_CX,PIANO_CY+42,24,10)} fill={tC}/>
-          <path d={branchPath(PIANO_CX-12,PIANO_CY+30,PIANO_CX-50,PIANO_CY-20,8,4)} fill={tA}/>
-          {/* Right: slightly different angle, one terminal only */}
-          <path d={branchPath(RBX,RBY,ASST_CX,ASST_CY+38,21,9)} fill={tC}/>
-          {/* Center vertical from trunk top to Tech crown */}
-          <path d={branchPath(499,TRUNK_TOP_Y,TECH_CX,TECH_CY+36,15,8)} fill={tC}/>
-          {/* Mid-left sub — nearly horizontal then lifts */}
-          <path d={branchPath(491,350,ML_CX,ML_CY+26,12,6)} fill={tA}/>
-          {/* Mid-right sub — shorter */}
-          <path d={branchPath(509,338,MR_CX,MR_CY+20,10,5)} fill={tA}/>
-
-          {/* ── ORGANIC CANOPIES — branches + leaves, no circles ──── */}
-          {/* Piano left */}
-          <OrganicCanopy cx={PIANO_CX} cy={PIANO_CY} prog={pianoP} color="#999999" done={pianoS.done} overdue={pianoS.overdue} seed={101}/>
-          <FlowerTip cx={PIANO_CX} cy={PIANO_CY-cR(pianoP)-8} prog={pianoP}/>
-          {/* Assistant right */}
-          <OrganicCanopy cx={ASST_CX} cy={ASST_CY} prog={asstP} color="#aaaaaa" done={asstS.done} overdue={asstS.overdue} seed={202}/>
-          <FlowerTip cx={ASST_CX} cy={ASST_CY-cR(asstP)-8} prog={asstP}/>
-          {/* Mid-left (tech sub) */}
-          <OrganicCanopy cx={ML_CX} cy={ML_CY} prog={Math.round(techP*0.65)} color="#888888" done={Math.round(techS.done*0.3)} overdue={0} seed={404}/>
-          {/* Mid-right (tech sub) */}
-          <OrganicCanopy cx={MR_CX} cy={MR_CY} prog={Math.round(techP*0.65)} color="#888888" done={Math.round(techS.done*0.3)} overdue={0} seed={505}/>
-          {/* Tech center crown — on top */}
-          <OrganicCanopy cx={TECH_CX} cy={TECH_CY} prog={techP} color="#888888" done={techS.done} overdue={techS.overdue} seed={303}/>
-          <FlowerTip cx={TECH_CX} cy={TECH_CY-cR(techP)-8} prog={techP}/>
-
-        </g>{/* end .tree-grp */}
-
-        {/* ── GROUND LINE ─────────────────────────────────────── */}
-        <rect x="0" y={GY} width={VW} height="22" fill="url(#soilG)"/>
-
-        {/* ── HR ROOTS (amber — clearly different from trunk) ── */}
-        <g style={{cursor:"pointer"}} onClick={e=>openZone("hr",e)}
-           onMouseEnter={()=>setHovered("hr")} onMouseLeave={()=>setHovered(null)}>
-          {/* large left root surfacing above ground */}
-          <path d={`M ${TX-56},${GY} C ${TX-110},${GY+8} ${TX-220},${GY-14} ${TX-330},${GY+2}
-            C ${TX-390},${GY+12} ${TX-420},${GY+28} ${TX-450},${GY+46}
-            L ${TX-438},${GY+54} C ${TX-406},${GY+36} ${TX-374},${GY+20} ${TX-314},${GY+10}
-            L ${TX-310},${GY+60} L ${TX-294},${GY+62} L ${TX-298},${GY+10}
-            C ${TX-200},${GY+0} ${TX-96},${GY+16} ${TX-48},${GY+20} Z`}
-            fill="url(#hrRootG)" opacity=".94"/>
-          {/* large right root */}
-          <path d={`M ${TX+56},${GY} C ${TX+110},${GY+8} ${TX+220},${GY-14} ${TX+330},${GY+2}
-            C ${TX+390},${GY+12} ${TX+420},${GY+28} ${TX+450},${GY+46}
-            L ${TX+438},${GY+54} C ${TX+406},${GY+36} ${TX+374},${GY+20} ${TX+314},${GY+10}
-            L ${TX+310},${GY+60} L ${TX+294},${GY+62} L ${TX+298},${GY+10}
-            C ${TX+200},${GY+0} ${TX+96},${GY+16} ${TX+48},${GY+20} Z`}
-            fill="url(#hrRootG)" opacity=".94"/>
-          {/* small tap root */}
-          <path d={`M ${TX-16},${GY} L ${TX-12},${GY+74} L ${TX+12},${GY+74} L ${TX+16},${GY} Z`}
-            fill="url(#hrRootG)" opacity=".78"/>
-          {/* thin trailing roots */}
-          <path d={`M ${TX-298},${GY+12} C ${TX-338},${GY+26} ${TX-376},${GY+50} ${TX-404},${GY+76} L ${TX-392},${GY+84} C ${TX-362},${GY+58} ${TX-324},${GY+34} ${TX-284},${GY+20} Z`}
-            fill="url(#hrRootG)" opacity=".68"/>
-          <path d={`M ${TX+298},${GY+12} C ${TX+338},${GY+26} ${TX+376},${GY+50} ${TX+404},${GY+76} L ${TX+392},${GY+84} C ${TX+362},${GY+58} ${TX+324},${GY+34} ${TX+284},${GY+20} Z`}
-            fill="url(#hrRootG)" opacity=".68"/>
-          {/* HR label  */}
-          <rect x={TX-94} y={GY+50} width={188} height={hovered==="hr"?56:38} rx="14"
-            fill={hovered==="hr"?"#888888":"rgba(8,12,26,0.92)"} stroke="#aaaaaa" strokeWidth={hovered==="hr"?1.5:2}
-            style={{filter:hovered==="hr"?"drop-shadow(0 0 18px rgba(150,150,150,0.35))":"drop-shadow(0 4px 8px rgba(0,0,0,.4))"}}/>
-          <circle cx={TX-70} cy={GY+50+(hovered==="hr"?28:19)} r="14"
-            fill={hovered==="hr"?"rgba(255,255,255,0.22)":"rgba(150,150,150,0.13)"}
-            stroke={hovered==="hr"?"rgba(255,255,255,0.45)":"#aaaaaa"} strokeWidth="1.5"/>
-          <text x={TX-70} y={GY+50+(hovered==="hr"?33:24)} textAnchor="middle" fontSize="14">👥</text>
-          <text x={TX-49} y={GY+65} textAnchor="start" fill="white" fontSize="11" fontWeight="800">Nhân Sự (Rễ)</text>
-          <text x={TX-49} y={GY+79} textAnchor="start" fill={hovered==="hr"?"white":"#aaaaaa"} fontSize="10" fontWeight="700">{hrP}% · {healthOf(hrP).dot} {healthOf(hrP).label}</text>
-          {hovered==="hr"&&<text x={TX-49} y={GY+96} textAnchor="start" fill="rgba(255,255,255,.85)" fontSize="9">✅ {hrS.done}/{hrS.total} hoàn thành</text>}
-          {/* transparent hit band */}
-          <rect x="0" y={GY} width={VW} height="94" fill="transparent"/>
-        </g>
-
-        {/* ── UNDERGROUND / MARKET ────────────────────────────── */}
-        <g style={{cursor:"pointer"}} onClick={e=>openZone("market",e)}
-           onMouseEnter={()=>setHovered("market")} onMouseLeave={()=>setHovered(null)}>
-          <rect x="0" y={GY+96} width={VW} height={VH-GY-96} fill="url(#underG)"/>
-          {/* pebbles */}
-          {Array.from({length:18},(_,i)=>{const r=mkRng(i*73);return{x:r()*VW,y:GY+98+r()*56,rx:2+r()*7,ry:1.5+r()*3};}).map((s,i)=>(
-            <ellipse key={i} cx={s.x} cy={s.y} rx={s.rx} ry={s.ry} fill={`rgba(100,56,10,${.06+mkRng(i*53)()*0.11})`}/>
-          ))}
-          <text x={VW/2} y={GY+128} textAnchor="middle" fill={hovered==="market"?"rgba(255,200,50,.55)":"rgba(255,255,255,.20)"} fontSize="10" letterSpacing="2.5">🌍 THỊ TRƯỜNG (ĐẤT) — Market Index: {mkIdx}</text>
-          {/* partner category labels */}
-          {[{x:108,icon:"📦",label:"Nhà cung cấp",c:"#cccccc"},{x:316,icon:"👥",label:"HR Partners",c:"#aaaaaa"},{x:660,icon:"🎓",label:"Kiến thức",c:"#bbbbbb"},{x:892,icon:"💰",label:"Tài chính",c:"#aaaaaa"}].map((lb,i)=>(
-            <text key={i} x={lb.x} y={GY+150} textAnchor="middle" fill={lb.c} fontSize="10" fontWeight="700">{lb.icon} {lb.label}</text>
-          ))}
-        </g>
-
-        {/* ── GRASS (partnerships) ────────────────────────────── */}
-        <g style={{cursor:"pointer"}} onClick={e=>openZone("partnerships",e)}
-           onMouseEnter={()=>setHovered("partnerships")} onMouseLeave={()=>setHovered(null)}>
-          {blades.map((bl,i)=>(<path key={i} d={`M ${bl.lx},${GY} Q ${bl.bx},${GY-bl.h} ${bl.rx},${GY}`} fill={bl.col} opacity=".90"/>))}
-          <rect x="0" y={GY-28} width={VW} height="34" fill="transparent"/>
-        </g>
-        {/* grass label */}
-        <text x={VW/2} y={GY-7} textAnchor="middle" fill="rgba(18,80,18,.75)" fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>
-          Hợp Tác · {partP}% · {partS.done}/{partS.total} việc · {healthOf(partP).dot} {healthOf(partP).label}
-        </text>
-
-        {/* ── CANOPY LABELS (on top of everything) ────────────── */}
-        <CanopyLabel cx={PIANO_CX} cy={PIANO_CY} r={pianoR} icon="🎹" title="Piano"
+        {/* â”€â”€ 8. CANOPY BADGES (Rule V â€” permanent label, expands on hover) â”€â”€ */}
+        <CanopyBadge cx={PIANO_CX} cy={PIANO_CY} icon="ðŸŽ¹" title="Piano"
           prog={pianoP} color="#999999" teamId="piano"
           hovered={hovered==="piano"} done={pianoS.done} total={pianoS.total}
           onClick={e=>openZone("piano",e)} onEnter={()=>setHovered("piano")} onLeave={()=>setHovered(null)}/>
-
-        <CanopyLabel cx={ASST_CX} cy={ASST_CY} r={asstR} icon="📋" title="Hành Chính"
+        <CanopyBadge cx={ASST_CX} cy={ASST_CY} icon="ðŸ“‹" title="HÃ nh ChÃ­nh"
           prog={asstP} color="#aaaaaa" teamId="assistant"
           hovered={hovered==="assistant"} done={asstS.done} total={asstS.total}
           onClick={e=>openZone("assistant",e)} onEnter={()=>setHovered("assistant")} onLeave={()=>setHovered(null)}/>
-
-        <CanopyLabel cx={TECH_CX} cy={TECH_CY} r={techR} icon="⚙️" title="Công Nghệ"
+        <CanopyBadge cx={TECH_CX} cy={TECH_CY} icon="âš™ï¸" title="CÃ´ng Nghá»‡"
           prog={techP} color="#888888" teamId="tech"
           hovered={hovered==="tech"} done={techS.done} total={techS.total}
           onClick={e=>openZone("tech",e)} onEnter={()=>setHovered("tech")} onLeave={()=>setHovered(null)}/>
 
-        {/* trunk click zone */}
-        <rect x={TX-72} y={TRUNK_TOP_Y} width={144} height={GY-TRUNK_TOP_Y} rx="12" fill="transparent" style={{cursor:"pointer"}}
-          onClick={e=>openZone("tech",e)} onMouseEnter={()=>setHovered("tech")} onMouseLeave={()=>setHovered(null)}/>
+        {/* Rule XI: health score badge (top-center) */}
+        <g style={{pointerEvents:"none"}}>
+          <rect x={VW/2-160} y={20} width={320} height={54} rx={12}
+            fill={lowHealth?"rgba(80,20,20,0.88)":"rgba(8,12,26,0.80)"}
+            stroke={lowHealth?"#994444":"#444466"} strokeWidth={2}/>
+          <text x={VW/2} y={44} textAnchor="middle" fill={lowHealth?"#ff8888":"#aaaaee"} fontSize={11.5} fontWeight="700">
+            {"Health Score: "+hScore+"% "+( lowHealth?"[!] He sinh thai yeu":"He sinh thai on dinh")}
+          </text>
+          <text x={VW/2} y={62} textAnchor="middle" fill="#888899" fontSize={9}>
+            {"Partnerships "+partP+"% · MKT "+mktP+"% · "+(partS.done+mktS.done)+" tasks hoan thanh"}
+          </text>
+        </g>
+
+        {/* floating zone label strip on hover â€” Rule XIII */}
+        {hovered&&(()=>{
+          const meta=ZONE_META[hovered];
+          return(
+            <g style={{pointerEvents:"none"}}>
+              <rect x={10} y={VH-120} width={1200} height={110} rx={20}
+                fill="rgba(8,12,26,0.92)" stroke={meta.color} strokeWidth={3}
+                style={{filter:`drop-shadow(0 2px ${12*S}px ${meta.color}55)`}}/>
+              <text x={42} y={VH-80} fontSize={38} fontWeight="800" fill={meta.color}>{meta.icon} {meta.title}</text>
+              <text x={42} y={VH-38} fontSize={28} fill="#94a3b8">{meta.subtitle}</text>
+            </g>
+          );
+        })()}
 
       </svg>
 
-      {/* ── MINI POPUP ─────────────────────────────────────── */}
+      {/* â”€â”€ MINI POPUP â”€â”€ */}
       {popup&&(()=>{
         const tid=ZONE_META[popup.zone].teamId;
         const s=tid?gs(tid):{done:0,total:0,overdue:0};
         const p=tid?gp(tid):0;
         const extra=
-          popup.zone==="heaven"?`🌦 Index: ${hvIdx}  ·  Mưa: ${rainOn?"Đang bật":"Đang tắt"}`:
-          popup.zone==="market"?`📈 Market Index: ${mkIdx}`:
-          popup.zone==="partnerships"?`🤝 ${app.partners.length} đối tác · ${app.partners.filter(pt=>pt.status==="active").length} active`:
+          popup.zone==="heaven"?`Index: ${hvIdx}  ·  Mua: ${rainOn?"Dang bat":"Dang tat"}`:
+          popup.zone==="market"?`Market Index: ${mkIdx}`:
+          popup.zone==="partnerships"?`${app.partners.length} doi tac · ${app.partners.filter(pt=>pt.status==="active").length} active`:
           undefined;
         return(
           <MiniPopup popup={popup} onClose={()=>setPopup(null)} onDetail={()=>openFull(popup.zone)}
@@ -773,8 +683,9 @@ export default function TreeCanvas(){
         );
       })()}
 
-      {/* ── FULL PANEL ─────────────────────────────────────── */}
+      {/* â”€â”€ FULL PANEL â”€â”€ */}
       {fullPanel&&<FullPanel zone={fullPanel} onClose={()=>setFullPanel(null)}/>}
     </div>
   );
 }
+
