@@ -99,7 +99,7 @@ const PROJECTS: Project[] = [
   { id: 22, name: "Partner API v2",                 active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
   { id: 23, name: "Mobile Payment App",             active: false, stages: ["pending","pending","pending"], note: "Q4 2026", docs: [] },
   { id: 24, name: "Business Process Automation",    active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
-  { id: 25, name: "Marketing Automation Suite",     active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Marketing Automation Blueprint", type: "Doc", desc: "Email, SMS, push workflow tự động" }] },
+  { id: 25, name: "Chuyển Đổi Automation Suite",     active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Chuyển Đổi Automation Blueprint", type: "Doc", desc: "Email, SMS, push workflow tự động" }] },
   { id: 26, name: "Revenue Analytics Engine",       active: false, stages: ["pending","pending","pending"], note: "Q3 2026", docs: [] },
   { id: 27, name: "Customer Segmentation AI",       active: false, stages: ["pending","pending","pending"], note: "Q4 2026", docs: [] },
   { id: 28, name: "Chatbot Support 24/7",           active: false, stages: ["active","pending","pending"], note: "Q2 2026", docs: [{ icon: "📝", name: "Chatbot Flow & Intent Map", type: "Doc", desc: "Kịch bản hội thoại, intent, fallback" }] },
@@ -129,27 +129,27 @@ const PARTNER_CATS = [
   { key: "noted",     label: "Đã ghi nhớ",   color: "#f59e0b", bg: "#fffbeb", border: "#fde68a", dot: "🟡", target: 40,
     desc: "Đã xác nhận quan tâm — đang trong giai đoạn đàm phán hoặc thử nghiệm",
     list: ["VPBank","ACB","Masan Group","TH True Milk","Kido Group","Hoà Phát","Vinamilk","Thế Giới Di Động","FPT Retail","An Phát Holdings","PAN Group","Sabeco","Habeco","PNJ","Gelex"] },
-  { key: "partnered", label: "Đã hợp tác",   color: "#10b981", bg: "#f0fdf4", border: "#bbf7d0", dot: "🟢", target: 36,
-    desc: "Đã ký kết hợp đồng — đang triển khai hợp tác thực tế",
+  { key: "partnered", label: "Đã ký kết",   color: "#10b981", bg: "#f0fdf4", border: "#bbf7d0", dot: "🟢", target: 36,
+    desc: "Đã ký kết hợp đồng — đang triển khai quan hệ đối tác thực tế",
     list: ["MoMo","VNPay","ZaloPay","VinaPhone","MobiFone","Be Group","Ahamove","UrBox","Homebase","GHN","GHTK","Propzy","OnPoint"] },
 ];
 
 // ─── GMV OKR by division ──────────────────────────────────────────────────────
 const GMV_DIVISIONS = [
-  { name: "Marketing / Thương mại", icon: "📣", color: "#ec4899", current: 3.2, target: 20, note: "GMV từ kênh marketing & TMĐT" },
-  { name: "Công nghệ",              icon: "⚙️", color: "#6366f1", current: 2.1, target: 15, note: "GMV từ nền tảng & API marketplace" },
-  { name: "Hợp tác / Đối tác",      icon: "🤝", color: "#10b981", current: 1.8, target: 8,  note: "GMV từ mạng lưới đối tác chiến lược" },
+  { name: "Chuyển Đổi / Thương mại", icon: "📣", color: "#ec4899", current: 3.2, target: 20, note: "GMV từ kênh chuyển đổi & TMĐT" },
+  { name: "Công Nghệ",              icon: "⚙️", color: "#6366f1", current: 2.1, target: 15, note: "GMV từ nền tảng & API marketplace" },
+  { name: "Đối Tác",      icon: "🤝", color: "#10b981", current: 1.8, target: 8,  note: "GMV từ mạng lưới đối tác chiến lược" },
   { name: "Piano Division",         icon: "🎹", color: "#8b5cf6", current: 0.7, target: 4,  note: "GMV từ dịch vụ & sản phẩm Piano" },
-  { name: "Hành chính / BOD",        icon: "📋", color: "#3b82f6", current: 0.4, target: 3,  note: "GMV từ dịch vụ vận hành & hỗ trợ" },
+  { name: "Trợ Lý / BOD",        icon: "📋", color: "#3b82f6", current: 0.4, target: 3,  note: "GMV từ dịch vụ vận hành & hỗ trợ" },
 ];
 
 // ─── Revenue by division ──────────────────────────────────────────────────────
 const REVENUE_DIVISIONS = [
-  { name: "Công nghệ",              icon: "⚙️", color: "#6366f1", current: 0.50, target: 3.5, note: "License, SaaS, API fee" },
-  { name: "Marketing / Thương mại", icon: "📣", color: "#ec4899", current: 0.40, target: 3.0, note: "Hoa hồng, quảng cáo, affiliate" },
-  { name: "Hợp tác / Đối tác",      icon: "🤝", color: "#10b981", current: 0.30, target: 2.0, note: "Revenue share, referral fee" },
+  { name: "Công Nghệ",              icon: "⚙️", color: "#6366f1", current: 0.50, target: 3.5, note: "License, SaaS, API fee" },
+  { name: "Chuyển Đổi / Thương mại", icon: "📣", color: "#ec4899", current: 0.40, target: 3.0, note: "Hoa hồng, quảng cáo, affiliate" },
+  { name: "Đối Tác",      icon: "🤝", color: "#10b981", current: 0.30, target: 2.0, note: "Revenue share, referral fee" },
   { name: "Piano Division",         icon: "🎹", color: "#8b5cf6", current: 0.15, target: 1.0, note: "Học phí, dịch vụ âm nhạc" },
-  { name: "Hành chính / BOD",        icon: "📋", color: "#3b82f6", current: 0.05, target: 0.5, note: "Dịch vụ vận hành, tư vấn" },
+  { name: "Trợ Lý / BOD",        icon: "📋", color: "#3b82f6", current: 0.05, target: 0.5, note: "Dịch vụ vận hành, tư vấn" },
 ];
 
 // ─── Member distribution by platform ─────────────────────────────────────────
@@ -306,6 +306,46 @@ export default function DashboardPage() {
     return Math.min(100, Math.round(pct + velocity * Q1_REMAINING));
   }
 
+  function getModalHealth(ratio: number) {
+    if (ratio >= 0.8) {
+      return {
+        label: "Đúng tiến độ",
+        color: "#f5d060",
+        bg: "rgba(201,162,39,0.20)",
+        border: "rgba(245,208,96,0.42)",
+      };
+    }
+    if (ratio >= 0.5) {
+      return {
+        label: "Hơi chậm",
+        color: "#d6b14b",
+        bg: "rgba(143,111,35,0.20)",
+        border: "rgba(214,177,75,0.36)",
+      };
+    }
+    return {
+      label: "Chưa đạt",
+      color: "#b58a2b",
+      bg: "rgba(98,74,24,0.24)",
+      border: "rgba(181,138,43,0.34)",
+    };
+  }
+
+  const modalFrameStyle = {
+    background: "rgba(20,20,20,0.92)",
+    border: "1px solid rgba(255,255,255,0.12)",
+    boxShadow: "0 12px 36px rgba(0,0,0,0.55)",
+  };
+  const modalCardStyle = {
+    background: "rgba(34,34,34,0.72)",
+    border: "1px solid rgba(255,255,255,0.10)",
+  };
+  const modalPanelStyle = {
+    background: "rgba(24,24,24,0.72)",
+    border: "1px solid rgba(255,255,255,0.08)",
+  };
+  const accentGradient = "linear-gradient(90deg,#8b6108,#c9a227 45%,#f5d060)";
+
   const timeElapsedPct = Math.round((Q1_ELAPSED / Q1_TOTAL) * 100);
 
   return (
@@ -365,7 +405,7 @@ export default function DashboardPage() {
           { label: "Xgroup",         value: `${overallPct}%`,              sub: "theo OKR trung bình",       accent: "#10b981" },
           { label: "GMV",            value: "500",                         sub: "M USD",                     accent: "#6366f1", noBar: true },
           { label: "DOANH THU",      value: "50",                          sub: "M USD",                     accent: "#f59e0b" },
-          { label: "NHÂN SỰ HỆ THỐNG", value: "5000",                      sub: "người",                     accent: "#8b5cf6" },
+          { label: "NHÂN LỰC HỆ THỐNG", value: "5000",                      sub: "người",                     accent: "#8b5cf6" },
           { label: "TEAM VƯỢT TRỘI", value: "5",                           sub: "team",                      accent: "#10b981" },
           { label: "TEAM QUÁ HẠN",   value: "1",                           sub: "team",                      accent: "#f97316" },
         ].map((s) => (
@@ -766,80 +806,84 @@ export default function DashboardPage() {
         return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setPartnerModalOpen(false)}>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
+          <div className="relative backdrop-blur-md rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" style={modalFrameStyle} onClick={e => e.stopPropagation()}>
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-              <div>
-                <h2 className="font-bold text-slate-800 text-lg">🤝 Đối Tác Ký Kết</h2>
-                <p className="text-xs text-slate-400 mt-0.5">13 ký kết · 41 trong pipeline · Mục tiêu 136 đối tác cuối năm</p>
+            <div className="relative flex items-center justify-center px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.10)" }}>
+              <div className="text-center">
+                <h2 className="font-bold text-white text-lg">ĐỐI TÁC KÝ KẾT</h2>
+                <p className="text-xs mt-0.5" style={{ color: "#9ca3af" }}>13 ký kết · 41 trong pipeline · Mục tiêu 136 đối tác cuối năm</p>
               </div>
-              <button onClick={() => setPartnerModalOpen(false)} className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 text-lg">✕</button>
+              <button
+                onClick={() => setPartnerModalOpen(false)}
+                className="absolute right-6 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-sm"
+                style={{ color: "#9ca3af" }}
+              >
+                ✕
+              </button>
             </div>
             <div className="overflow-y-auto p-6 space-y-5">
               {/* Progress vs annual target */}
-              <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold text-slate-600">📈 Tiến độ tổng thể</span>
-                  <span className="text-xs text-slate-400">Năm đã qua {yearExpPct}%</span>
+              <div className="rounded-2xl p-4" style={modalCardStyle}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold" style={{ color: "#f5d060" }}>Tiến độ tổng thể</span>
+                  <span className="text-xs" style={{ color: "#9ca3af" }}>Năm đã qua {yearExpPct}%</span>
                 </div>
                 {/* Signed bar */}
-                <div className="relative h-4 bg-white rounded-full overflow-hidden border border-slate-200 mb-1">
-                  <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: `${pipelinePct}%`, background: "linear-gradient(90deg,#fde68a,#fbbf24)" }} />
-                  <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: `${signedPct}%`, background: "linear-gradient(90deg,#6ee7b7,#10b981)" }} />
+                <div className="relative h-4 rounded-full overflow-hidden mb-2" style={{ background: "rgba(255,255,255,0.10)" }}>
+                  <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: `${pipelinePct}%`, background: "linear-gradient(90deg,#6f530f,#9d7a1b)" }} />
+                  <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: `${signedPct}%`, background: accentGradient }} />
                   {/* expected marker */}
-                  <div className="absolute top-0 bottom-0 w-0.5 bg-slate-400" style={{ left: `${yearExpPct}%` }} />
+                  <div className="absolute top-0 bottom-0 w-0.5" style={{ left: `${yearExpPct}%`, background: "rgba(255,255,255,0.45)" }} />
                 </div>
-                <div className="flex items-center gap-4 text-[11px] text-slate-500 mt-1">
-                  <span><span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 mr-1" />🟢 Ký kết: <b className="text-slate-700">13</b> / 136</span>
-                  <span><span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-300 mr-1" />🟡 Pipeline: <b className="text-slate-700">41</b> / 136</span>
-                  <span className="ml-auto text-slate-400">│ dọc = kỳ vọng hôm nay</span>
+                <div className="flex flex-wrap items-center gap-3 text-[11px]" style={{ color: "#9ca3af" }}>
+                  <span>Ký kết: <b style={{ color: "#f5d060" }}>13</b> / 136</span>
+                  <span>Pipeline: <b style={{ color: "#d6b14b" }}>41</b> / 136</span>
+                  <span className="ml-auto">Dọc = kỳ vọng hôm nay</span>
                 </div>
               </div>
               {/* Funnel summary */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {PARTNER_CATS.map(cat => {
                   const pct = Math.round(cat.list.length / cat.target * 100);
                   return (
-                    <div key={cat.key} className="rounded-xl p-3 border text-center" style={{ background: cat.bg, borderColor: cat.border }}>
-                      <div className="text-xl mb-1">{cat.dot}</div>
-                      <div className="font-black text-xl" style={{ color: cat.color }}>{cat.list.length}<span className="text-sm font-normal text-slate-400">/{cat.target}</span></div>
-                      <div className="text-[11px] font-bold" style={{ color: cat.color }}>{cat.label}</div>
-                      <div className="mt-2 h-1.5 bg-white/60 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: cat.color }} />
+                    <div key={cat.key} className="rounded-xl p-3 border text-center" style={modalPanelStyle}>
+                      <div className="font-black text-xl" style={{ color: "#f5d060" }}>{cat.list.length}<span className="text-sm font-normal" style={{ color: "#9ca3af" }}>/ {cat.target}</span></div>
+                      <div className="text-[11px] font-semibold mt-0.5" style={{ color: "#d4d4d8" }}>{cat.label}</div>
+                      <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+                        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: accentGradient }} />
                       </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">{pct}% mục tiêu</div>
+                      <div className="text-[10px] mt-0.5" style={{ color: "#9ca3af" }}>{pct}% mục tiêu</div>
                     </div>
                   );
                 })}
               </div>
               {/* Funnel flow arrow */}
-              <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
-                <span className="px-3 py-1.5 rounded-full font-semibold bg-red-50 text-red-500 border border-red-100">13 Tiếp cận</span>
-                <span>→</span>
-                <span className="px-3 py-1.5 rounded-full font-semibold bg-amber-50 text-amber-500 border border-amber-100">15 Ghi nhớ</span>
-                <span>→</span>
-                <span className="px-3 py-1.5 rounded-full font-semibold bg-emerald-50 text-emerald-600 border border-emerald-100">13 Ký kết ✅</span>
+              <div className="rounded-xl px-3 py-2.5 text-xs text-center font-semibold" style={modalPanelStyle}>
+                <span style={{ color: "#d4d4d8" }}>Tiếp cận: </span><b style={{ color: "#f5d060" }}>13</b>
+                <span style={{ color: "#9ca3af" }}> · </span>
+                <span style={{ color: "#d4d4d8" }}>Ghi nhớ: </span><b style={{ color: "#f5d060" }}>15</b>
+                <span style={{ color: "#9ca3af" }}> · </span>
+                <span style={{ color: "#d4d4d8" }}>Ký kết: </span><b style={{ color: "#f5d060" }}>13</b>
               </div>
               {/* Per-group detail */}
               {PARTNER_CATS.map(cat => (
-                <div key={cat.key} className="rounded-2xl border overflow-hidden" style={{ borderColor: cat.border }}>
-                  <div className="flex items-center gap-2 px-4 py-3" style={{ background: cat.bg }}>
-                    <span className="text-base">{cat.dot}</span>
+                <div key={cat.key} className="rounded-2xl border overflow-hidden" style={modalCardStyle}>
+                  <div className="px-4 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-bold text-sm" style={{ color: cat.color }}>{cat.label}</h3>
-                        <span className="text-xs font-bold" style={{ color: cat.color }}>{cat.list.length} / {cat.target} ({Math.round(cat.list.length/cat.target*100)}%)</span>
+                        <h3 className="font-bold text-sm" style={{ color: "#ffffff" }}>{cat.label}</h3>
+                        <span className="text-xs font-bold" style={{ color: "#f5d060" }}>{cat.list.length} / {cat.target} ({Math.round(cat.list.length / cat.target * 100)}%)</span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5">{cat.desc}</p>
+                      <p className="text-[11px] mt-0.5" style={{ color: "#9ca3af" }}>{cat.desc}</p>
                     </div>
                   </div>
-                  <div className="h-1.5 bg-slate-100">
-                    <div className="h-full" style={{ width: `${Math.round(cat.list.length/cat.target*100)}%`, background: `linear-gradient(90deg,${cat.color}80,${cat.color})` }} />
+                  <div className="h-1.5" style={{ background: "rgba(255,255,255,0.08)" }}>
+                    <div className="h-full" style={{ width: `${Math.round(cat.list.length / cat.target * 100)}%`, background: accentGradient }} />
                   </div>
                   <div className="p-4 flex flex-wrap gap-2">
                     {cat.list.map(name => (
                       <span key={name} className="px-3 py-1.5 rounded-full text-xs font-semibold border"
-                        style={{ background: cat.bg, borderColor: cat.border, color: cat.color }}>{name}</span>
+                        style={{ background: "rgba(24,24,24,0.72)", borderColor: "rgba(245,208,96,0.24)", color: "#d6b14b" }}>{name}</span>
                     ))}
                   </div>
                 </div>
@@ -862,37 +906,43 @@ export default function DashboardPage() {
         return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setGmvModalOpen(false)}>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-              <div>
-                <h2 className="font-bold text-slate-800 text-lg">📊 GMV Năm 2026</h2>
-                <p className="text-xs text-slate-400 mt-0.5">8.2T / 50T VND · Năm đã qua {yearExpPct}% · OKR 5 mảng</p>
+          <div className="relative backdrop-blur-md rounded-2xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden" style={modalFrameStyle} onClick={e => e.stopPropagation()}>
+            <div className="relative flex items-center justify-center px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.10)" }}>
+              <div className="text-center">
+                <h2 className="font-bold text-white text-lg">GMV NĂM 2026</h2>
+                <p className="text-xs mt-0.5" style={{ color: "#9ca3af" }}>8.2T / 50T VND · Năm đã qua {yearExpPct}% · OKR 5 mảng</p>
               </div>
-              <button onClick={() => setGmvModalOpen(false)} className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 text-lg">✕</button>
+              <button
+                onClick={() => setGmvModalOpen(false)}
+                className="absolute right-6 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-sm"
+                style={{ color: "#9ca3af" }}
+              >
+                ✕
+              </button>
             </div>
             <div className="overflow-y-auto p-6 space-y-4">
               {/* Total summary */}
-              <div className="rounded-2xl p-4" style={{ background: "linear-gradient(135deg,#f5f3ff,#eef2ff)", border: "1px solid #ddd6fe" }}>
+              <div className="rounded-2xl p-4" style={modalCardStyle}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-bold text-slate-700">🏢 Tổng Xgroup</span>
-                  <span className="text-sm font-black text-violet-600">{totalPct}%</span>
+                  <span className="text-sm font-bold" style={{ color: "#f5d060" }}>Tổng Xgroup</span>
+                  <span className="text-sm font-black" style={{ color: "#f5d060" }}>{totalPct}%</span>
                 </div>
-                <div className="relative h-4 bg-white/70 rounded-full overflow-hidden mb-2">
-                  <div className="h-4 rounded-full" style={{ width: `${totalPct}%`, background: "linear-gradient(90deg,#8b5cf6,#6366f1)" }} />
-                  <div className="absolute top-0 bottom-0 w-0.5 bg-slate-400/70" style={{ left: `${yearExpPct}%` }} />
+                <div className="relative h-4 rounded-full overflow-hidden mb-2" style={{ background: "rgba(255,255,255,0.10)" }}>
+                  <div className="h-4 rounded-full" style={{ width: `${totalPct}%`, background: accentGradient }} />
+                  <div className="absolute top-0 bottom-0 w-0.5" style={{ left: `${yearExpPct}%`, background: "rgba(255,255,255,0.45)" }} />
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="rounded-xl bg-white/80 py-2">
-                    <div className="text-sm font-black text-violet-700">8.2T</div>
-                    <div className="text-[10px] text-slate-400">Thực tế</div>
+                  <div className="rounded-xl py-2" style={modalPanelStyle}>
+                    <div className="text-sm font-black" style={{ color: "#f5d060" }}>8.2T</div>
+                    <div className="text-[10px]" style={{ color: "#9ca3af" }}>Thực tế</div>
                   </div>
-                  <div className="rounded-xl bg-white/80 py-2">
-                    <div className="text-sm font-black text-slate-600">{totalForecast}T</div>
-                    <div className="text-[10px] text-slate-400">Dự báo cuối năm</div>
+                  <div className="rounded-xl py-2" style={modalPanelStyle}>
+                    <div className="text-sm font-black" style={{ color: "#e5e7eb" }}>{totalForecast}T</div>
+                    <div className="text-[10px]" style={{ color: "#9ca3af" }}>Dự báo cuối năm</div>
                   </div>
-                  <div className="rounded-xl bg-white/80 py-2">
-                    <div className="text-sm font-black text-slate-600">{+(totalCurrent / monthsEl).toFixed(1)}T</div>
-                    <div className="text-[10px] text-slate-400">Trung bình/tháng</div>
+                  <div className="rounded-xl py-2" style={modalPanelStyle}>
+                    <div className="text-sm font-black" style={{ color: "#e5e7eb" }}>{+(totalCurrent / monthsEl).toFixed(1)}T</div>
+                    <div className="text-[10px]" style={{ color: "#9ca3af" }}>Trung bình/tháng</div>
                   </div>
                 </div>
               </div>
@@ -900,48 +950,47 @@ export default function DashboardPage() {
               {GMV_DIVISIONS.map(d => {
                 const pct = Math.round(d.current / d.target * 100);
                 const ratio = yearExpPct > 0 ? pct / yearExpPct : 1;
-                const health = ratio >= 0.8 ? { icon: "🟢", label: "Đúng tiến độ", c: "#10b981", bg: "#f0fdf4" }
-                             : ratio >= 0.5 ? { icon: "🟡", label: "Hơi chậm",     c: "#f59e0b", bg: "#fffbeb" }
-                             :                { icon: "🔴", label: "Chưa đạt",     c: "#ef4444", bg: "#fef2f2" };
+                const health = getModalHealth(ratio);
                 const forecast = yearFrac > 0 ? +(d.current / yearFrac).toFixed(1) : 0;
-                const monthlyAvg = monthsEl > 0 ? +(d.current / monthsEl).toFixed(2) : 0;
                 const monthlyNeed = monthsLeft > 0 ? +(( d.target - d.current) / monthsLeft).toFixed(2) : 0;
                 return (
-                  <div key={d.name} className="rounded-2xl border overflow-hidden" style={{ borderColor: `${d.color}30` }}>
-                    <div className="flex items-center gap-3 px-4 py-3" style={{ background: `${d.color}0d` }}>
-                      <span className="text-xl">{d.icon}</span>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-bold text-slate-800">{d.name}</span>
-                          <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: health.bg, color: health.c }}>{health.icon} {health.label}</span>
-                        </div>
-                        <p className="text-[11px] text-slate-400 mt-0.5">{d.note}</p>
+                  <div key={d.name} className="rounded-2xl border overflow-hidden" style={modalCardStyle}>
+                    <div className="px-4 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-sm font-bold" style={{ color: "#ffffff" }}>{d.name}</span>
+                        <span
+                          className="text-xs font-bold px-2 py-0.5 rounded-full border"
+                          style={{ background: health.bg, color: health.color, borderColor: health.border }}
+                        >
+                          {health.label}
+                        </span>
                       </div>
+                      <p className="text-[11px] mt-0.5" style={{ color: "#9ca3af" }}>{d.note}</p>
                     </div>
                     {/* Progress bar with expected marker */}
                     <div className="px-4 pt-3 pb-1">
-                      <div className="relative h-3 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: `${Math.min(pct,100)}%`, background: `linear-gradient(90deg,${d.color}70,${d.color})` }} />
-                        <div className="absolute top-0 bottom-0 w-0.5 bg-slate-400/60" style={{ left: `${yearExpPct}%` }} />
+                      <div className="relative h-3 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.10)" }}>
+                        <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: `${Math.min(pct,100)}%`, background: accentGradient }} />
+                        <div className="absolute top-0 bottom-0 w-0.5" style={{ left: `${yearExpPct}%`, background: "rgba(255,255,255,0.45)" }} />
                       </div>
                     </div>
                     {/* Stats row */}
-                    <div className="grid grid-cols-4 gap-0 divide-x divide-slate-100 px-4 pb-3 pt-1">
+                    <div className="grid grid-cols-4 gap-0 divide-x divide-white/10 px-4 pb-3 pt-1">
                       <div className="text-center pr-2">
-                        <div className="text-sm font-black" style={{ color: d.color }}>{pct}%</div>
-                        <div className="text-[10px] text-slate-400">Hoàn thành</div>
+                        <div className="text-sm font-black" style={{ color: "#f5d060" }}>{pct}%</div>
+                        <div className="text-[10px]" style={{ color: "#9ca3af" }}>Hoàn thành</div>
                       </div>
                       <div className="text-center px-2">
-                        <div className="text-sm font-bold text-slate-700">{d.current}T</div>
-                        <div className="text-[10px] text-slate-400">Thực tế</div>
+                        <div className="text-sm font-bold" style={{ color: "#e5e7eb" }}>{d.current}T</div>
+                        <div className="text-[10px]" style={{ color: "#9ca3af" }}>Thực tế</div>
                       </div>
                       <div className="text-center px-2">
-                        <div className="text-sm font-bold text-slate-600">{forecast}T</div>
-                        <div className="text-[10px] text-slate-400">Dự báo / năm</div>
+                        <div className="text-sm font-bold" style={{ color: "#e5e7eb" }}>{forecast}T</div>
+                        <div className="text-[10px]" style={{ color: "#9ca3af" }}>Dự báo / năm</div>
                       </div>
                       <div className="text-center pl-2">
-                        <div className="text-sm font-bold text-rose-500">{monthlyNeed}T</div>
-                        <div className="text-[10px] text-slate-400">Cần/tháng</div>
+                        <div className="text-sm font-bold" style={{ color: "#d6b14b" }}>{monthlyNeed}T</div>
+                        <div className="text-[10px]" style={{ color: "#9ca3af" }}>Cần/tháng</div>
                       </div>
                     </div>
                   </div>
@@ -965,37 +1014,43 @@ export default function DashboardPage() {
         return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setRevenueModalOpen(false)}>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-              <div>
-                <h2 className="font-bold text-slate-800 text-lg">💰 Doanh Thu Năm 2026</h2>
-                <p className="text-xs text-slate-400 mt-0.5">1.4T / 10T VND · Năm đã qua {yearExpPct}% · Holding & 5 mảng</p>
+          <div className="relative backdrop-blur-md rounded-2xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden" style={modalFrameStyle} onClick={e => e.stopPropagation()}>
+            <div className="relative flex items-center justify-center px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.10)" }}>
+              <div className="text-center">
+                <h2 className="font-bold text-white text-lg">DOANH THU NĂM 2026</h2>
+                <p className="text-xs mt-0.5" style={{ color: "#9ca3af" }}>1.4T / 10T VND · Năm đã qua {yearExpPct}% · Holding & 5 mảng</p>
               </div>
-              <button onClick={() => setRevenueModalOpen(false)} className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 text-lg">✕</button>
+              <button
+                onClick={() => setRevenueModalOpen(false)}
+                className="absolute right-6 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-sm"
+                style={{ color: "#9ca3af" }}
+              >
+                ✕
+              </button>
             </div>
             <div className="overflow-y-auto p-6 space-y-4">
               {/* Holding total */}
-              <div className="rounded-2xl p-4" style={{ background: "linear-gradient(135deg,#fffbeb,#fef3c7)", border: "1px solid #fde68a" }}>
+              <div className="rounded-2xl p-4" style={modalCardStyle}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-bold text-slate-700">🏢 Holding (Tổng)</span>
-                  <span className="text-sm font-black text-amber-600">{totalPct}%</span>
+                  <span className="text-sm font-bold" style={{ color: "#f5d060" }}>Holding (Tổng)</span>
+                  <span className="text-sm font-black" style={{ color: "#f5d060" }}>{totalPct}%</span>
                 </div>
-                <div className="relative h-4 bg-white/70 rounded-full overflow-hidden mb-2">
-                  <div className="h-4 rounded-full" style={{ width: `${totalPct}%`, background: "linear-gradient(90deg,#f59e0b,#d97706)" }} />
-                  <div className="absolute top-0 bottom-0 w-0.5 bg-slate-400/70" style={{ left: `${yearExpPct}%` }} />
+                <div className="relative h-4 rounded-full overflow-hidden mb-2" style={{ background: "rgba(255,255,255,0.10)" }}>
+                  <div className="h-4 rounded-full" style={{ width: `${totalPct}%`, background: accentGradient }} />
+                  <div className="absolute top-0 bottom-0 w-0.5" style={{ left: `${yearExpPct}%`, background: "rgba(255,255,255,0.45)" }} />
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="rounded-xl bg-white/80 py-2">
-                    <div className="text-sm font-black text-amber-600">1.4T</div>
-                    <div className="text-[10px] text-slate-400">Thực tế</div>
+                  <div className="rounded-xl py-2" style={modalPanelStyle}>
+                    <div className="text-sm font-black" style={{ color: "#f5d060" }}>1.4T</div>
+                    <div className="text-[10px]" style={{ color: "#9ca3af" }}>Thực tế</div>
                   </div>
-                  <div className="rounded-xl bg-white/80 py-2">
-                    <div className="text-sm font-black text-slate-600">{totalForecast}T</div>
-                    <div className="text-[10px] text-slate-400">Dự báo cuối năm</div>
+                  <div className="rounded-xl py-2" style={modalPanelStyle}>
+                    <div className="text-sm font-black" style={{ color: "#e5e7eb" }}>{totalForecast}T</div>
+                    <div className="text-[10px]" style={{ color: "#9ca3af" }}>Dự báo cuối năm</div>
                   </div>
-                  <div className="rounded-xl bg-white/80 py-2">
-                    <div className="text-sm font-black text-slate-600">{+(totalCurrent / monthsEl).toFixed(2)}T</div>
-                    <div className="text-[10px] text-slate-400">Trung bình/tháng</div>
+                  <div className="rounded-xl py-2" style={modalPanelStyle}>
+                    <div className="text-sm font-black" style={{ color: "#e5e7eb" }}>{+(totalCurrent / monthsEl).toFixed(2)}T</div>
+                    <div className="text-[10px]" style={{ color: "#9ca3af" }}>Trung bình/tháng</div>
                   </div>
                 </div>
               </div>
@@ -1003,46 +1058,48 @@ export default function DashboardPage() {
               {REVENUE_DIVISIONS.map(d => {
                 const pct = Math.round(d.current / d.target * 100);
                 const ratio = yearExpPct > 0 ? pct / yearExpPct : 1;
-                const health = ratio >= 0.8 ? { icon: "🟢", label: "Đúng tiến độ", c: "#10b981", bg: "#f0fdf4" }
-                             : ratio >= 0.5 ? { icon: "🟡", label: "Hơi chậm",     c: "#f59e0b", bg: "#fffbeb" }
-                             :                { icon: "🔴", label: "Chưa đạt",     c: "#ef4444", bg: "#fef2f2" };
+                const health = getModalHealth(ratio);
                 const forecast = yearFrac > 0 ? +(d.current / yearFrac).toFixed(2) : 0;
                 const monthlyNeed = monthsLeft > 0 ? +(( d.target - d.current) / monthsLeft).toFixed(2) : 0;
                 const sharePct = Math.round(d.current / totalCurrent * 100);
                 return (
-                  <div key={d.name} className="rounded-2xl border overflow-hidden" style={{ borderColor: `${d.color}30` }}>
-                    <div className="flex items-center gap-3 px-4 py-3" style={{ background: `${d.color}0d` }}>
-                      <span className="text-xl">{d.icon}</span>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-bold text-slate-800">{d.name}</span>
-                          <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: health.bg, color: health.c }}>{health.icon} {health.label}</span>
-                        </div>
-                        <p className="text-[11px] text-slate-400 mt-0.5">{d.note} · <b className="text-slate-500">{sharePct}%</b> tổng doanh thu</p>
+                  <div key={d.name} className="rounded-2xl border overflow-hidden" style={modalCardStyle}>
+                    <div className="px-4 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-sm font-bold" style={{ color: "#ffffff" }}>{d.name}</span>
+                        <span
+                          className="text-xs font-bold px-2 py-0.5 rounded-full border"
+                          style={{ background: health.bg, color: health.color, borderColor: health.border }}
+                        >
+                          {health.label}
+                        </span>
                       </div>
+                      <p className="text-[11px] mt-0.5" style={{ color: "#9ca3af" }}>
+                        {d.note} · <b style={{ color: "#d4d4d8" }}>{sharePct}%</b> tổng doanh thu
+                      </p>
                     </div>
                     <div className="px-4 pt-3 pb-1">
-                      <div className="relative h-3 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: `${Math.min(pct,100)}%`, background: `linear-gradient(90deg,${d.color}70,${d.color})` }} />
-                        <div className="absolute top-0 bottom-0 w-0.5 bg-slate-400/60" style={{ left: `${yearExpPct}%` }} />
+                      <div className="relative h-3 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.10)" }}>
+                        <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: `${Math.min(pct,100)}%`, background: accentGradient }} />
+                        <div className="absolute top-0 bottom-0 w-0.5" style={{ left: `${yearExpPct}%`, background: "rgba(255,255,255,0.45)" }} />
                       </div>
                     </div>
-                    <div className="grid grid-cols-4 gap-0 divide-x divide-slate-100 px-4 pb-3 pt-1">
+                    <div className="grid grid-cols-4 gap-0 divide-x divide-white/10 px-4 pb-3 pt-1">
                       <div className="text-center pr-2">
-                        <div className="text-sm font-black" style={{ color: d.color }}>{pct}%</div>
-                        <div className="text-[10px] text-slate-400">Hoàn thành</div>
+                        <div className="text-sm font-black" style={{ color: "#f5d060" }}>{pct}%</div>
+                        <div className="text-[10px]" style={{ color: "#9ca3af" }}>Hoàn thành</div>
                       </div>
                       <div className="text-center px-2">
-                        <div className="text-sm font-bold text-slate-700">{d.current}T</div>
-                        <div className="text-[10px] text-slate-400">Thực tế</div>
+                        <div className="text-sm font-bold" style={{ color: "#e5e7eb" }}>{d.current}T</div>
+                        <div className="text-[10px]" style={{ color: "#9ca3af" }}>Thực tế</div>
                       </div>
                       <div className="text-center px-2">
-                        <div className="text-sm font-bold text-slate-600">{forecast}T</div>
-                        <div className="text-[10px] text-slate-400">Dự báo / năm</div>
+                        <div className="text-sm font-bold" style={{ color: "#e5e7eb" }}>{forecast}T</div>
+                        <div className="text-[10px]" style={{ color: "#9ca3af" }}>Dự báo / năm</div>
                       </div>
                       <div className="text-center pl-2">
-                        <div className="text-sm font-bold text-rose-500">{monthlyNeed}T</div>
-                        <div className="text-[10px] text-slate-400">Cần/tháng</div>
+                        <div className="text-sm font-bold" style={{ color: "#d6b14b" }}>{monthlyNeed}T</div>
+                        <div className="text-[10px]" style={{ color: "#9ca3af" }}>Cần/tháng</div>
                       </div>
                     </div>
                   </div>
@@ -1067,37 +1124,43 @@ export default function DashboardPage() {
         return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setMemberModalOpen(false)}>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-              <div>
-                <h2 className="font-bold text-slate-800 text-lg">👥 Thành Viên Nền Tảng</h2>
-                <p className="text-xs text-slate-400 mt-0.5">12,400 / 100,000 · Năm đã qua {yearExpPct}% · 5 nền tảng</p>
+          <div className="relative backdrop-blur-md rounded-2xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden" style={modalFrameStyle} onClick={e => e.stopPropagation()}>
+            <div className="relative flex items-center justify-center px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.10)" }}>
+              <div className="text-center">
+                <h2 className="font-bold text-white text-lg">THÀNH VIÊN NỀN TẢNG</h2>
+                <p className="text-xs mt-0.5" style={{ color: "#9ca3af" }}>12,400 / 100,000 · Năm đã qua {yearExpPct}% · 5 nền tảng</p>
               </div>
-              <button onClick={() => setMemberModalOpen(false)} className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 text-lg">✕</button>
+              <button
+                onClick={() => setMemberModalOpen(false)}
+                className="absolute right-6 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-sm"
+                style={{ color: "#9ca3af" }}
+              >
+                ✕
+              </button>
             </div>
             <div className="overflow-y-auto p-6 space-y-4">
               {/* Total summary */}
-              <div className="rounded-2xl p-4 border border-indigo-100" style={{ background: "linear-gradient(135deg,#eef2ff,#f5f3ff)" }}>
+              <div className="rounded-2xl p-4" style={modalCardStyle}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-bold text-slate-700">🌐 Toàn hệ sinh thái</span>
-                  <span className="text-sm font-black text-indigo-600">{totalPct}%</span>
+                  <span className="text-sm font-bold" style={{ color: "#f5d060" }}>Toàn hệ sinh thái</span>
+                  <span className="text-sm font-black" style={{ color: "#f5d060" }}>{totalPct}%</span>
                 </div>
-                <div className="relative h-4 bg-white/70 rounded-full overflow-hidden mb-2">
-                  <div className="h-4 rounded-full" style={{ width: `${totalPct}%`, background: "linear-gradient(90deg,#818cf8,#6366f1)" }} />
-                  <div className="absolute top-0 bottom-0 w-0.5 bg-slate-400/70" style={{ left: `${yearExpPct}%` }} />
+                <div className="relative h-4 rounded-full overflow-hidden mb-2" style={{ background: "rgba(255,255,255,0.10)" }}>
+                  <div className="h-4 rounded-full" style={{ width: `${totalPct}%`, background: accentGradient }} />
+                  <div className="absolute top-0 bottom-0 w-0.5" style={{ left: `${yearExpPct}%`, background: "rgba(255,255,255,0.45)" }} />
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="rounded-xl bg-white/80 py-2">
-                    <div className="text-sm font-black text-indigo-600">12,400</div>
-                    <div className="text-[10px] text-slate-400">Thực tế</div>
+                  <div className="rounded-xl py-2" style={modalPanelStyle}>
+                    <div className="text-sm font-black" style={{ color: "#f5d060" }}>12,400</div>
+                    <div className="text-[10px]" style={{ color: "#9ca3af" }}>Thực tế</div>
                   </div>
-                  <div className="rounded-xl bg-white/80 py-2">
-                    <div className="text-sm font-black text-slate-600">{totalForecast.toLocaleString()}</div>
-                    <div className="text-[10px] text-slate-400">Dự báo cuối năm</div>
+                  <div className="rounded-xl py-2" style={modalPanelStyle}>
+                    <div className="text-sm font-black" style={{ color: "#e5e7eb" }}>{totalForecast.toLocaleString()}</div>
+                    <div className="text-[10px]" style={{ color: "#9ca3af" }}>Dự báo cuối năm</div>
                   </div>
-                  <div className="rounded-xl bg-white/80 py-2">
-                    <div className="text-sm font-black text-rose-500">{totalMonthlyNeed.toLocaleString()}</div>
-                    <div className="text-[10px] text-slate-400">Cần thêm/tháng</div>
+                  <div className="rounded-xl py-2" style={modalPanelStyle}>
+                    <div className="text-sm font-black" style={{ color: "#d6b14b" }}>{totalMonthlyNeed.toLocaleString()}</div>
+                    <div className="text-[10px]" style={{ color: "#9ca3af" }}>Cần thêm/tháng</div>
                   </div>
                 </div>
               </div>
@@ -1106,53 +1169,58 @@ export default function DashboardPage() {
                 const pct = Math.round(p.current / p.target * 100);
                 const sharePct = Math.round(p.current / totalCurrent * 100);
                 const ratio = yearExpPct > 0 ? pct / yearExpPct : 1;
-                const health = ratio >= 0.8 ? { icon: "🟢", label: "Đúng tiến độ", c: "#10b981", bg: "#f0fdf4" }
-                             : ratio >= 0.5 ? { icon: "🟡", label: "Hơi chậm",     c: "#f59e0b", bg: "#fffbeb" }
-                             :                { icon: "🔴", label: "Chưa đạt",     c: "#ef4444", bg: "#fef2f2" };
+                const health = getModalHealth(ratio);
                 const forecast = yearFrac > 0 ? Math.round(p.current / yearFrac) : 0;
                 const monthlyNeed = monthsLeft > 0 ? Math.round((p.target - p.current) / monthsLeft) : 0;
                 return (
-                  <div key={p.name} className="rounded-2xl border overflow-hidden" style={{ borderColor: `${p.color}30` }}>
-                    <div className="flex items-center gap-3 px-4 py-3" style={{ background: `${p.color}0d` }}>
-                      <span className="text-2xl">{p.icon}</span>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-bold text-slate-800">{p.name}</span>
-                          <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: health.bg, color: health.c }}>{health.icon} {health.label}</span>
-                        </div>
-                        <p className="text-[11px] text-slate-400 mt-0.5">{p.desc}</p>
+                  <div key={p.name} className="rounded-2xl border overflow-hidden" style={modalCardStyle}>
+                    <div className="px-4 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-sm font-bold" style={{ color: "#ffffff" }}>{p.name}</span>
+                        <span
+                          className="text-xs font-bold px-2 py-0.5 rounded-full border"
+                          style={{ background: health.bg, color: health.color, borderColor: health.border }}
+                        >
+                          {health.label}
+                        </span>
                       </div>
+                      <p className="text-[11px] mt-0.5" style={{ color: "#9ca3af" }}>{p.desc}</p>
                     </div>
                     {/* Progress bar */}
                     <div className="px-4 pt-3 pb-1">
-                      <div className="relative h-3 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: `${Math.min(pct,100)}%`, background: `linear-gradient(90deg,${p.color}70,${p.color})` }} />
-                        <div className="absolute top-0 bottom-0 w-0.5 bg-slate-400/60" style={{ left: `${yearExpPct}%` }} />
+                      <div className="relative h-3 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.10)" }}>
+                        <div className="absolute left-0 top-0 h-full rounded-full" style={{ width: `${Math.min(pct,100)}%`, background: accentGradient }} />
+                        <div className="absolute top-0 bottom-0 w-0.5" style={{ left: `${yearExpPct}%`, background: "rgba(255,255,255,0.45)" }} />
                       </div>
                     </div>
                     {/* Stats grid */}
-                    <div className="grid grid-cols-4 gap-0 divide-x divide-slate-100 px-4 pb-3 pt-1">
+                    <div className="grid grid-cols-4 gap-0 divide-x divide-white/10 px-4 pb-3 pt-1">
                       <div className="text-center pr-2">
-                        <div className="text-sm font-black" style={{ color: p.color }}>{pct}%</div>
-                        <div className="text-[10px] text-slate-400">Mục tiêu</div>
+                        <div className="text-sm font-black" style={{ color: "#f5d060" }}>{pct}%</div>
+                        <div className="text-[10px]" style={{ color: "#9ca3af" }}>Mục tiêu</div>
                       </div>
                       <div className="text-center px-2">
-                        <div className="text-sm font-bold text-slate-700">{p.current.toLocaleString()}</div>
-                        <div className="text-[10px] text-slate-400">Thực tế</div>
+                        <div className="text-sm font-bold" style={{ color: "#e5e7eb" }}>{p.current.toLocaleString()}</div>
+                        <div className="text-[10px]" style={{ color: "#9ca3af" }}>Thực tế</div>
                       </div>
                       <div className="text-center px-2">
-                        <div className="text-sm font-bold text-slate-600">{p.monthlyNew.toLocaleString()}</div>
-                        <div className="text-[10px] text-slate-400">Mới/tháng</div>
+                        <div className="text-sm font-bold" style={{ color: "#e5e7eb" }}>{p.monthlyNew.toLocaleString()}</div>
+                        <div className="text-[10px]" style={{ color: "#9ca3af" }}>Mới/tháng</div>
                       </div>
                       <div className="text-center pl-2">
-                        <div className="text-sm font-bold text-rose-500">{monthlyNeed.toLocaleString()}</div>
-                        <div className="text-[10px] text-slate-400">Cần/tháng</div>
+                        <div className="text-sm font-bold" style={{ color: "#d6b14b" }}>{monthlyNeed.toLocaleString()}</div>
+                        <div className="text-[10px]" style={{ color: "#9ca3af" }}>Cần/tháng</div>
                       </div>
                     </div>
                     {/* Share badge */}
                     <div className="px-4 pb-3">
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full text-white" style={{ background: p.color }}>{sharePct}% tổng thành viên</span>
-                      <span className="text-[11px] text-slate-400 ml-2">Dự báo cuối năm: <b className="text-slate-600">{forecast.toLocaleString()}</b></span>
+                      <span
+                        className="text-[10px] font-bold px-2.5 py-1 rounded-full border"
+                        style={{ color: "#f5d060", background: "rgba(201,162,39,0.16)", borderColor: "rgba(245,208,96,0.30)" }}
+                      >
+                        {sharePct}% tổng thành viên
+                      </span>
+                      <span className="text-[11px] ml-2" style={{ color: "#9ca3af" }}>Dự báo cuối năm: <b style={{ color: "#d4d4d8" }}>{forecast.toLocaleString()}</b></span>
                     </div>
                   </div>
                 );

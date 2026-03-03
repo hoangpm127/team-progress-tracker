@@ -7,13 +7,13 @@ import { useApp } from "@/lib/AppContext";
 // ─────────────────────────────────────────────────────────────
 type ZoneId = "tech"|"hr"|"mkt"|"heaven"|"partnerships"|"market"|"assistant"|"piano";
 const ZONE_META: Record<ZoneId,{icon:string;title:string;color:string;border:string;subtitle:string;teamId:string|null}> = {
-  tech:         {icon:"⚙️", title:"Công nghệ",  color:"#888888",border:"#aaaaaa",subtitle:"Thân cây — Technology Core",        teamId:"tech"},
-  hr:           {icon:"👥", title:"Nhân sự",    color:"#cccccc",border:"#dddddd",subtitle:"Rễ cây — Human Resources",          teamId:"hr"},
-  mkt:          {icon:"📣", title:"Marketing",  color:"#999999",border:"#aaaaaa",subtitle:"Mây trái — Quảng bá & Thương hiệu", teamId:"mkt"},
+  tech:         {icon:"⚙️", title:"Công Nghệ",  color:"#888888",border:"#aaaaaa",subtitle:"Thân cây — Technology Core",        teamId:"tech"},
+  hr:           {icon:"👥", title:"Nhân Lực",    color:"#cccccc",border:"#dddddd",subtitle:"Rễ cây — Human Resources",          teamId:"hr"},
+  mkt:          {icon:"📣", title:"Chuyển Đổi",  color:"#999999",border:"#aaaaaa",subtitle:"Mây trái — Quảng bá & Thương hiệu", teamId:"mkt"},
   heaven:       {icon:"🌦", title:"Thiên thời", color:"#888888",border:"#aaaaaa",subtitle:"Mây phải — Cơ hội & Thời điểm",    teamId:null},
-  partnerships: {icon:"🤝", title:"Hợp tác",    color:"#aaaaaa",border:"#bbbbbb",subtitle:"Cỏ xanh — 4 nhóm đối tác",         teamId:"partnerships"},
+  partnerships: {icon:"🤝", title:"Đối Tác",    color:"#aaaaaa",border:"#bbbbbb",subtitle:"Cỏ xanh — 4 nhóm đối tác",         teamId:"partnerships"},
   market:       {icon:"🌍", title:"Thị trường", color:"#888888",border:"#aaaaaa",subtitle:"Đất — Bối cảnh kinh doanh",         teamId:null},
-  assistant:    {icon:"📋", title:"Hành chính", color:"#aaaaaa",border:"#bbbbbb",subtitle:"Nhánh phải — BOD / Admin",          teamId:"assistant"},
+  assistant:    {icon:"📋", title:"Trợ Lý", color:"#aaaaaa",border:"#bbbbbb",subtitle:"Nhánh phải — BOD / Admin",          teamId:"assistant"},
   piano:        {icon:"🎹", title:"Piano",      color:"#999999",border:"#aaaaaa",subtitle:"Nhánh trái — Piano Division",       teamId:"piano"},
 };
 
@@ -562,7 +562,7 @@ export default function TreeCanvas(){
             style={{animationDelay:wl.d,animationDuration:wl.dr}}/>
         ))}
 
-        {/* ── LEFT CLOUD — Marketing — wispy, smaller ─────── */}
+        {/* ── LEFT CLOUD — Chuyển Đổi — wispy, smaller ─────── */}
         <g className="cl" style={{cursor:"pointer"}} onClick={e=>openZone("mkt",e)}>
           <ellipse cx="146" cy="102" rx="82" ry="48" fill="rgba(255,255,255,.10)" filter="url(#cloudBlur)"/>
           <circle cx="134" cy="110" r="36" fill="rgba(255,255,255,.95)"/>
@@ -580,7 +580,7 @@ export default function TreeCanvas(){
             fill={hovered==="mkt"?"rgba(255,255,255,0.22)":"rgba(160,160,160,0.13)"}
             stroke={hovered==="mkt"?"rgba(255,255,255,0.45)":"#aaaaaa"} strokeWidth="1.5" style={{pointerEvents:"none"}}/>
           <text x={88} y={hovered==="mkt"?181:172} textAnchor="middle" fontSize="14" style={{pointerEvents:"none"}}>📣</text>
-          <text x="109" y="163" textAnchor="start" fill="white" fontSize="11" fontWeight="800" style={{pointerEvents:"none"}}>Marketing</text>
+          <text x="109" y="163" textAnchor="start" fill="white" fontSize="11" fontWeight="800" style={{pointerEvents:"none"}}>Chuyển Đổi</text>
           <text x="109" y="177" textAnchor="start" fill={hovered==="mkt"?"white":"#aaaaaa"} fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>{mktP}% · {healthOf(mktP).dot} {healthOf(mktP).label}</text>
           {hovered==="mkt"&&<text x="109" y="192" textAnchor="start" fill="rgba(255,255,255,.85)" fontSize="9" style={{pointerEvents:"none"}}>✅ {mktS.done}/{mktS.total} việc</text>}
           <rect x="22" y="42" width="248" height="158" rx="12" fill="transparent"
@@ -702,7 +702,7 @@ export default function TreeCanvas(){
             fill={hovered==="hr"?"rgba(255,255,255,0.22)":"rgba(150,150,150,0.13)"}
             stroke={hovered==="hr"?"rgba(255,255,255,0.45)":"#aaaaaa"} strokeWidth="1.5"/>
           <text x={TX-70} y={GY+50+(hovered==="hr"?33:24)} textAnchor="middle" fontSize="14">👥</text>
-          <text x={TX-49} y={GY+65} textAnchor="start" fill="white" fontSize="11" fontWeight="800">Nhân Sự (Rễ)</text>
+          <text x={TX-49} y={GY+65} textAnchor="start" fill="white" fontSize="11" fontWeight="800">Nhân Lực (Rễ)</text>
           <text x={TX-49} y={GY+79} textAnchor="start" fill={hovered==="hr"?"white":"#aaaaaa"} fontSize="10" fontWeight="700">{hrP}% · {healthOf(hrP).dot} {healthOf(hrP).label}</text>
           {hovered==="hr"&&<text x={TX-49} y={GY+96} textAnchor="start" fill="rgba(255,255,255,.85)" fontSize="9">✅ {hrS.done}/{hrS.total} hoàn thành</text>}
           {/* transparent hit band */}
@@ -732,7 +732,7 @@ export default function TreeCanvas(){
         </g>
         {/* grass label */}
         <text x={VW/2} y={GY-7} textAnchor="middle" fill="rgba(18,80,18,.75)" fontSize="10" fontWeight="700" style={{pointerEvents:"none"}}>
-          Hợp Tác · {partP}% · {partS.done}/{partS.total} việc · {healthOf(partP).dot} {healthOf(partP).label}
+          Đối Tác · {partP}% · {partS.done}/{partS.total} việc · {healthOf(partP).dot} {healthOf(partP).label}
         </text>
 
         {/* ── CANOPY LABELS (on top of everything) ────────────── */}
@@ -741,7 +741,7 @@ export default function TreeCanvas(){
           hovered={hovered==="piano"} done={pianoS.done} total={pianoS.total}
           onClick={e=>openZone("piano",e)} onEnter={()=>setHovered("piano")} onLeave={()=>setHovered(null)}/>
 
-        <CanopyLabel cx={ASST_CX} cy={ASST_CY} r={asstR} icon="📋" title="Hành Chính"
+        <CanopyLabel cx={ASST_CX} cy={ASST_CY} r={asstR} icon="📋" title="Trợ Lý"
           prog={asstP} color="#aaaaaa" teamId="assistant"
           hovered={hovered==="assistant"} done={asstS.done} total={asstS.total}
           onClick={e=>openZone("assistant",e)} onEnter={()=>setHovered("assistant")} onLeave={()=>setHovered(null)}/>

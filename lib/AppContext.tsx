@@ -69,6 +69,33 @@ interface AppContextValue extends AppState {
 const DEFAULT_MARKET: Market = { marketIndex: 55, notes: "", updatedAt: "" };
 const DEFAULT_HEAVEN: HeavenTiming = { heavenTimingIndex: 60, rainEnabled: true, updatedAt: "" };
 
+const TEAM_NAME_RENAMES: Record<string, string> = {
+  "Công nghệ": "Công Nghệ",
+  "Nhân sự": "Nhân Lực",
+  "Nhân Sự": "Nhân Lực",
+  "Marketing": "Chuyển Đổi",
+  "Hợp tác": "Đối Tác",
+  "Hợp Tác": "Đối Tác",
+  "Hành chính": "Trợ Lý",
+  "Hành Chính": "Trợ Lý",
+};
+
+function normalizeTeamName(name: string): string {
+  return TEAM_NAME_RENAMES[name] ?? name;
+}
+
+function normalizeDisplayLabel(label: string): string {
+  return label
+    .replaceAll("Công nghệ", "Công Nghệ")
+    .replaceAll("Nhân Sự", "Nhân Lực")
+    .replaceAll("Nhân sự", "Nhân Lực")
+    .replaceAll("Marketing", "Chuyển Đổi")
+    .replaceAll("Hợp Tác", "Đối Tác")
+    .replaceAll("Hợp tác", "Đối Tác")
+    .replaceAll("Hành Chính", "Trợ Lý")
+    .replaceAll("Hành chính", "Trợ Lý");
+}
+
 const AppContext = createContext<AppContextValue | null>(null);
 
 const INITIAL_STATE: AppState = {
@@ -93,7 +120,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [leaderTeamId, setLeaderTeamId] = useState("");
 
   const setAuth = useCallback((r: Role, name: string, teamId: string) => {
-    setRole(r); setRoleName(name); setLeaderTeamId(teamId);
+    setRole(r); setRoleName(normalizeDisplayLabel(name)); setLeaderTeamId(teamId);
   }, []);
 
   const logoutAuth = useCallback(() => {
@@ -121,8 +148,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           fetchHeavenTiming(),
         ]);
         if (cancelled) return;
+        const normalizedTeams = (teams.length ? teams : TEAMS).map((team) => ({
+          ...team,
+          name: normalizeTeamName(team.name),
+        }));
         setState({
-          teams:        teams.length      ? teams      : TEAMS,
+          teams:        normalizedTeams,
           tasks:        tasks.length      ? tasks      : SEED_TASKS,
           objectives:   objectives.length ? objectives : SEED_OBJECTIVES,
           activity,

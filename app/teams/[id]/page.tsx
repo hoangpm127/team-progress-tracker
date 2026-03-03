@@ -2,7 +2,6 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
 import { useApp } from "@/lib/AppContext";
-import ProgressBar from "@/components/ProgressBar";
 import StatusBadge from "@/components/StatusBadge";
 import AddTaskModal from "@/components/AddTaskModal";
 import ActivityLog from "@/components/ActivityLog";
@@ -17,6 +16,42 @@ const FILTER_LABELS: Record<Filter, string> = {
   Todo: "Chờ làm",
   Doing: "Đang làm",
   Done: "Hoàn thành",
+};
+
+const HEADER_COLOR_BY_TEAM: Record<string, string> = {
+  tech: "#ef4444",
+  hr: "#f97316",
+  mkt: "#eab308",
+  partnerships: "#22c55e",
+  assistant: "#3b82f6",
+  piano: "#8b5cf6",
+};
+
+const HEADER_PROGRESS_STYLE_BY_TEAM: Record<string, { fill: string; glow: string }> = {
+  tech: {
+    fill: "linear-gradient(90deg, #7f1d1d 0%, #ef4444 55%, #f87171 100%)",
+    glow: "0 0 12px rgba(239,68,68,0.55)",
+  },
+  hr: {
+    fill: "linear-gradient(90deg, #7c2d12 0%, #f97316 55%, #fb923c 100%)",
+    glow: "0 0 12px rgba(249,115,22,0.55)",
+  },
+  mkt: {
+    fill: "linear-gradient(90deg, #713f12 0%, #eab308 55%, #facc15 100%)",
+    glow: "0 0 12px rgba(234,179,8,0.55)",
+  },
+  partnerships: {
+    fill: "linear-gradient(90deg, #14532d 0%, #22c55e 55%, #4ade80 100%)",
+    glow: "0 0 12px rgba(34,197,94,0.55)",
+  },
+  assistant: {
+    fill: "linear-gradient(90deg, #1e3a8a 0%, #3b82f6 55%, #60a5fa 100%)",
+    glow: "0 0 12px rgba(59,130,246,0.55)",
+  },
+  piano: {
+    fill: "linear-gradient(90deg, #581c87 0%, #8b5cf6 55%, #a78bfa 100%)",
+    glow: "0 0 12px rgba(139,92,246,0.55)",
+  },
 };
 
 export default function TeamDetailPage() {
@@ -89,6 +124,12 @@ export default function TeamDetailPage() {
     );
   }
 
+  const headerColor = HEADER_COLOR_BY_TEAM[team.id] ?? team.color;
+  const headerProgressStyle = HEADER_PROGRESS_STYLE_BY_TEAM[team.id] ?? {
+    fill: "linear-gradient(90deg, #8b6108 0%, #c9a227 35%, #f5d060 72%, #fff4b8 100%)",
+    glow: "0 0 12px rgba(245,208,96,0.5)",
+  };
+
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
       {/* Navigation buttons */}
@@ -104,33 +145,47 @@ export default function TeamDetailPage() {
           Tổng quan
         </button>
       </div>
-
       {/* Team header card */}
       <div
-        className="rounded-2xl p-6 mb-6 text-white shadow-lg"
+        className="rounded-2xl px-4 py-4 mb-6 text-white border shadow-lg"
         style={{
-          background: `linear-gradient(135deg, ${team.color}ee, ${team.color}99)`,
+          background: `linear-gradient(135deg, ${headerColor}38, ${headerColor}1f)`,
+          borderColor: `${headerColor}88`,
+          boxShadow: `0 10px 24px -12px ${headerColor}aa`,
         }}
       >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold mb-1 text-center">{team.name}</h1>
-            <p className="text-white/70 text-sm">{allTasks.length} công việc · {allTasks.filter((t) => t.done).length} hoàn thành</p>
+        <div className="text-center">
+          <h1 className="text-2xl font-black tracking-wide">{team.name}</h1>
+          {lastUpdated && (
+            <p className="text-white/70 text-xs mt-1">
+              {"C\u1eadp nh\u1eadt l\u00fac"}{" "}
+              {new Date(lastUpdated).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}{" "}
+              {"ng\u00e0y"} {new Date(lastUpdated).toLocaleDateString("vi-VN")}
+            </p>
+          )}
+        </div>
+
+        <div className="mt-3">
+          <div className="text-center mb-2">
+            <span className="text-4xl font-extrabold leading-none text-white">{progress}%</span>
           </div>
-          <div className="flex flex-col items-end gap-2 sm:w-72 w-full">
-            <span className="text-4xl font-extrabold">{progress}%</span>
-            <div className="w-full">
-              <ProgressBar value={progress} color="rgba(255,255,255,0.9)" size="lg" />
-            </div>
+          <div
+            className="relative h-2.5 rounded-full overflow-visible"
+            style={{ background: "rgba(255,255,255,0.14)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.10)" }}
+          >
+            <div
+                className="absolute left-0 top-0 h-full rounded-full"
+                style={{
+                  width: `${progress}%`,
+                  background: headerProgressStyle.fill,
+                  boxShadow: progress > 5 ? headerProgressStyle.glow : "none",
+                }}
+              />
+            {[25, 50, 75].map((mark) => (
+              <div key={mark} className="absolute top-0 bottom-0 w-px bg-white/50" style={{ left: `${mark}%` }} />
+            ))}
           </div>
         </div>
-        {lastUpdated && (
-          <p className="text-white/50 text-xs mt-4">
-            Cập nhật lúc{" "}
-            {new Date(lastUpdated).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}{" "}
-            ngày {new Date(lastUpdated).toLocaleDateString("vi-VN")}
-          </p>
-        )}
       </div>
 
       {/* Weight warning */}

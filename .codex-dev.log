@@ -1,0 +1,40 @@
+
+> team-progress-tracker@0.1.0 dev
+> next dev --port 3000
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://172.16.40.162:3000
+- Environments: .env.local
+
+✓ Starting...
+Creating turbopack project { dir: 'D:\\CRM WEB\\CRM WEB\\team-progress-tracker', testMode: true }
+✓ Ready in 966ms
+ GET / 200 in 537ms (compile: 284ms, render: 253ms)
+ GET /api/ai-analysis 200 in 320ms (compile: 88ms, render: 233ms)
+ GET / 200 in 50ms (compile: 4ms, render: 46ms)
+ GET / 200 in 67ms (compile: 9ms, render: 58ms)
+ GET /api/ai-analysis 502 in 119ms (compile: 4ms, render: 115ms)
+ POST /api/auth/verify 200 in 266ms (compile: 200ms, render: 67ms)
+ GET / 200 in 256ms (compile: 21ms, render: 234ms)
+ GET /api/ai-analysis 502 in 58ms (compile: 8ms, render: 50ms)
+ GET /teams/partnerships 200 in 1933ms (compile: 1843ms, render: 90ms)
+ GET /teams/partnerships 200 in 351ms (compile: 41ms, render: 310ms)
+ GET / 200 in 85ms (compile: 20ms, render: 65ms)
+ GET /teams/tech 200 in 127ms (compile: 32ms, render: 96ms)
+ GET / 200 in 77ms (compile: 8ms, render: 69ms)
+ GET /teams/assistant 200 in 128ms (compile: 34ms, render: 94ms)
+ GET / 200 in 55ms (compile: 7ms, render: 48ms)
+ GET /api/ai-analysis 200 in 12.6s (compile: 15ms, render: 12.6s)
+ GET /api/ai-analysis 200 in 199ms (compile: 6ms, render: 193ms)
+ GET /api/ai-analysis 200 in 203ms (compile: 12ms, render: 191ms)
+ GET /api/ai-analysis 200 in 204ms (compile: 6ms, render: 198ms)
+ GET /api/ai-analysis 200 in 180ms (compile: 8ms, render: 172ms)
+ GET /api/ai-analysis 200 in 174ms (compile: 9ms, render: 166ms)
+ POST /api/auth/verify 200 in 424ms (compile: 4ms, render: 420ms)
+ GET /teams/tech 200 in 86ms (compile: 25ms, render: 61ms)
+ GET /teams 200 in 480ms (compile: 375ms, render: 106ms)
+ GET /okr 200 in 289ms (compile: 226ms, render: 63ms)
+ GET / 200 in 72ms (compile: 13ms, render: 60ms)
+ GET /api/ai-analysis 200 in 943ms (compile: 4ms, render: 939ms)
+ GET /api/ai-analysis 200 in 394ms (compile: 11ms, render: 383ms)

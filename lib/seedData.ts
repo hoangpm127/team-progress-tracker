@@ -13,11 +13,11 @@ function daysAgo(days: number): string {
 }
 
 export const TEAMS: Team[] = [
-  { id: "tech", name: "Công nghệ", color: "#6366f1" },
-  { id: "mkt", name: "Marketing", color: "#ec4899" },
-  { id: "hr", name: "Nhân sự", color: "#f59e0b" },
-  { id: "partnerships", name: "Hợp tác", color: "#10b981" },
-  { id: "assistant", name: "Hành chính", color: "#3b82f6" },
+  { id: "tech", name: "Công Nghệ", color: "#6366f1" },
+  { id: "mkt", name: "Chuyển Đổi", color: "#ec4899" },
+  { id: "hr", name: "Nhân Lực", color: "#f59e0b" },
+  { id: "partnerships", name: "Đối Tác", color: "#10b981" },
+  { id: "assistant", name: "Trợ Lý", color: "#3b82f6" },
   { id: "piano", name: "Piano", color: "#8b5cf6" },
 ];
 
@@ -104,7 +104,7 @@ export const SEED_OBJECTIVES: Objective[] = [
     ],
   },
 
-  // ── Marketing ─────────────────────────────────────────────────
+  // ── Chuyển Đổi ─────────────────────────────────────────────────
   {
     id: "obj-mkt1",
     teamId: "mkt",
@@ -159,7 +159,7 @@ export const SEED_OBJECTIVES: Objective[] = [
     keyResults: [
       { id: "kr-p1-1", title: "Ký kết 5 MOU mới với đối tác tiềm năng", current: 3, target: 5, unit: "MOU" },
       { id: "kr-p1-2", title: "Tăng doanh thu từ kênh đối tác lên 20%", current: 12, target: 20, unit: "%" },
-      { id: "kr-p1-3", title: "Tổ chức 3 sự kiện co-marketing", current: 1, target: 3, unit: "sự kiện" },
+      { id: "kr-p1-3", title: "Tổ chức 3 sự kiện đồng thương hiệu", current: 1, target: 3, unit: "sự kiện" },
     ],
   },
 

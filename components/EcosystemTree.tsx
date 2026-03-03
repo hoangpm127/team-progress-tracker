@@ -44,7 +44,7 @@ const LAYERS: LayerDef[] = [
     pct: "0.1%",
     color: "#999999",
     shape: { type: "rect", x: 58, y: 98, w: 268, h: 188, rx: 30 },
-    tooltip: "Gió — Marketing, luồng lực đẩy thương hiệu ra thị trường",
+    tooltip: "Gió — Chuyển Đổi, luồng lực đẩy thương hiệu ra thị trường",
   },
 
   // ── 3. Mưa (phải — vùng hạt mưa rơi) ────────────────────────────
@@ -81,7 +81,7 @@ const LAYERS: LayerDef[] = [
       // Rễ trái + rễ phải + rễ trung tâm thẳng đứng
       d: "M424,468 Q382,464 336,472 Q284,482 252,496 Q225,510 230,522 Q240,528 262,522 Q294,512 342,502 Q388,492 426,490 Z M476,468 Q518,464 564,472 Q616,482 648,496 Q675,510 670,522 Q660,528 638,522 Q606,512 558,502 Q512,492 474,490 Z M448,468 L448,526 L452,526 L452,468 Z",
     },
-    tooltip: "Rễ cây — Personnel System, nền tảng nhân sự HR của tổ chức",
+    tooltip: "Rễ cây — Personnel System, nền tảng nhân lực HR của tổ chức",
   },
 
   // ── 6. Cỏ & hoa lá dưới mặt đất (grass / ground cover) ──────────
