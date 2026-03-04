@@ -477,7 +477,7 @@ function EquityWheel() {
         <circle cx={cx} cy={cy} r={innerR - 18} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="3 6" />
         <text x={cx} y={cy - 16} textAnchor="middle" fontSize={8.5} fill="#aaaaaa" fontWeight={700} letterSpacing="0.12em">MỤC TIÊU</text>
         <text x={cx} y={cy + 12} textAnchor="middle" fontSize={30} fontWeight={800} fill="#ffffff">3,5</text>
-        <text x={cx} y={cy + 28} textAnchor="middle" fontSize={9.5} fill="#aaaaaa">T USD</text>
+        <text x={cx} y={cy + 28} textAnchor="middle" fontSize={9.5} fill="#aaaaaa">Tỷ USD</text>
       </svg>
     </div>
   );

@@ -136,20 +136,20 @@ const PARTNER_CATS = [
 
 // ─── GMV OKR by division ──────────────────────────────────────────────────────
 const GMV_DIVISIONS = [
-  { name: "Chuyển Đổi / Thương mại", icon: "📣", color: "#ec4899", current: 3.2, target: 20, note: "GMV từ kênh chuyển đổi & TMĐT" },
-  { name: "Công Nghệ",              icon: "⚙️", color: "#6366f1", current: 2.1, target: 15, note: "GMV từ nền tảng & API marketplace" },
-  { name: "Đối Tác",      icon: "🤝", color: "#10b981", current: 1.8, target: 8,  note: "GMV từ mạng lưới đối tác chiến lược" },
-  { name: "Piano Division",         icon: "🎹", color: "#8b5cf6", current: 0.7, target: 4,  note: "GMV từ dịch vụ & sản phẩm Piano" },
-  { name: "Trợ Lý / BOD",        icon: "📋", color: "#3b82f6", current: 0.4, target: 3,  note: "GMV từ dịch vụ vận hành & hỗ trợ" },
+  { name: "Xpiano",        icon: "📣", color: "#ec4899", current: 3.2, target: 20, note: "36% tổng GMV" },
+  { name: "Spiano Coffee", icon: "⚙️", color: "#6366f1", current: 2.1, target: 15, note: "16% tổng GMV" },
+  { name: "VN Share",      icon: "🤝", color: "#10b981", current: 1.8, target: 8,  note: "16% tổng GMV" },
+  { name: "Web Diệu Liên", icon: "🎹", color: "#8b5cf6", current: 0.7, target: 4,  note: "4% tổng GMV" },
+  { name: "Space Share",   icon: "📋", color: "#3b82f6", current: 0.4, target: 3,  note: "35% tổng GMV" },
 ];
 
 // ─── Revenue by division ──────────────────────────────────────────────────────
 const REVENUE_DIVISIONS = [
-  { name: "Công Nghệ",              icon: "⚙️", color: "#6366f1", current: 0.50, target: 3.5, note: "License, SaaS, API fee" },
-  { name: "Chuyển Đổi / Thương mại", icon: "📣", color: "#ec4899", current: 0.40, target: 3.0, note: "Hoa hồng, quảng cáo, affiliate" },
-  { name: "Đối Tác",      icon: "🤝", color: "#10b981", current: 0.30, target: 2.0, note: "Revenue share, referral fee" },
-  { name: "Piano Division",         icon: "🎹", color: "#8b5cf6", current: 0.15, target: 1.0, note: "Học phí, dịch vụ âm nhạc" },
-  { name: "Trợ Lý / BOD",        icon: "📋", color: "#3b82f6", current: 0.05, target: 0.5, note: "Dịch vụ vận hành, tư vấn" },
+  { name: "Spiano Coffee",          icon: "⚙️", color: "#6366f1", current: 0.50, target: 3.5, note: "36% tổng doanh thu" },
+  { name: "Xpiano",                 icon: "📣", color: "#ec4899", current: 0.40, target: 3.0, note: "29% tổng doanh thu" },
+  { name: "VN Share",               icon: "🤝", color: "#10b981", current: 0.30, target: 2.0, note: "21% tổng doanh thu" },
+  { name: "Web Diệu Liên",          icon: "🎹", color: "#8b5cf6", current: 0.15, target: 1.0, note: "11% tổng doanh thu" },
+  { name: "Space Share",            icon: "📋", color: "#3b82f6", current: 0.05, target: 0.5, note: "4% tổng doanh thu" },
 ];
 
 // ─── Member distribution by platform ─────────────────────────────────────────
@@ -910,7 +910,7 @@ export default function DashboardPage() {
             <div className="relative flex items-center justify-center px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.10)" }}>
               <div className="text-center">
                 <h2 className="font-bold text-white text-lg">GMV NĂM 2026</h2>
-                <p className="text-xs mt-0.5" style={{ color: "#9ca3af" }}>8.2T / 50T VND · Năm đã qua {yearExpPct}% · OKR 5 mảng</p>
+                <p className="text-xs mt-0.5" style={{ color: "#9ca3af" }}>8.2T / 50T VND · 8 dự án đang triển khai</p>
               </div>
               <button
                 onClick={() => setGmvModalOpen(false)}
@@ -924,7 +924,7 @@ export default function DashboardPage() {
               {/* Total summary */}
               <div className="rounded-2xl p-4" style={modalCardStyle}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-bold" style={{ color: "#f5d060" }}>Tổng Xgroup</span>
+                  <span className="text-sm font-bold" style={{ color: "#f5d060" }}>Xgroup</span>
                   <span className="text-sm font-black" style={{ color: "#f5d060" }}>{totalPct}%</span>
                 </div>
                 <div className="relative h-4 rounded-full overflow-hidden mb-2" style={{ background: "rgba(255,255,255,0.10)" }}>
@@ -1032,7 +1032,7 @@ export default function DashboardPage() {
               {/* Holding total */}
               <div className="rounded-2xl p-4" style={modalCardStyle}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-bold" style={{ color: "#f5d060" }}>Holding (Tổng)</span>
+                  <span className="text-sm font-bold" style={{ color: "#f5d060" }}>Xgroup</span>
                   <span className="text-sm font-black" style={{ color: "#f5d060" }}>{totalPct}%</span>
                 </div>
                 <div className="relative h-4 rounded-full overflow-hidden mb-2" style={{ background: "rgba(255,255,255,0.10)" }}>
@@ -1061,7 +1061,6 @@ export default function DashboardPage() {
                 const health = getModalHealth(ratio);
                 const forecast = yearFrac > 0 ? +(d.current / yearFrac).toFixed(2) : 0;
                 const monthlyNeed = monthsLeft > 0 ? +(( d.target - d.current) / monthsLeft).toFixed(2) : 0;
-                const sharePct = Math.round(d.current / totalCurrent * 100);
                 return (
                   <div key={d.name} className="rounded-2xl border overflow-hidden" style={modalCardStyle}>
                     <div className="px-4 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
@@ -1074,9 +1073,7 @@ export default function DashboardPage() {
                           {health.label}
                         </span>
                       </div>
-                      <p className="text-[11px] mt-0.5" style={{ color: "#9ca3af" }}>
-                        {d.note} · <b style={{ color: "#d4d4d8" }}>{sharePct}%</b> tổng doanh thu
-                      </p>
+                      <p className="text-[11px] mt-0.5" style={{ color: "#9ca3af" }}>{d.note}</p>
                     </div>
                     <div className="px-4 pt-3 pb-1">
                       <div className="relative h-3 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.10)" }}>
